@@ -1,7 +1,6 @@
 #version 330 core
 
 in vec2 fragTexCoord;
-flat in vec3 fragColor;
 
 uniform sampler2D texture1;
 
