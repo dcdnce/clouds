@@ -65,7 +65,7 @@ int	main(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, tex[3]);
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, tex[3]);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glUniform1i(glGetUniformLocation(shader.program, "texture1"), 0);
@@ -111,15 +111,42 @@ int	main(void)
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window))
 	{
+		static int frames = 0;
 		glClearColor(0.3f, 0.49f, 0.66f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//offsets
+		unsigned int offsets[8];
+		int t = frames / 5;
+		offsets[0] = static_cast<unsigned int>(t* 2.5f) << 8;
+		offsets[1] = static_cast<unsigned int>(t * 3.0f);
+		offsets[2] = static_cast<unsigned int>(-t * 3.5f);
+		offsets[3] = static_cast<unsigned int>(t * 4.0f) << 8;
+		offsets[4] = static_cast<unsigned int>(t * 4.5f);
+		offsets[5] = static_cast<unsigned int>(-t * 5.0f);
+		offsets[6] = static_cast<unsigned int>(t * 5.5f) << 8;
+		offsets[7] = static_cast<unsigned int>(-t * 6.0f);
+
+		//composition
+		unsigned char buffer[256*256];
+		for (int i = 0 ; i < 65536 ; i++)
+		{
+			int sum = 0;
+			for (int k = 0 ; k < 8 ; k++)
+			{
+				int index = ((i + offsets[k]) & 0x0000ffff);
+				sum += (tex[k][index] << k);
+			}
+			sum += 128;
+			buffer[i] = sum >> 8;
+		}
 
 		glUseProgram(shader.program);
 		glBindVertexArray(vao);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -128,6 +155,7 @@ int	main(void)
 
         glfwSwapBuffers(clouds.window);
         glfwPollEvents();
+		frames++;
 	}
 
 	return (0);
