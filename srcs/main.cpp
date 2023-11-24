@@ -21,7 +21,7 @@
 #include "Shader.hpp"
 
 
-float Noise(int x, int y, int random);
+void	interpolate(unsigned char * buffer, int step);
 
 int	main(void)
 {
@@ -33,10 +33,14 @@ int	main(void)
 	shader.loadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
 
 	// Noise related
-	float map32[32 * 32];
-	for (size_t i = 0 ; i < 32 ; i++)
-		for (size_t j = 0 ; j < 32 ; j++)
-			map32[i*32+j] = Noise(j, i, 1336);
+	unsigned char tex[8][256*256];
+	// For every octave fill the texture and interpolate
+	for (size_t i = 0 ; i < 8 ; i++)
+	{
+		for (size_t j = 0 ; j < 256*256 ; j++)
+			tex[i][j] = rand()&255;
+		interpolate(tex[i], 1<<i);
+	}
 
 	/* Texture */
 	// Creer et bind texture
@@ -49,7 +53,7 @@ int	main(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 32, 32, 0, GL_RED, GL_FLOAT, map32);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 32, 32, 0, GL_RED, GL_UNSIGNED_BYTE, tex[0]);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glUniform1i(glGetUniformLocation(shader.program, "texture1"), 0);
@@ -117,10 +121,27 @@ int	main(void)
 	return (0);
 }
 
-float Noise(int x, int y, int random)
+void	interpolate(unsigned char * buffer, int step)
 {
-    int n = x + y * 57 + random * 131;
-    n = (n<<13) ^ n;
-    return (1.0f - ( (n * (n * n * 15731 + 789221) +
-            1376312589)&0x7fffffff)* 0.000000000931322574615478515625f);
+	for (size_t y = 0 ; y < 256 ; y += step)
+	{
+		for (size_t x = 0 ; x < 256 ; x += step)
+		{
+			float a = buffer[(y<<8)+x];
+			float b = buffer[(y<<8) + ((x+step)&255)];
+			float c = buffer[(((y+step)&255)<<8) + x];
+			float d = buffer[(((y+step)&255)<<8) + ((x+step)&255)];
+			for (size_t i = 0 ; i < step ; i++)
+			{
+				for (size_t j = 0 ; j < step ; j++)
+				{
+					float xf = (float)i / (float)step;
+					float yf = (float)j / (float)step;
+					xf = xf*xf*(3.f-2.f*xf);
+					yf = yf*yf*(3.f-2.f*yf);
+            		buffer[((y+j)<<8)+(x+i)] = a + xf*(b-a) + yf*(c-a) + xf*yf*(a-b-c+d);
+				}
+			}
+		}
+	}
 }
