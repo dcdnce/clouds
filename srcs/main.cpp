@@ -116,16 +116,16 @@ int	main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//offsets
-		unsigned int offsets[8];
+		int offsets[8];
 		int t = frames / 5;
-		offsets[0] = static_cast<unsigned int>(t* 2.5f) << 8;
-		offsets[1] = static_cast<unsigned int>(t * 3.0f);
-		offsets[2] = static_cast<unsigned int>(-t * 3.5f);
-		offsets[3] = static_cast<unsigned int>(t * 4.0f) << 8;
-		offsets[4] = static_cast<unsigned int>(t * 4.5f);
-		offsets[5] = static_cast<unsigned int>(-t * 5.0f);
-		offsets[6] = static_cast<unsigned int>(t * 5.5f) << 8;
-		offsets[7] = static_cast<unsigned int>(-t * 6.0f);
+		offsets[0] = static_cast<int>(t* 2.5f) << 8;
+		offsets[1] = static_cast<int>(t * 3.0f);
+		offsets[2] = static_cast<int>(-t * 3.5f);
+		offsets[3] = static_cast<int>(t * 4.0f) << 8;
+		offsets[4] = static_cast<int>(t * 4.5f);
+		offsets[5] = static_cast<int>(-t * 5.0f);
+		offsets[6] = static_cast<int>(t * 5.5f) << 8;
+		offsets[7] = static_cast<int>(-t * 6.0f);
 
 		//composition
 		unsigned char buffer[256*256];
