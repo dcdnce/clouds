@@ -38,6 +38,7 @@ void	Engine::_initEvents()
 	glfwSetWindowUserPointer(window, this);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, Engine::mouseCallback);
 	if (glfwRawMouseMotionSupported())
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 

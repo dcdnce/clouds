@@ -1,9 +1,8 @@
 #include "Camera.hpp"
-#include "glm/glm.hpp"
 
 Camera::Camera()
 {
-	position = {0.f, 0.f, 0.f};	
+	position = {0.f, 0.f, 10.f};	
 	up = {0.f, 1.f, 0.f};	
 	front = pfm::vec3(0.0f, 0.0f, -1.0f);
 	movementSpeed = SPEED;
@@ -13,6 +12,15 @@ Camera::Camera()
 	yaw = YAW;
 	pitch = PITCH;
 	_updateCameraVectors();
+}
+
+std::ostream& operator<<(std::ostream & o, Camera const& camera)
+{
+	o << "Camera :" << std::endl;
+	o << "- Position: " << camera.position << std::endl;
+	o << "- Up: " << camera.up << std::endl;
+	o << "- Front: " << camera.front << std::endl;
+	return (o);
 }
 
 pfm::mat4 Camera::getViewMatrix()

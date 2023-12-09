@@ -1,6 +1,7 @@
 SRCS =	srcs/main.cpp \
 		libs/glad/glad.cpp \
 		srcs/Shader.cpp \
+		srcs/Camera.cpp \
 		srcs/Engine/Engine.cpp \
 		srcs/Engine/Engine_Init.cpp \
 

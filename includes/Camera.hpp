@@ -44,3 +44,5 @@ class Camera
 		void processKeyboard(Camera_Movement direction, float deltaTime);
 		void processMouseMovement(float xoffset, float yoffset);
 };
+
+std::ostream& operator<<(std::ostream & o, Camera const& camera);

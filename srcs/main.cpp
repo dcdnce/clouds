@@ -73,10 +73,10 @@ int	main(void)
 
 	GLfloat vertices[] = {
         // Position       // TexCoord
-        -1.0f, -1.0f,     0.0f, 0.0f,
-         1.0f, -1.0f,     1.0f, 0.0f,
-         1.0f,  1.0f,     1.0f, 1.0f,
-        -1.0f,  1.0f,     0.0f, 1.0f
+        -10.0f, -10.0f,     0.0f, 0.0f,
+         10.0f, -10.0f,     1.0f, 0.0f,
+         10.0f,  10.0f,     1.0f, 1.0f,
+        -10.0f,  10.0f,     0.0f, 1.0f
     };
 
 	GLuint indices[] = {
@@ -107,10 +107,16 @@ int	main(void)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	// Set projection matrix
+	shader.setProjMat(
+		pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
+	);
+
 
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window))
 	{
+		clouds.computeDeltaTime();
 		static int frames = 0;
 		glClearColor(0.3f, 0.49f, 0.66f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,6 +146,10 @@ int	main(void)
 			sum += 128;
 			buffer[i] = sum >> 8;
 		}
+
+		// Matrices - model and view
+		shader.setModelMat(pfm::mat4(1.f));
+		shader.setViewMat(clouds.camera.getViewMatrix());
 
 		glUseProgram(shader.program);
 		glBindVertexArray(vao);
