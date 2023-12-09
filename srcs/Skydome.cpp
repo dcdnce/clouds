@@ -37,7 +37,20 @@ void Skydome::fillBuffers(float const& radius, size_t const& numRows, size_t con
 	{
 		for (float heading = 0.f ; heading < 360.f ; heading += headingIncrement)
 		{
-			//todo
+			pfm::vec3 v0 = pfm::sphericalToCartesian(radius, pitch, heading);
+			pfm::vec3 v1 = pfm::sphericalToCartesian(radius, pitch, heading+headingIncrement);
+			pfm::vec3 v2 = pfm::sphericalToCartesian(radius, pitch+pitchIncrement, heading);
+			pfm::vec3 v3 = pfm::sphericalToCartesian(radius, pitch+pitchIncrement, heading+headingIncrement);
+
+			assert(i + 6 <= _numVertices);
+
+			vertices[i++].position = v0;
+			vertices[i++].position = v1;
+			vertices[i++].position = v2;
+
+			vertices[i++].position = v1;
+			vertices[i++].position = v3;
+			vertices[i++].position = v2;
 		}
 	}
 }
