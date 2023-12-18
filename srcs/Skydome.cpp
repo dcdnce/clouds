@@ -1,7 +1,5 @@
 #include "Skydome.hpp"
 #include "pfm/pfm.hpp"
-#include <vector>
-#include "Vertex.hpp"
 
 Skydome::Skydome()
 {}
@@ -16,7 +14,7 @@ void Skydome::fillBuffers(float const& radius, size_t const& numRows, size_t con
 	//minus 1 because of top strip
 	_numVertices = topStripNumVertices + ((numRows - 1) * regularStripNumVertices);
 
-	std::vector<Vertex> vertices(_numVertices);
+	_vertices = std::vector<Vertex>(_numVertices);
 
 	float pitchIncrement = 90.f / static_cast<float>(numRows);
 	float headingIncrement = 360.f / static_cast<float>(numCols);
@@ -27,9 +25,9 @@ void Skydome::fillBuffers(float const& radius, size_t const& numRows, size_t con
 	// Top strip
 	for (float heading = 0.f ; heading < 360.f ; heading += headingIncrement)
 	{
-		vertices[i++].position = pfm::vec3(0.f, radius, 0.f); // apex
-		vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitchIncrement, heading);
-		vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitchIncrement, heading + headingIncrement);
+		_vertices[i++].position = pfm::vec3(0.f, radius, 0.f); // apex
+		_vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitchIncrement, heading);
+		_vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitchIncrement, heading + headingIncrement);
 	}
 
 	//Regular strips
@@ -44,13 +42,59 @@ void Skydome::fillBuffers(float const& radius, size_t const& numRows, size_t con
 
 			assert(i + 6 <= _numVertices);
 
-			vertices[i++].position = v0;
-			vertices[i++].position = v1;
-			vertices[i++].position = v2;
+			_vertices[i++].position = v0;
+			_vertices[i++].position = v1;
+			_vertices[i++].position = v2;
 
-			vertices[i++].position = v1;
-			vertices[i++].position = v3;
-			vertices[i++].position = v2;
+			_vertices[i++].position = v1;
+			_vertices[i++].position = v3;
+			_vertices[i++].position = v2;
 		}
 	}
+
+	for (size_t i = 0 ; i < _vertices.size() ; i++)
+    {
+        _vertices[i].color = {
+            static_cast<float>(rand()%255) / 255.f,
+            static_cast<float>(rand()%255) / 255.f,
+            static_cast<float>(rand()%255) / 255.f
+        };
+    }
+}
+
+void Skydome::sendBuffers()
+{
+	glGenVertexArrays(1, &_VAO);
+	glGenBuffers(1, &_VBO);
+	glBindVertexArray(_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
+	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), _vertices.data(), GL_STATIC_DRAW);
+
+	// Link
+	 /* Position */
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
+        /* Normal */
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, normal)));
+        /* TexCoords */
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, texCoords)));
+        /* Color */
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, color)));
+	
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Skydome::draw()
+{
+	glUseProgram(this->shader.program);
+	glBindVertexArray(_VAO);
+
+	glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
+
+	glUseProgram(0);
+	glBindVertexArray(0);
 }

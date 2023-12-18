@@ -7,6 +7,7 @@
 #include "Engine.hpp"
 #include "Logger.hpp"
 #include "Shader.hpp"
+#include "Skydome.hpp"
 
 void	interpolate(unsigned char * buffer, int step)
 {
@@ -39,76 +40,85 @@ int	main(void)
 {
 	Engine 	clouds;
 	Shader  shader;
+	Skydome skydome;
 
 	// Initialization
 	clouds.init();
 	shader.loadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
+	skydome.shader.loadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
+	skydome.fillBuffers(90.f, 80, 80);
+	skydome.sendBuffers();
 
-	// Noise related
-	unsigned char tex[8][256*256];
-	// For every octave fill the texture and interpolate
-	for (int i = 0 ; i < 8 ; i++)
-	{
-		for (int j = 0 ; j < 256*256 ; j++)
-			tex[i][j] = rand()&255;
-		interpolate(tex[i], 1<<i);
-	}
 
-	/* Texture */
-	// Creer et bind texture
-	glUseProgram(shader.program);
-	GLuint	texID;
-	glGenTextures(1, &texID);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texID);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, tex[3]);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glUniform1i(glGetUniformLocation(shader.program, "texture1"), 0);
-	glUseProgram(0);
+		// Noise related
+		unsigned char tex[8][256*256];
+		// For every octave fill the texture and interpolate
+		for (int i = 0 ; i < 8 ; i++)
+		{
+			for (int j = 0 ; j < 256*256 ; j++)
+				tex[i][j] = rand()&255;
+			interpolate(tex[i], 1<<i);
+		}
 
-	GLfloat vertices[] = {
-        // Position       // TexCoord
-        -10.0f, -10.0f,     0.0f, 0.0f,
-         10.0f, -10.0f,     1.0f, 0.0f,
-         10.0f,  10.0f,     1.0f, 1.0f,
-        -10.0f,  10.0f,     0.0f, 1.0f
-    };
+		/* Texture */
+		// Creer et bind texture
+		glUseProgram(shader.program);
+		GLuint	texID;
+		glGenTextures(1, &texID);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, tex[3]);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glUniform1i(glGetUniformLocation(shader.program, "texture1"), 0);
+		glUseProgram(0);
 
-	GLuint indices[] = {
-		0, 1, 3,
-		1, 2, 3
-	};
+		// Noise panel
+		GLfloat vertices[] = {
+			// Position       // TexCoord
+			-10.0f, -10.0f,     0.0f, 0.0f,
+			10.0f, -10.0f,     1.0f, 0.0f,
+			10.0f,  10.0f,     1.0f, 1.0f,
+			-10.0f,  10.0f,     0.0f, 1.0f
+		};
 
-	/* Buffers */
-	GLuint vao;
-	GLuint vbo;
-	GLuint ebo;
-	// Bind and fill objects
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	// Link the data
-    glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
-	// Unbind
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		GLuint indices[] = {
+			0, 1, 3,
+			1, 2, 3
+		};
+
+		/* Buffers */
+		GLuint vao;
+		GLuint vbo;
+		GLuint ebo;
+		// Bind and fill objects
+		glGenVertexArrays(1, &vao);
+		glGenBuffers(1, &vbo);
+		glGenBuffers(1, &ebo);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		// Link the data
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+		// Unbind
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	// Set projection matrix
 	shader.setProjMat(
+		pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
+	);
+	skydome.shader.setProjMat(
 		pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
 	);
 
@@ -121,47 +131,54 @@ int	main(void)
 		glClearColor(0.3f, 0.49f, 0.66f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//offsets
-		int offsets[8];
-		int t = frames / 5;
-		offsets[0] = static_cast<int>(t* 2.5f) << 8;
-		offsets[1] = static_cast<int>(t * 3.0f);
-		offsets[2] = static_cast<int>(-t * 3.5f);
-		offsets[3] = static_cast<int>(t * 4.0f) << 8;
-		offsets[4] = static_cast<int>(t * 4.5f);
-		offsets[5] = static_cast<int>(-t * 5.0f);
-		offsets[6] = static_cast<int>(t * 5.5f) << 8;
-		offsets[7] = static_cast<int>(-t * 6.0f);
+			//offsets
+			int offsets[8];
+			int t = frames / 5;
+			offsets[0] = static_cast<int>(t* 2.5f) << 8;
+			offsets[1] = static_cast<int>(t * 3.0f);
+			offsets[2] = static_cast<int>(-t * 3.5f);
+			offsets[3] = static_cast<int>(t * 4.0f) << 8;
+			offsets[4] = static_cast<int>(t * 4.5f);
+			offsets[5] = static_cast<int>(-t * 5.0f);
+			offsets[6] = static_cast<int>(t * 5.5f) << 8;
+			offsets[7] = static_cast<int>(-t * 6.0f);
 
-		//composition
-		unsigned char buffer[256*256];
-		for (int i = 0 ; i < 65536 ; i++)
-		{
-			int sum = 0;
-			for (int k = 0 ; k < 8 ; k++)
+			//composition
+			unsigned char buffer[256*256];
+			for (int i = 0 ; i < 65536 ; i++)
 			{
-				int index = ((i + offsets[k]) & 0x0000ffff);
-				sum += (tex[k][index] << k);
+				int sum = 0;
+				for (int k = 0 ; k < 8 ; k++)
+				{
+					int index = ((i + offsets[k]) & 0x0000ffff);
+					sum += (tex[k][index] << k);
+				}
+				sum += 128;
+				buffer[i] = sum >> 8;
 			}
-			sum += 128;
-			buffer[i] = sum >> 8;
-		}
 
 		// Matrices - model and view
 		shader.setModelMat(pfm::mat4(1.f));
 		shader.setViewMat(clouds.camera.getViewMatrix());
+		skydome.shader.setModelMat(pfm::mat4(1.f));
+		skydome.shader.setViewMat(clouds.camera.getViewMatrix());
 
-		glUseProgram(shader.program);
-		glBindVertexArray(vao);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
+		// Draw skydome
+		skydome.draw();
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			// Draw noise panel
+			glUseProgram(shader.program);
+			glBindVertexArray(vao);
 
-		glBindVertexArray(0);
-		glUseProgram(0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texID);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
+
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			glBindVertexArray(0);
+			glUseProgram(0);
 
         glfwSwapBuffers(clouds.window);
         glfwPollEvents();

@@ -4,6 +4,7 @@ SRCS =	srcs/main.cpp \
 		srcs/Camera.cpp \
 		srcs/Engine/Engine.cpp \
 		srcs/Engine/Engine_Init.cpp \
+		srcs/Skydome.cpp \
 
 OBJS = $(SRCS:%.cpp=%.o)
 
