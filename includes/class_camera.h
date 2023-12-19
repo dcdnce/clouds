@@ -38,10 +38,14 @@ class Camera {
 
 		Camera();
 
-		pfm::mat4 GetViewMatrix() const noexcept;
-
 		void ProcessKeyboard(Camera_Movement direction, float delta_time) noexcept;
 		void ProcessMouseMovement(float xoffset, float yoffset) noexcept;
+
+		inline pfm::mat4 GetViewMatrix() const noexcept
+		{
+			return pfm::lookAt(position, position + front, up);
+		}
+
 };
 
 std::ostream& operator<<(std::ostream& o, Camera const& camera) noexcept;

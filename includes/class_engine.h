@@ -16,7 +16,12 @@ class Engine {
 		void Init(void);
 		static void	KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods) noexcept;
 		static void MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y) noexcept;
-		void ComputeDeltaTime() noexcept;
+		inline void ComputeDeltaTime() noexcept
+		{
+			float	current_frame = glfwGetTime();
+			delta_time = current_frame - last_frame;
+			last_frame = current_frame;
+		}
 
 		Camera camera;
 		float delta_time;

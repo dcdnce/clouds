@@ -83,14 +83,3 @@ void Skydome::SendBuffers()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
-void Skydome::Draw()
-{
-	glUseProgram(this->shader.program);
-	glBindVertexArray(_VAO);
-
-	glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
-
-	glUseProgram(0);
-	glBindVertexArray(0);
-}

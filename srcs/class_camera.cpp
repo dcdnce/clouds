@@ -23,11 +23,6 @@ std::ostream& operator<<(std::ostream& o, Camera const& camera) noexcept
 	return (o);
 }
 
-pfm::mat4 Camera::GetViewMatrix() const noexcept
-{
-	return pfm::lookAt(position, position + front, up);
-}
-
 void Camera::_UpdateCameraVectors() noexcept
 {
 	pfm::vec3 direction;

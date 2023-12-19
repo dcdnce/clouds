@@ -51,10 +51,3 @@ void Engine::MouseCallback(GLFWwindow* w, double current_mouse_x, double current
 
 	engine->camera.ProcessMouseMovement(xoffset, yoffset);
 }
-
-void Engine::ComputeDeltaTime() noexcept
-{
-	float	current_frame = glfwGetTime();
-	delta_time = current_frame - last_frame;
-	last_frame = current_frame;
-}
