@@ -106,17 +106,17 @@ void	Shader::SetVec3(char* const uniform_name, pfm::vec3& v)
 	glUseProgram(0);
 }
 
-pfm::mat4	Shader::GetProjMat() const
+pfm::mat4	Shader::GetProjMat() const noexcept
 {
 	return _proj_mat;
 }
 
-pfm::mat4	Shader::GetViewMat() const
+pfm::mat4	Shader::GetViewMat() const noexcept
 {
 	return _view_mat;
 }
 
-pfm::mat4	Shader::GetModelMat() const
+pfm::mat4	Shader::GetModelMat() const noexcept
 {
 	return _model_mat;
 }

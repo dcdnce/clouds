@@ -21,7 +21,7 @@ class Shader {
 		void  SetProjMat(pfm::mat4 const& new_proj_mat);
 		void  SetViewMat(pfm::mat4 const& new_view_mat);
 		void  SetModelMat(pfm::mat4 const& new_model_mat);
-		pfm::mat4 GetProjMat() const;
-		pfm::mat4 GetViewMat() const;
-		pfm::mat4 GetModelMat() const;
+		pfm::mat4 GetProjMat() const noexcept;
+		pfm::mat4 GetViewMat() const noexcept;
+		pfm::mat4 GetModelMat() const noexcept;
 };

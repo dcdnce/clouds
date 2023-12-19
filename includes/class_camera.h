@@ -19,7 +19,7 @@ const float ZOOM        =  45.0f;
 
 class Camera {
 	private:
-		void _UpdateCameraVectors();
+		void _UpdateCameraVectors() noexcept;
 
 	public:
 		// camera Attributes
@@ -38,10 +38,10 @@ class Camera {
 
 		Camera();
 
-		pfm::mat4 GetViewMatrix();
+		pfm::mat4 GetViewMatrix() const noexcept;
 
-		void ProcessKeyboard(Camera_Movement direction, float delta_time);
-		void ProcessMouseMovement(float xoffset, float yoffset);
+		void ProcessKeyboard(Camera_Movement direction, float delta_time) noexcept;
+		void ProcessMouseMovement(float xoffset, float yoffset) noexcept;
 };
 
-std::ostream& operator<<(std::ostream& o, Camera const& camera);
+std::ostream& operator<<(std::ostream& o, Camera const& camera) noexcept;

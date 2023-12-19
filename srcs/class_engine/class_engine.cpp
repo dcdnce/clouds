@@ -13,7 +13,7 @@ Engine::~Engine(void)
 	glfwTerminate();
 }
 
-void	Engine::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods)
+void	Engine::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods) noexcept
 {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(w));
 
@@ -29,7 +29,7 @@ void	Engine::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int m
 		engine->camera.ProcessKeyboard(RIGHT, engine->delta_time);
 }
 
-void Engine::MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y)
+void Engine::MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y) noexcept
 {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(w));
 	static bool first_mouse = true;
@@ -52,7 +52,7 @@ void Engine::MouseCallback(GLFWwindow* w, double current_mouse_x, double current
 	engine->camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-void Engine::ComputeDeltaTime()
+void Engine::ComputeDeltaTime() noexcept
 {
 	float	current_frame = glfwGetTime();
 	delta_time = current_frame - last_frame;

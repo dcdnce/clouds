@@ -9,7 +9,7 @@
 #include "class_shader.h"
 #include "class_skydome.h"
 
-void	interpolate(unsigned char* buffer, int step)
+inline void	interpolate(unsigned char* buffer, int step) noexcept
 {
 	for (int y = 0 ; y < 256 ; y += step) {
 		for (int x = 0 ; x < 256 ; x += step) {

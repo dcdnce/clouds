@@ -14,9 +14,9 @@ class Engine {
 		Engine(void);
 		~Engine(void);
 		void Init(void);
-		static void	KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods);
-		static void MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y);
-		void ComputeDeltaTime();
+		static void	KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods) noexcept;
+		static void MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y) noexcept;
+		void ComputeDeltaTime() noexcept;
 
 		Camera camera;
 		float delta_time;

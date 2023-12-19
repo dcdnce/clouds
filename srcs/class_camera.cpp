@@ -14,7 +14,7 @@ Camera::Camera()
 	_UpdateCameraVectors();
 }
 
-std::ostream& operator<<(std::ostream& o, Camera const& camera)
+std::ostream& operator<<(std::ostream& o, Camera const& camera) noexcept
 {
 	o << "Camera :" << std::endl;
 	o << "- Position: " << camera.position << std::endl;
@@ -23,12 +23,12 @@ std::ostream& operator<<(std::ostream& o, Camera const& camera)
 	return (o);
 }
 
-pfm::mat4 Camera::GetViewMatrix()
+pfm::mat4 Camera::GetViewMatrix() const noexcept
 {
 	return pfm::lookAt(position, position + front, up);
 }
 
-void Camera::_UpdateCameraVectors()
+void Camera::_UpdateCameraVectors() noexcept
 {
 	pfm::vec3 direction;
 	direction.x = cos(pfm::radians(yaw)) * cos(pfm::radians(pitch));
@@ -40,7 +40,7 @@ void Camera::_UpdateCameraVectors()
 	up    = pfm::normalize(pfm::cross(front, right));
 }
 
-void Camera::ProcessKeyboard(Camera_Movement direction, float delta_time)
+void Camera::ProcessKeyboard(Camera_Movement direction, float delta_time) noexcept
 {
 	float velocity = movement_speed * delta_time;
 	if (direction == FORWARD)
@@ -54,7 +54,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float delta_time)
 }
 
 // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-void Camera::ProcessMouseMovement(float xoffset, float yoffset)
+void Camera::ProcessMouseMovement(float xoffset, float yoffset) noexcept
 {
 	xoffset *= mouse_sensitivity;
 	yoffset *= mouse_sensitivity;
