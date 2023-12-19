@@ -1,10 +1,10 @@
 SRCS =	srcs/main.cpp \
 		libs/glad/glad.cpp \
-		srcs/Shader.cpp \
-		srcs/Camera.cpp \
-		srcs/Engine/Engine.cpp \
-		srcs/Engine/Engine_Init.cpp \
-		srcs/Skydome.cpp \
+		srcs/class_shader.cpp \
+		srcs/class_camera.cpp \
+		srcs/class_engine/class_engine.cpp \
+		srcs/class_engine/class_engine_init.cpp \
+		srcs/class_skydome.cpp \
 
 OBJS = $(SRCS:%.cpp=%.o)
 

@@ -1,4 +1,4 @@
-#include "Skydome.hpp"
+#include "class_skydome.h"
 #include "pfm/pfm.hpp"
 
 Skydome::Skydome()

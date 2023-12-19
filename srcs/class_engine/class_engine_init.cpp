@@ -1,7 +1,7 @@
 #include <iostream>
-#include "main.hpp"
-#include "Engine.hpp"
-#include "Logger.hpp"
+#include "main.h"
+#include "class_engine.h"
+#include "class_logger.h"
 
 void Engine::init(void)
 {

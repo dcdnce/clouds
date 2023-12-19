@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
-#include "Camera.hpp"
+#include "class_camera.h"
 
 class Engine
 {

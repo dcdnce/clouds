@@ -3,11 +3,11 @@
 #include <cmath>
 #include <iostream>
 #include <string>
-#include "main.hpp"
-#include "Engine.hpp"
-#include "Logger.hpp"
-#include "Shader.hpp"
-#include "Skydome.hpp"
+#include "main.h"
+#include "class_engine.h"
+#include "class_logger.h"
+#include "class_shader.h"
+#include "class_skydome.h"
 
 void	interpolate(unsigned char * buffer, int step)
 {
@@ -46,9 +46,8 @@ int	main(void)
 	clouds.init();
 	shader.loadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
 	skydome.shader.loadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
-	skydome.fillBuffers(90.f, 80, 80);
+	skydome.fillBuffers(10.f, 8, 8);
 	skydome.sendBuffers();
-
 
 		// Noise related
 		unsigned char tex[8][256*256];

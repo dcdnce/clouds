@@ -1,5 +1,5 @@
-#include "Engine.hpp"
-#include "Logger.hpp"
+#include "class_engine.h"
+#include "class_logger.h"
 #include <iostream>
 
 Engine::Engine(void) : framebufferWidth(0), framebufferHeight(0), window(NULL)

@@ -3,8 +3,8 @@
 #include <iostream>
 #include "glad/glad.h"
 #include <vector>
-#include "Vertex.hpp"
-#include "Shader.hpp"
+#include "class_vertex.h"
+#include "class_shader.h"
 
 class Skydome {
 	private:
