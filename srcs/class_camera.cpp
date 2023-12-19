@@ -5,13 +5,13 @@ Camera::Camera()
 	position = {0.f, 0.f, 10.f};	
 	up = {0.f, 1.f, 0.f};	
 	front = pfm::vec3(0.0f, 0.0f, -1.0f);
-	movementSpeed = SPEED;
-	mouseSensitivity = SENSITIVITY;
+	movement_speed = SPEED;
+	mouse_sensitivity = SENSITIVITY;
 	zoom = ZOOM;
-	worldUp = up;
+	world_up = up;
 	yaw = YAW;
 	pitch = PITCH;
-	_updateCameraVectors();
+	_UpdateCameraVectors();
 }
 
 std::ostream& operator<<(std::ostream & o, Camera const& camera)
@@ -23,12 +23,12 @@ std::ostream& operator<<(std::ostream & o, Camera const& camera)
 	return (o);
 }
 
-pfm::mat4 Camera::getViewMatrix()
+pfm::mat4 Camera::GetViewMatrix()
 {
 	return pfm::lookAt(position, position + front, up);
 }
 
-void Camera::_updateCameraVectors()
+void Camera::_UpdateCameraVectors()
 {
 	pfm::vec3 direction;
 	direction.x = cos(pfm::radians(yaw)) * cos(pfm::radians(pitch));
@@ -36,13 +36,13 @@ void Camera::_updateCameraVectors()
 	direction.z = sin(pfm::radians(yaw)) * cos(pfm::radians(pitch));
 	this->front = pfm::normalize(direction);
 	// also re-calculate the Right and Up vector
-	right = pfm::normalize(pfm::cross(worldUp, front));
+	right = pfm::normalize(pfm::cross(world_up, front));
 	up    = pfm::normalize(pfm::cross(front, right));
 }
 
-void Camera::processKeyboard(Camera_Movement direction, float deltaTime)
+void Camera::ProcessKeyboard(Camera_Movement direction, float delta_time)
 {
-	float velocity = movementSpeed * deltaTime;
+	float velocity = movement_speed * delta_time;
 	if (direction == FORWARD)
 		position += front * velocity;
 	if (direction == BACKWARD)
@@ -54,10 +54,10 @@ void Camera::processKeyboard(Camera_Movement direction, float deltaTime)
 }
 
 // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-void Camera::processMouseMovement(float xoffset, float yoffset)
+void Camera::ProcessMouseMovement(float xoffset, float yoffset)
 {
-	xoffset *= mouseSensitivity;
-	yoffset *= mouseSensitivity;
+	xoffset *= mouse_sensitivity;
+	yoffset *= mouse_sensitivity;
 
 	yaw   += xoffset;
 	pitch += yoffset;
@@ -68,5 +68,5 @@ void Camera::processMouseMovement(float xoffset, float yoffset)
 	if (pitch < -89.0f)
 		pitch = -89.0f;
 
-	_updateCameraVectors();
+	_UpdateCameraVectors();
 }

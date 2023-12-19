@@ -3,16 +3,16 @@
 #include "class_engine.h"
 #include "class_logger.h"
 
-void Engine::init(void)
+void Engine::Init(void)
 {
 	glfwInit();
-	_initWindow();
-	_initGlad();
-	_initEvents();
-	_initGl();
+	_InitWindow();
+	_InitGlad();
+	_InitEvents();
+	_InitGl();
 }
 
-void	Engine::_initWindow()
+void	Engine::_InitWindow()
 {
 	//Create a window
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -30,29 +30,29 @@ void	Engine::_initWindow()
 
 	glfwMakeContextCurrent(window);
 
-	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
+	glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
 }
 
-void	Engine::_initEvents()
+void	Engine::_InitEvents()
 {
 	glfwSetWindowUserPointer(window, this);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, Engine::mouseCallback);
+	glfwSetCursorPosCallback(window, Engine::MouseCallback);
 	if (glfwRawMouseMotionSupported())
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-	glfwSetKeyCallback(window, Engine::keyCallback);
+	glfwSetKeyCallback(window, Engine::KeyCallback);
 }
 
-void	Engine::_initGl()
+void	Engine::_InitGl()
 {
-	glViewport(0, 0, framebufferWidth, framebufferHeight);
+	glViewport(0, 0, framebuffer_width, framebuffer_height);
 	glEnable(GL_DEPTH_TEST);
 	glPointSize(2.f);
 }
 
-void	Engine::_initGlad()
+void	Engine::_InitGlad()
 {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		throw std::runtime_error("Failed to initialize glad");

@@ -10,14 +10,14 @@ class Skydome {
 	private:
 	 	GLuint _VBO;
 	 	GLuint _VAO;
-		size_t _numVertices;
+		size_t _num_vertices;
 		std::vector<Vertex> _vertices;
 	public:
 		Shader shader;	 
 
 		Skydome();
 		~Skydome();
-		void fillBuffers(float const& radius, size_t const& numRows, size_t const& numCols);
-		void sendBuffers();
-		void draw();
+		void FillBuffers(float const& radius, size_t const& num_rows, size_t const& num_cols);
+		void SendBuffers();
+		void Draw();
 };

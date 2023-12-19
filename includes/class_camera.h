@@ -20,7 +20,7 @@ const float ZOOM        =  45.0f;
 class Camera
 {
 	private:
-		void _updateCameraVectors();
+		void _UpdateCameraVectors();
 
 	public:
 		// camera Attributes
@@ -28,21 +28,21 @@ class Camera
 		pfm::vec3 front;
 		pfm::vec3 up;
 		pfm::vec3 right;
-		pfm::vec3 worldUp;
+		pfm::vec3 world_up;
 		// euler Angles
 		float yaw;
 		float pitch;
 		// camera options
-		float movementSpeed;
-		float mouseSensitivity;
+		float movement_speed;
+		float mouse_sensitivity;
 		float zoom;
 
 		Camera();
 
-		pfm::mat4 getViewMatrix();
+		pfm::mat4 GetViewMatrix();
 
-		void processKeyboard(Camera_Movement direction, float deltaTime);
-		void processMouseMovement(float xoffset, float yoffset);
+		void ProcessKeyboard(Camera_Movement direction, float delta_time);
+		void ProcessMouseMovement(float xoffset, float yoffset);
 };
 
 std::ostream& operator<<(std::ostream & o, Camera const& camera);

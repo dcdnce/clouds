@@ -7,23 +7,23 @@
 class Engine
 {
 	private:
-		void	_initWindow();
-		void	_initGlad();
-		void	_initEvents();
-		void	_initGl();
+		void	_InitWindow();
+		void	_InitGlad();
+		void	_InitEvents();
+		void	_InitGl();
 	public:
 		Engine(void);
 		~Engine(void);
-		void init(void);
-		static void	keyCallback(GLFWwindow *w, int key, int scancode, int action, int mods);
-		static void mouseCallback(GLFWwindow* w, double currMouseX, double currMouseY);
-		void computeDeltaTime();
+		void Init(void);
+		static void	KeyCallback(GLFWwindow *w, int key, int scancode, int action, int mods);
+		static void MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y);
+		void ComputeDeltaTime();
 
 		Camera camera;
-		float deltaTime;
-		float lastFrame;
-		int			framebufferWidth;
-		int			framebufferHeight;
+		float delta_time;
+		float last_frame;
+		int			framebuffer_width;
+		int			framebuffer_height;
 		GLFWwindow* window;
 };
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-static int	createShader(GLuint *shaderRef, GLenum type, const char *path);
+static int	CreateShader(GLuint *shader_ref, GLenum type, const char *path);
 
 Shader::Shader() {}
 
@@ -14,21 +14,21 @@ Shader::~Shader()
 }
 
 
-int	Shader::loadShaders(char * const vertexShaderPath, char * const fragmentShaderPath)
+int	Shader::LoadShaders(char * const vertex_shader_path, char * const fragment_shader_path)
 {
 	int			ret_value = 1;
 	char		infoLog[512];
 	GLint		status;
-	GLuint		vertexShaderRef;
-	GLuint		fragmentShaderRef;
+	GLuint		vertex_shader_ref;
+	GLuint		fragment_shader_ref;
 
-	if (!createShader(&vertexShaderRef, GL_VERTEX_SHADER, vertexShaderPath))
+	if (!CreateShader(&vertex_shader_ref, GL_VERTEX_SHADER, vertex_shader_path))
 		return (0);
-	if (!createShader(&fragmentShaderRef, GL_FRAGMENT_SHADER, fragmentShaderPath))
+	if (!CreateShader(&fragment_shader_ref, GL_FRAGMENT_SHADER, fragment_shader_path))
 		return (0);
 	program = glCreateProgram();
-	glAttachShader(program, vertexShaderRef);
-	glAttachShader(program, fragmentShaderRef);
+	glAttachShader(program, vertex_shader_ref);
+	glAttachShader(program, fragment_shader_ref);
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
 	if (!status)
@@ -38,12 +38,12 @@ int	Shader::loadShaders(char * const vertexShaderPath, char * const fragmentShad
 		Logger::error(false) << infoLog << std::endl;
 		ret_value = 0;
 	}
-	glDeleteShader(vertexShaderRef);
-	glDeleteShader(fragmentShaderRef);
+	glDeleteShader(vertex_shader_ref);
+	glDeleteShader(fragment_shader_ref);
 	return (ret_value);
 }
 
-static int	createShader(GLuint *shaderRef, GLenum type, const char *path)
+static int	CreateShader(GLuint *shader_ref, GLenum type, const char *path)
 {
 	GLint			status;
 	char			infoLog[512];
@@ -61,15 +61,15 @@ static int	createShader(GLuint *shaderRef, GLenum type, const char *path)
 		Logger::error(true) << "Shader class couldn't open shader file" << std::endl;
 		return (0);	
 	}
-	*shaderRef = glCreateShader(type);	
+	*shader_ref = glCreateShader(type);	
 	const GLchar	*source = src.c_str();
-	glShaderSource(*shaderRef, 1, &source, NULL); 
-	glCompileShader(*shaderRef);
-	glGetShaderiv(*shaderRef, GL_COMPILE_STATUS, &status);
+	glShaderSource(*shader_ref, 1, &source, NULL); 
+	glCompileShader(*shader_ref);
+	glGetShaderiv(*shader_ref, GL_COMPILE_STATUS, &status);
 	file.close();
 	if (!status)
 	{
-		glGetShaderInfoLog(*shaderRef, 512, NULL, infoLog);
+		glGetShaderInfoLog(*shader_ref, 512, NULL, infoLog);
 		Logger::error(true) << "Shader class compile error" << std::endl;
 		Logger::error(false) << infoLog << std::endl;
 		return (0);
@@ -77,49 +77,49 @@ static int	createShader(GLuint *shaderRef, GLenum type, const char *path)
 	return (1);
 }
 
-void  Shader::setProjMat(pfm::mat4 const& newProjMat)
+void  Shader::SetProjMat(pfm::mat4 const& new_proj_mat)
 {
-	_projMat = newProjMat;
+	_proj_mat = new_proj_mat;
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "uProj"), 1, GL_FALSE, &_projMat);
+	glUniformMatrix4fv(glGetUniformLocation(program, "uProj"), 1, GL_FALSE, &_proj_mat);
 	glUseProgram(0);
 }
 
-void  Shader::setViewMat(pfm::mat4 const& newViewMat)
+void  Shader::SetViewMat(pfm::mat4 const& new_view_mat)
 {
-	_viewMat = newViewMat;
+	_view_mat = new_view_mat;
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "uView"), 1, GL_FALSE, &_viewMat);
+	glUniformMatrix4fv(glGetUniformLocation(program, "uView"), 1, GL_FALSE, &_view_mat);
 	glUseProgram(0);
 }
 
-void  Shader::setModelMat(pfm::mat4 const& newModelMat)
+void  Shader::SetModelMat(pfm::mat4 const& new_model_mat)
 {
-	_modelMat = newModelMat;
+	_model_mat = new_model_mat;
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "uModel"), 1, GL_FALSE, &_modelMat);
+	glUniformMatrix4fv(glGetUniformLocation(program, "uModel"), 1, GL_FALSE, &_model_mat);
 	glUseProgram(0);
 
 }
 
-void	Shader::setVec3(char * const uniformName, pfm::vec3 & v)	
+void	Shader::SetVec3(char * const uniform_name, pfm::vec3 & v)	
 {
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, uniformName), 1, GL_FALSE, &v);
+	glUniformMatrix4fv(glGetUniformLocation(program, uniform_name), 1, GL_FALSE, &v);
 	glUseProgram(0);
 }
 
-pfm::mat4	Shader::getProjMat() const
+pfm::mat4	Shader::GetProjMat() const
 {
-	return _projMat;
+	return _proj_mat;
 }
 
-pfm::mat4	Shader::getViewMat() const
+pfm::mat4	Shader::GetViewMat() const
 {
-	return _viewMat;
+	return _view_mat;
 }
 
-pfm::mat4	Shader::getModelMat() const
+pfm::mat4	Shader::GetModelMat() const
 {
-	return _modelMat;
+	return _model_mat;
 }

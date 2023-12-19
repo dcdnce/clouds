@@ -43,11 +43,11 @@ int	main(void)
 	Skydome skydome;
 
 	// Initialization
-	clouds.init();
-	shader.loadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
-	skydome.shader.loadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
-	skydome.fillBuffers(10.f, 8, 8);
-	skydome.sendBuffers();
+	clouds.Init();
+	shader.LoadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
+	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
+	skydome.FillBuffers(10.f, 8, 8);
+	skydome.SendBuffers();
 
 		// Noise related
 		unsigned char tex[8][256*256];
@@ -114,10 +114,10 @@ int	main(void)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	// Set projection matrix
-	shader.setProjMat(
+	shader.SetProjMat(
 		pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
 	);
-	skydome.shader.setProjMat(
+	skydome.shader.SetProjMat(
 		pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
 	);
 
@@ -125,7 +125,7 @@ int	main(void)
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window))
 	{
-		clouds.computeDeltaTime();
+		clouds.ComputeDeltaTime();
 		static int frames = 0;
 		glClearColor(0.3f, 0.49f, 0.66f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -157,14 +157,14 @@ int	main(void)
 			}
 
 		// Matrices - model and view
-		shader.setModelMat(pfm::mat4(1.f));
-		shader.setViewMat(clouds.camera.getViewMatrix());
-		skydome.shader.setModelMat(pfm::mat4(1.f));
-		skydome.shader.setViewMat(clouds.camera.getViewMatrix());
+		shader.SetModelMat(pfm::mat4(1.f));
+		shader.SetViewMat(clouds.camera.GetViewMatrix());
+		skydome.shader.SetModelMat(pfm::mat4(1.f));
+		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 
 		// Draw skydome
-		skydome.draw();
+		skydome.Draw();
 
 			// Draw noise panel
 			glUseProgram(shader.program);
