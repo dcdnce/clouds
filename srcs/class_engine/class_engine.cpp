@@ -13,7 +13,7 @@ Engine::~Engine(void)
 	glfwTerminate();
 }
 
-void	Engine::KeyCallback(GLFWwindow *w, int key, int scancode, int action, int mods)
+void	Engine::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods)
 {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(w));
 
@@ -35,20 +35,19 @@ void Engine::MouseCallback(GLFWwindow* w, double current_mouse_x, double current
 	static bool first_mouse = true;
 	static float last_mouse_x;
 	static float last_mouse_y;
-    float xpos = static_cast<float>(current_mouse_x);
-    float ypos = static_cast<float>(current_mouse_y);
+	float xpos = static_cast<float>(current_mouse_x);
+	float ypos = static_cast<float>(current_mouse_y);
 
-    if (first_mouse)
-    {
-        last_mouse_x = xpos;
-        last_mouse_y = ypos;
-        first_mouse = false;
-    }
+	if (first_mouse) {
+		last_mouse_x = xpos;
+		last_mouse_y = ypos;
+		first_mouse = false;
+	}
 
-    float xoffset = xpos - last_mouse_x;
-    float yoffset = last_mouse_y - ypos; // reversed since y-coordinates go from bottom to top
-    last_mouse_x = xpos;
-    last_mouse_y = ypos;
+	float xoffset = xpos - last_mouse_x;
+	float yoffset = last_mouse_y - ypos; // reversed since y-coordinates go from bottom to top
+	last_mouse_x = xpos;
+	last_mouse_y = ypos;
 
 	engine->camera.ProcessMouseMovement(xoffset, yoffset);
 }

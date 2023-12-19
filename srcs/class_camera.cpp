@@ -2,8 +2,8 @@
 
 Camera::Camera()
 {
-	position = {0.f, 0.f, 10.f};	
-	up = {0.f, 1.f, 0.f};	
+	position = {0.f, 0.f, 10.f};
+	up = {0.f, 1.f, 0.f};
 	front = pfm::vec3(0.0f, 0.0f, -1.0f);
 	movement_speed = SPEED;
 	mouse_sensitivity = SENSITIVITY;
@@ -14,7 +14,7 @@ Camera::Camera()
 	_UpdateCameraVectors();
 }
 
-std::ostream& operator<<(std::ostream & o, Camera const& camera)
+std::ostream& operator<<(std::ostream& o, Camera const& camera)
 {
 	o << "Camera :" << std::endl;
 	o << "- Position: " << camera.position << std::endl;

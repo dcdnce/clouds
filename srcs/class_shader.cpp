@@ -3,18 +3,18 @@
 #include <iostream>
 #include <fstream>
 
-static int	CreateShader(GLuint *shader_ref, GLenum type, const char *path);
+static int	CreateShader(GLuint* shader_ref, GLenum type, const char* path);
 
 Shader::Shader() {}
 
 
 Shader::~Shader()
 {
-    glDeleteProgram(program);
+	glDeleteProgram(program);
 }
 
 
-int	Shader::LoadShaders(char * const vertex_shader_path, char * const fragment_shader_path)
+int	Shader::LoadShaders(char* const vertex_shader_path, char* const fragment_shader_path)
 {
 	int			ret_value = 1;
 	char		infoLog[512];
@@ -31,8 +31,7 @@ int	Shader::LoadShaders(char * const vertex_shader_path, char * const fragment_s
 	glAttachShader(program, fragment_shader_ref);
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
-	if (!status)
-	{
+	if (!status) {
 		glGetProgramInfoLog(program, 512, NULL, infoLog);
 		Logger::error(true) << "Shader class linking error" << std::endl;
 		Logger::error(false) << infoLog << std::endl;
@@ -43,7 +42,7 @@ int	Shader::LoadShaders(char * const vertex_shader_path, char * const fragment_s
 	return (ret_value);
 }
 
-static int	CreateShader(GLuint *shader_ref, GLenum type, const char *path)
+static int	CreateShader(GLuint* shader_ref, GLenum type, const char* path)
 {
 	GLint			status;
 	char			infoLog[512];
@@ -53,22 +52,20 @@ static int	CreateShader(GLuint *shader_ref, GLenum type, const char *path)
 
 	// Vertex Shader
 	file.open(path);
-	if(file.is_open())
+	if (file.is_open())
 		while (std::getline(file, tmp))
 			src += tmp + "\n";
-	else
-	{
+	else {
 		Logger::error(true) << "Shader class couldn't open shader file" << std::endl;
-		return (0);	
+		return (0);
 	}
-	*shader_ref = glCreateShader(type);	
-	const GLchar	*source = src.c_str();
-	glShaderSource(*shader_ref, 1, &source, NULL); 
+	*shader_ref = glCreateShader(type);
+	const GLchar*	source = src.c_str();
+	glShaderSource(*shader_ref, 1, &source, NULL);
 	glCompileShader(*shader_ref);
 	glGetShaderiv(*shader_ref, GL_COMPILE_STATUS, &status);
 	file.close();
-	if (!status)
-	{
+	if (!status) {
 		glGetShaderInfoLog(*shader_ref, 512, NULL, infoLog);
 		Logger::error(true) << "Shader class compile error" << std::endl;
 		Logger::error(false) << infoLog << std::endl;
@@ -102,7 +99,7 @@ void  Shader::SetModelMat(pfm::mat4 const& new_model_mat)
 
 }
 
-void	Shader::SetVec3(char * const uniform_name, pfm::vec3 & v)	
+void	Shader::SetVec3(char* const uniform_name, pfm::vec3& v)
 {
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, uniform_name), 1, GL_FALSE, &v);

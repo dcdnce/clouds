@@ -23,18 +23,15 @@ void Skydome::FillBuffers(float const& radius, size_t const& num_rows, size_t co
 	size_t i = 0;
 
 	// Top strip
-	for (float heading = 0.f ; heading < 360.f ; heading += heading_increment)
-	{
+	for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
 		_vertices[i++].position = pfm::vec3(0.f, radius, 0.f); // apex
 		_vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitch_increment, heading);
 		_vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitch_increment, heading + heading_increment);
 	}
 
 	//Regular strips
-	for (float pitch = -90.f + pitch_increment ; pitch < 0.f ; pitch += pitch_increment)
-	{
-		for (float heading = 0.f ; heading < 360.f ; heading += heading_increment)
-		{
+	for (float pitch = -90.f + pitch_increment ; pitch < 0.f ; pitch += pitch_increment) {
+		for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
 			pfm::vec3 v0 = pfm::sphericalToCartesian(radius, pitch, heading);
 			pfm::vec3 v1 = pfm::sphericalToCartesian(radius, pitch, heading+heading_increment);
 			pfm::vec3 v2 = pfm::sphericalToCartesian(radius, pitch+pitch_increment, heading);
@@ -52,14 +49,13 @@ void Skydome::FillBuffers(float const& radius, size_t const& num_rows, size_t co
 		}
 	}
 
-	for (size_t i = 0 ; i < _vertices.size() ; i++)
-    {
-        _vertices[i].color = {
-            static_cast<float>(rand()%255) / 255.f,
-            static_cast<float>(rand()%255) / 255.f,
-            static_cast<float>(rand()%255) / 255.f
-        };
-    }
+	for (size_t i = 0 ; i < _vertices.size() ; i++) {
+		_vertices[i].color = {
+			static_cast<float>(rand()%255) / 255.f,
+			static_cast<float>(rand()%255) / 255.f,
+			static_cast<float>(rand()%255) / 255.f
+		};
+	}
 }
 
 void Skydome::SendBuffers()
@@ -71,19 +67,19 @@ void Skydome::SendBuffers()
 	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), _vertices.data(), GL_STATIC_DRAW);
 
 	// Link
-	 /* Position */
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
-        /* Normal */
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, normal)));
-        /* tex_coords */
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, tex_coords)));
-        /* Color */
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, color)));
-	
+	/* Position */
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	/* Normal */
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, normal)));
+	/* tex_coords */
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, tex_coords)));
+	/* Color */
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, color)));
+
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

@@ -4,10 +4,10 @@
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT
+	FORWARD,
+	BACKWARD,
+	LEFT,
+	RIGHT
 };
 
 // Default camera values
@@ -17,8 +17,7 @@ const float SPEED       =  5.f;
 const float SENSITIVITY =  0.15f;
 const float ZOOM        =  45.0f;
 
-class Camera
-{
+class Camera {
 	private:
 		void _UpdateCameraVectors();
 
@@ -45,4 +44,4 @@ class Camera
 		void ProcessMouseMovement(float xoffset, float yoffset);
 };
 
-std::ostream& operator<<(std::ostream & o, Camera const& camera);
+std::ostream& operator<<(std::ostream& o, Camera const& camera);

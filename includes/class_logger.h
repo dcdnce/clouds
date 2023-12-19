@@ -4,8 +4,7 @@
 #include <iostream>
 #include <vector>
 
-class Logger
-{
+class Logger {
 	private:
 		static std::string _getTime(void)
 		{
@@ -18,7 +17,7 @@ class Logger
 			return (buf);
 		}
 
-		static std::string _repeat(const int times, const std::string &str)
+		static std::string _repeat(const int times, const std::string& str)
 		{
 			std::string result;
 
@@ -28,7 +27,7 @@ class Logger
 			return (result);
 		}
 
-		static std::string::size_type _find(const std::string &str, const std::string &chars, const std::string::size_type start = 0)
+		static std::string::size_type _find(const std::string& str, const std::string& chars, const std::string::size_type start = 0)
 		{
 			for (std::string::size_type i = start; i < str.size(); ++i)
 				if (chars.find(str[i]) != std::string::npos)
@@ -37,7 +36,7 @@ class Logger
 		}
 
 	public:
-		static std::ostream &info(const bool time = false)
+		static std::ostream& info(const bool time = false)
 		{
 			if (time)
 				std::cout << "\e[1;37;40m " << _getTime() << " \e[0m";
@@ -45,7 +44,7 @@ class Logger
 			return (std::cout);
 		}
 
-		static std::ostream &warn(const bool time = false)
+		static std::ostream& warn(const bool time = false)
 		{
 			if (time)
 				std::cout << "\e[1;37;40m " << _getTime() << " \e[0m";
@@ -53,7 +52,7 @@ class Logger
 			return (std::cout);
 		}
 
-		static std::ostream &error(const bool time = false)
+		static std::ostream& error(const bool time = false)
 		{
 			if (time)
 				std::cout << "\e[1;37;40m " << _getTime() << " \e[0m";
@@ -61,7 +60,7 @@ class Logger
 			return (std::cout);
 		}
 
-		static std::ostream &debug(const bool time = false)
+		static std::ostream& debug(const bool time = false)
 		{
 			if (time)
 				std::cout << "\e[1;37;40m " << _getTime() << " \e[0m";
@@ -69,7 +68,7 @@ class Logger
 			return (std::cout);
 		}
 
-		static void block(const std::string &title, const std::string &content)
+		static void block(const std::string& title, const std::string& content)
 		{
 			const std::string newLineCharacters = "\n\r";
 
@@ -80,8 +79,7 @@ class Logger
 			std::string::size_type start = 0;
 			std::string::size_type end = 0;
 
-			while ((end = _find(content, newLineCharacters, start)) != std::string::npos)
-			{
+			while ((end = _find(content, newLineCharacters, start)) != std::string::npos) {
 				std::string line = content.substr(start, end - start);
 				contentLines.push_back(line);
 				if (line.size() > maxLineLength)
@@ -96,7 +94,7 @@ class Logger
 			block(title, contentLines);
 		};
 
-		static void block(const std::string &title, const std::vector<std::string> &lines)
+		static void block(const std::string& title, const std::vector<std::string>& lines)
 		{
 			std::string::size_type maxLineLength = 0;
 

@@ -8,12 +8,12 @@
 
 class Skydome {
 	private:
-	 	GLuint _VBO;
-	 	GLuint _VAO;
+		GLuint _VBO;
+		GLuint _VAO;
 		size_t _num_vertices;
 		std::vector<Vertex> _vertices;
 	public:
-		Shader shader;	 
+		Shader shader;
 
 		Skydome();
 		~Skydome();

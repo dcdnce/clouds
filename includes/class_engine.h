@@ -4,8 +4,7 @@
 #include <glfw/glfw3.h>
 #include "class_camera.h"
 
-class Engine
-{
+class Engine {
 	private:
 		void	_InitWindow();
 		void	_InitGlad();
@@ -15,7 +14,7 @@ class Engine
 		Engine(void);
 		~Engine(void);
 		void Init(void);
-		static void	KeyCallback(GLFWwindow *w, int key, int scancode, int action, int mods);
+		static void	KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods);
 		static void MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y);
 		void ComputeDeltaTime();
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#define	W_HEIGHT	600	
+#define	W_HEIGHT	600
 #define	W_WIDTH		600
 
 #define	A_RAND	"\e[38;5;222m"
