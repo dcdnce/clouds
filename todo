@@ -3,7 +3,6 @@
  - Skydome - texture mapping
 
 Guidelines
-- F.6
-- ES.22
-- NL.17
-- NL.18
+- F.6 If your function must not throw, declare it noexcept
+- ES.22 Don’t declare a variable until you have a value to initialize it with
+- NL.17 K&R-derived layout
