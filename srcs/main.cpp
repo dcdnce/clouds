@@ -42,7 +42,7 @@ int	main(void)
 	clouds.Init();
 	shader.LoadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
 	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
-	skydome.FillBuffers(10.f, 8, 8);
+	skydome.FillBuffers(10.f, 80, 80);
 	skydome.SendBuffers();
 
 	// Noise related
@@ -153,7 +153,6 @@ int	main(void)
 		shader.SetViewMat(clouds.camera.GetViewMatrix());
 		skydome.shader.SetModelMat(pfm::mat4(1.f));
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
-
 
 		// Draw skydome
 		skydome.Draw();

@@ -22,13 +22,6 @@ void Skydome::FillBuffers(float const& radius, size_t const& num_rows, size_t co
 	// float pitch = -90.f; //really ?
 	size_t i = 0;
 
-	// Top strip
-	for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
-		_vertices[i++].position = pfm::vec3(0.f, radius, 0.f); // apex
-		_vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitch_increment, heading);
-		_vertices[i++].position = pfm::sphericalToCartesian(radius, -90.f + pitch_increment, heading + heading_increment);
-	}
-
 	//Regular strips
 	for (float pitch = -90.f + pitch_increment ; pitch < 0.f ; pitch += pitch_increment) {
 		for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
