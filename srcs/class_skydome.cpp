@@ -20,7 +20,6 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 	float pitch_increment = 90.f / static_cast<float>(num_rows);
 	float heading_increment = 360.f / static_cast<float>(num_cols);
 
-	// float pitch = -90.f; //really ?
 	size_t i = 0;
 	
 	// Top strips
@@ -76,8 +75,8 @@ void Skydome::ComputeTexCoords()
 {
 	for (size_t i = 0 ; i < _num_vertices ; i++) {
 		pfm::vec3 d = pfm::normalize(pfm::vec3(0.f, 0.f, 0.f) - _vertices[i].position);
-		_vertices[i].tex_coords.u = (atan2(d.z, d.x) / (2*M_PI));
-		_vertices[i].tex_coords.v = (asin(d.y) / M_PI);
+		_vertices[i].tex_coords.u = (atan2(d.z, d.x) / (2*M_PI)) + 0.5;
+		_vertices[i].tex_coords.v = (asin(d.y) / M_PI) + 0.5;
 	}
 }
 
