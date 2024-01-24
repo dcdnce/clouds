@@ -10,8 +10,10 @@ uniform mat4 uView;
 uniform mat4 uModel;
 
 out vec3 fragColor;
+out vec2 fragTexCoord;
 
 void main() {
 	gl_Position = uProj * uView * uModel * vec4(vertexPosition, 1.0);
 	fragColor = vertexColor;
+    fragTexCoord = vertexTexCoord;
 }

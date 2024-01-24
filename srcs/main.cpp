@@ -42,12 +42,14 @@ int	main(void)
 	clouds.Init();
 	shader.LoadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
 	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
-	skydome.FillBuffers(10.f, 80, 80);
+	skydome.ComputePositions(10.f, 1002, 1002);
+	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 
 	// Noise related
 	unsigned char tex[8][256*256];
 	// For every octave fill the texture and interpolate
+	srand(2009);
 	for (int i = 0 ; i < 8 ; i++) {
 		for (int j = 0 ; j < 256*256 ; j++)
 			tex[i][j] = rand()&255;
@@ -56,7 +58,7 @@ int	main(void)
 
 	/* Texture */
 	// Creer et bind texture
-	glUseProgram(shader.program);
+	glUseProgram(skydome.shader.program);
 	GLuint	texID;
 	glGenTextures(1, &texID);
 	glActiveTexture(GL_TEXTURE0);
@@ -68,7 +70,7 @@ int	main(void)
 	// glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, tex[3]);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glUniform1i(glGetUniformLocation(shader.program, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(skydome.shader.program, "texture1"), 0);
 	glUseProgram(0);
 
 	// Noise panel
@@ -110,10 +112,10 @@ int	main(void)
 
 	// Set projection matrix
 	shader.SetProjMat(
-	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
+	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 1000.f)
 	);
 	skydome.shader.SetProjMat(
-	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
+	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 1000.f)
 	);
 
 
@@ -121,20 +123,20 @@ int	main(void)
 	while (!glfwWindowShouldClose(clouds.window)) {
 		clouds.ComputeDeltaTime();
 		static int frames = 0;
-		glClearColor(0.3f, 0.49f, 0.66f, 1.f);
+		glClearColor(0.16f, 0.32f, 0.75f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//offsets
 		int offsets[8];
-		int t = frames / 5;
-		offsets[0] = static_cast<int>(t* 2.5f) << 8;
-		offsets[1] = static_cast<int>(t * 3.0f);
-		offsets[2] = static_cast<int>(-t * 3.5f);
-		offsets[3] = static_cast<int>(t * 4.0f) << 8;
-		offsets[4] = static_cast<int>(t * 4.5f);
-		offsets[5] = static_cast<int>(-t * 5.0f);
-		offsets[6] = static_cast<int>(t * 5.5f) << 8;
-		offsets[7] = static_cast<int>(-t * 6.0f);
+		int t = frames;
+		offsets[0] = static_cast<int>(t * 0.025f) << 8;
+		offsets[1] = static_cast<int>(t * 0.030f);
+		offsets[2] = static_cast<int>(-t * 0.035f);
+		offsets[3] = static_cast<int>(t * 0.040f) << 8;
+		offsets[4] = static_cast<int>(t * 0.045f);
+		offsets[5] = static_cast<int>(-t * 0.050f);
+		offsets[6] = static_cast<int>(t * 0.055f) << 8;
+		offsets[7] = static_cast<int>(-t * 0.060f);
 
 		//composition
 		unsigned char buffer[256*256];
@@ -155,20 +157,25 @@ int	main(void)
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 		// Draw skydome
-		skydome.Draw();
-
-		// Draw noise panel
-		glUseProgram(shader.program);
-		glBindVertexArray(vao);
-
+		glUseProgram(skydome.shader.program);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texID);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
-
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		glBindVertexArray(0);
 		glUseProgram(0);
+		skydome.Draw();
+
+//		// Draw noise panel
+//		glUseProgram(shader.program);
+//		glBindVertexArray(vao);
+//
+//		glActiveTexture(GL_TEXTURE0);
+//		glBindTexture(GL_TEXTURE_2D, texID);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
+//
+//		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//
+//		glBindVertexArray(0);
+//		glUseProgram(0);
 
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
@@ -177,4 +184,3 @@ int	main(void)
 
 	return (0);
 }
-

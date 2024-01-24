@@ -17,7 +17,8 @@ class Skydome {
 
 		Skydome();
 		~Skydome();
-		void FillBuffers(float const& radius, size_t const& num_rows, size_t const& num_cols);
+		void ComputePositions(float const& radius, size_t const& num_rows, size_t const& num_cols);
+		void ComputeTexCoords();
 		void SendBuffers();
 		inline void Draw()
 		{

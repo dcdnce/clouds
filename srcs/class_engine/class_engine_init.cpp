@@ -49,7 +49,9 @@ void	Engine::_InitGl()
 {
 	glViewport(0, 0, framebuffer_width, framebuffer_height);
 	glEnable(GL_DEPTH_TEST);
-	glPointSize(2.f);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glPointSize(1.f);
 }
 
 void	Engine::_InitGlad()

@@ -1,6 +1,4 @@
- - Skydome - buffers et rendu
- - Skydome - texture mapping
-
+- Skydome - texture mapping glitches
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline
 - F.6 If your function must not throw, declare it noexcept

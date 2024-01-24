@@ -1,5 +1,6 @@
 #include "class_skydome.h"
 #include "pfm/pfm.hpp"
+#include <cmath>
 
 Skydome::Skydome()
 {}
@@ -7,7 +8,7 @@ Skydome::Skydome()
 Skydome::~Skydome()
 {}
 
-void Skydome::FillBuffers(float const& radius, size_t const& num_rows, size_t const& num_cols)
+void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size_t const& num_cols)
 {
 	int top_strip_num_vertices = 3 * num_cols;
 	int regular_strip_num_vertices = 6 * num_cols;
@@ -22,7 +23,7 @@ void Skydome::FillBuffers(float const& radius, size_t const& num_rows, size_t co
 	// float pitch = -90.f; //really ?
 	size_t i = 0;
 
-	//Regular strips
+ 	//Regular strips
 	for (float pitch = -90.f + pitch_increment ; pitch < 0.f ; pitch += pitch_increment) {
 		for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
 			pfm::vec3 v0 = pfm::sphericalToCartesian(radius, pitch, heading);
@@ -35,10 +36,23 @@ void Skydome::FillBuffers(float const& radius, size_t const& num_rows, size_t co
 			_vertices[i++].position = v0;
 			_vertices[i++].position = v1;
 			_vertices[i++].position = v2;
+			// Normals
+			pfm::vec3 vn1 = v1 - v0;
+			pfm::vec3 vn2 = v2 - v0;
+			_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
 
 			_vertices[i++].position = v1;
 			_vertices[i++].position = v3;
 			_vertices[i++].position = v2;
+			// Normals
+			vn1 = v3 - v1;
+			vn2 = v2 - v1;
+			_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
+
 		}
 	}
 
@@ -48,6 +62,15 @@ void Skydome::FillBuffers(float const& radius, size_t const& num_rows, size_t co
 			static_cast<float>(rand()%255) / 255.f,
 			static_cast<float>(rand()%255) / 255.f
 		};
+	}
+}
+
+void Skydome::ComputeTexCoords()
+{
+	for (size_t i = 0 ; i < _num_vertices ; i++) {
+		pfm::vec3 d = pfm::normalize(pfm::vec3(0.f, 0.f, 0.f) - _vertices[i].position);
+		_vertices[i].tex_coords.u = (atan2(d.z, d.x) / (2*M_PI));
+		_vertices[i].tex_coords.v = (asin(d.y) / M_PI);
 	}
 }
 
