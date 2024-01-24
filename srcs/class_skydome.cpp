@@ -22,9 +22,16 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 
 	// float pitch = -90.f; //really ?
 	size_t i = 0;
+	
+	// Top strips
+	for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
+		_vertices[i++].position = pfm::vec3(0.f, radius, 0.f);
+		_vertices[i++].position = pfm::sphericalToCartesian(radius, -pitch_increment, heading + heading_increment);
+		_vertices[i++].position = pfm::sphericalToCartesian(radius, -pitch_increment, heading);
+	}
 
- 	//Regular strips
-	for (float pitch = -90.f + pitch_increment ; pitch < 0.f ; pitch += pitch_increment) {
+ 	// Regular strips
+	for (float pitch = -90.f; pitch < -pitch_increment ; pitch += pitch_increment) {
 		for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
 			pfm::vec3 v0 = pfm::sphericalToCartesian(radius, pitch, heading);
 			pfm::vec3 v1 = pfm::sphericalToCartesian(radius, pitch, heading+heading_increment);
@@ -36,22 +43,22 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 			_vertices[i++].position = v0;
 			_vertices[i++].position = v1;
 			_vertices[i++].position = v2;
-			// Normals
-			pfm::vec3 vn1 = v1 - v0;
-			pfm::vec3 vn2 = v2 - v0;
-			_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			//// Normals
+			//pfm::vec3 vn1 = v1 - v0;
+			//pfm::vec3 vn2 = v2 - v0;
+			//_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			//_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			//_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
 
 			_vertices[i++].position = v1;
 			_vertices[i++].position = v3;
 			_vertices[i++].position = v2;
-			// Normals
-			vn1 = v3 - v1;
-			vn2 = v2 - v1;
-			_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			//// Normals
+			//vn1 = v3 - v1;
+			//vn2 = v2 - v1;
+			//_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			//_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
+			//_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
 
 		}
 	}
