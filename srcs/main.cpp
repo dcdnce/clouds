@@ -146,7 +146,7 @@ int	main(void)
 				int index = ((i + offsets[k]) & 0x0000ffff);
 				sum += (tex[k][index] << k);
 			}
-			sum += 128;
+			//sum += 128; 
 			buffer[i] = sum >> 8;
 		}
 
