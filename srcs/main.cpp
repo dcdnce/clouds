@@ -43,7 +43,7 @@ int	main(void)
 	shader.LoadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
 	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
 	skydome.ComputePositions(10.f, 10, 10);
-	// skydome.ComputeTexCoords();
+	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 
 	// Noise related
@@ -129,14 +129,14 @@ int	main(void)
 		//offsets
 		int offsets[8];
 		int t = frames;
-		offsets[0] = static_cast<int>(t * 0.055f) << 8;
-		offsets[1] = static_cast<int>(t * 0.060f);
-		offsets[2] = static_cast<int>(-t * 0.065f);
-		offsets[3] = static_cast<int>(t * 0.080f) << 8;
-		offsets[4] = static_cast<int>(t * 0.085f);
-		offsets[5] = static_cast<int>(-t * 0.10f);
+		offsets[0] = static_cast<int>(t * 0.55f) << 8;
+		offsets[1] = static_cast<int>(t * 0.60f) << 8;
+		offsets[2] = static_cast<int>(t * 0.65f) << 8;
+		offsets[3] = static_cast<int>(t * 0.80f) << 8;
+		offsets[4] = static_cast<int>(t * 0.85f) << 8;
+		offsets[5] = static_cast<int>(t * 0.10f) << 8;
 		offsets[6] = static_cast<int>(t * 0.15f) << 8;
-		offsets[7] = static_cast<int>(-t * 0.160f);
+		offsets[7] = static_cast<int>(t * 0.160f) << 8;
 
 		//composition
 		unsigned char buffer[256*256];

@@ -20,7 +20,7 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 	float heading_increment = 360.f / static_cast<float>(num_cols);
 	float pitch_increment = 90.f / static_cast<float>(num_rows);
 	float u_increment = heading_increment / 360.f;
-	float v_increment = pitch_increment / 90.f;
+	float v_increment = pitch_increment / 180.f;
 
 	size_t i = 0;
 	
@@ -93,9 +93,26 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 void Skydome::ComputeTexCoords()
 {
 	for (size_t i = 0 ; i < _num_vertices ; i++) {
-		pfm::vec3 d = pfm::normalize(pfm::vec3(0.f, 0.f, 0.f) - _vertices[i].position);
-		_vertices[i].tex_coords.u = (atan2(d.z, d.x) / (2*M_PI)) + 0.5;
-		_vertices[i].tex_coords.v = (asin(d.y) / M_PI) + 0.5;
+		// pfm::vec3 d = pfm::normalize(pfm::vec3(0.f, 0.f, 0.f) - _vertices[i].position);
+		// _vertices[i].tex_coords.u = (atan2(d.z, d.x) / (2*M_PI)) + 0.5;
+		// _vertices[i].tex_coords.v = (asin(d.y) / M_PI) + 0.5;
+		// float kRadius = 10.f;
+
+		// _vertices[i].tex_coords.u = _vertices[i].position.x / (1 - (_vertices[i].position.y/kRadius));
+		// _vertices[i].tex_coords.v = _vertices[i].position.z / (1 - (_vertices[i].position.y/kRadius));
+
+		// pfm::normalize(_vertices[i].tex_coords);
+
+
+		// float kRadius = 10.f;
+// 
+        // pfm::vec3 d = pfm::normalize(_vertices[i].position - pfm::vec3(0.f, kRadius, 0.f));
+// 
+        // _vertices[i].tex_coords.u = 0.5 + (atan2(d.x, d.z) / (2 * M_PI));
+        // _vertices[i].tex_coords.v = 0.5 - (asin(d.y) / M_PI);
+// 
+        // Normalize texture coordinates to [0, 1] range
+        // pfm::normalize(_vertices[i].tex_coords);
 	}
 }
 

@@ -1,3 +1,4 @@
+- Skydome - projection stereographique
 - Skydome - texture mapping glitches
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline
