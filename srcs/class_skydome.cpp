@@ -10,55 +10,74 @@ Skydome::~Skydome()
 
 void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size_t const& num_cols)
 {
-	int top_strip_num_vertices = 3 * num_cols;
+	int top_strip_num_vertices = 6 * num_cols;
 	int regular_strip_num_vertices = 6 * num_cols;
 	//minus 1 because of top strip
 	_num_vertices = top_strip_num_vertices + ((num_rows - 1) * regular_strip_num_vertices);
 
 	_vertices = std::vector<Vertex>(_num_vertices);
 
-	float pitch_increment = 90.f / static_cast<float>(num_rows);
 	float heading_increment = 360.f / static_cast<float>(num_cols);
+	float pitch_increment = 90.f / static_cast<float>(num_rows);
+	float u_increment = heading_increment / 360.f;
+	float v_increment = pitch_increment / 90.f;
 
 	size_t i = 0;
 	
 	// Top strips
-	for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
-		_vertices[i++].position = pfm::vec3(0.f, radius, 0.f);
-		_vertices[i++].position = pfm::sphericalToCartesian(radius, -pitch_increment, heading + heading_increment);
-		_vertices[i++].position = pfm::sphericalToCartesian(radius, -pitch_increment, heading);
+	for (float heading = 0.f, u = 0.f ; heading < 360.f ; heading += heading_increment, u += u_increment) {
+		pfm::vec3 v0(0.f, radius, 0.f); 
+		pfm::vec2 v0_tex_coords(u - (u/2.f), 1.f);
+		pfm::vec3 v1(0.f, radius, 0.f); 
+		pfm::vec2 v1_tex_coords(u, 1.f);
+
+		pfm::vec3 v2 = pfm::sphericalToCartesian(radius, -pitch_increment, heading);
+		pfm::vec2 v2_tex_coords(u, 1.f - v_increment);
+		pfm::vec3 v3 = pfm::sphericalToCartesian(radius, -pitch_increment, heading+heading_increment);
+		pfm::vec2 v3_tex_coords(u + u_increment, 1.f - v_increment);
+
+		_vertices[i].tex_coords = v0_tex_coords;
+		_vertices[i++].position = v0;
+		_vertices[i].tex_coords = v1_tex_coords;
+		_vertices[i++].position = v1;
+		_vertices[i].tex_coords = v2_tex_coords;
+		_vertices[i++].position = v2;
+
+		_vertices[i].tex_coords = v1_tex_coords;
+		_vertices[i++].position = v1;
+		_vertices[i].tex_coords = v3_tex_coords;
+		_vertices[i++].position = v3;
+		_vertices[i].tex_coords = v2_tex_coords;
+		_vertices[i++].position = v2;
 	}
 
  	// Regular strips
-	for (float pitch = -90.f; pitch < -pitch_increment ; pitch += pitch_increment) {
-		for (float heading = 0.f ; heading < 360.f ; heading += heading_increment) {
+	for (float pitch = -90.f, v = 0.f; pitch < -pitch_increment ; pitch += pitch_increment, v += v_increment) {
+		for (float heading = 0.f, u = 0.f ; heading < 360.f ; heading += heading_increment, u += u_increment) {
 			pfm::vec3 v0 = pfm::sphericalToCartesian(radius, pitch, heading);
+			pfm::vec2 v0_tex_coords(u, v);
 			pfm::vec3 v1 = pfm::sphericalToCartesian(radius, pitch, heading+heading_increment);
+			pfm::vec2 v1_tex_coords(u + u_increment, v);
 			pfm::vec3 v2 = pfm::sphericalToCartesian(radius, pitch+pitch_increment, heading);
+			pfm::vec2 v2_tex_coords(u, v + v_increment);
 			pfm::vec3 v3 = pfm::sphericalToCartesian(radius, pitch+pitch_increment, heading+heading_increment);
+			pfm::vec2 v3_tex_coords(u + u_increment, v + v_increment);
 
 			assert(i + 6 <= _num_vertices);
 
+			_vertices[i].tex_coords = v0_tex_coords;
 			_vertices[i++].position = v0;
+			_vertices[i].tex_coords = v1_tex_coords;
 			_vertices[i++].position = v1;
+			_vertices[i].tex_coords = v2_tex_coords;
 			_vertices[i++].position = v2;
-			//// Normals
-			//pfm::vec3 vn1 = v1 - v0;
-			//pfm::vec3 vn2 = v2 - v0;
-			//_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			//_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			//_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
 
+			_vertices[i].tex_coords = v1_tex_coords;
 			_vertices[i++].position = v1;
+			_vertices[i].tex_coords = v3_tex_coords;
 			_vertices[i++].position = v3;
+			_vertices[i].tex_coords = v2_tex_coords;
 			_vertices[i++].position = v2;
-			//// Normals
-			//vn1 = v3 - v1;
-			//vn2 = v2 - v1;
-			//_vertices[i-2].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			//_vertices[i-1].normal = pfm::normalize(pfm::cross(vn1, vn2));
-			//_vertices[i].normal = pfm::normalize(pfm::cross(vn1, vn2));
-
 		}
 	}
 

@@ -43,7 +43,7 @@ int	main(void)
 	shader.LoadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
 	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
 	skydome.ComputePositions(10.f, 10, 10);
-	skydome.ComputeTexCoords();
+	// skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 
 	// Noise related
