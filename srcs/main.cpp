@@ -42,7 +42,7 @@ int	main(void)
 	clouds.Init();
 	shader.LoadShaders("./shaders/vertex.glsl", "./shaders/frag.glsl");
 	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
-	skydome.ComputePositions(10.f, 10, 10);
+	skydome.ComputePositions(10.f, 6, 6);
 	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 

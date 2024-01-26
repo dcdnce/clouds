@@ -92,27 +92,36 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 
 void Skydome::ComputeTexCoords()
 {
+	float max_u = 0.f;
+	float min_u = 0.f;
+	float max_v = 0.f;
+	float min_v = 0.f;
+	bool b = false;
+
 	for (size_t i = 0 ; i < _num_vertices ; i++) {
-		// pfm::vec3 d = pfm::normalize(pfm::vec3(0.f, 0.f, 0.f) - _vertices[i].position);
-		// _vertices[i].tex_coords.u = (atan2(d.z, d.x) / (2*M_PI)) + 0.5;
-		// _vertices[i].tex_coords.v = (asin(d.y) / M_PI) + 0.5;
-		// float kRadius = 10.f;
+		pfm::vec3 v = _vertices[i].position;
 
-		// _vertices[i].tex_coords.u = _vertices[i].position.x / (1 - (_vertices[i].position.y/kRadius));
-		// _vertices[i].tex_coords.v = _vertices[i].position.z / (1 - (_vertices[i].position.y/kRadius));
+		_vertices[i].tex_coords.u = v.x / (1.f - v.y);
+		_vertices[i].tex_coords.v = v.z / (1.f - v.y);
 
-		// pfm::normalize(_vertices[i].tex_coords);
+		max_u = std::max(max_u, _vertices[i].tex_coords.u);
+		max_v = std::max(max_v, _vertices[i].tex_coords.v);
+		min_u = std::min(min_u, _vertices[i].tex_coords.u);
+		min_v = std::min(min_v, _vertices[i].tex_coords.v);
+	}
 
+	max_u += std::abs(min_u);
+	max_v += std::abs(min_v);
 
-		// float kRadius = 10.f;
-// 
-        // pfm::vec3 d = pfm::normalize(_vertices[i].position - pfm::vec3(0.f, kRadius, 0.f));
-// 
-        // _vertices[i].tex_coords.u = 0.5 + (atan2(d.x, d.z) / (2 * M_PI));
-        // _vertices[i].tex_coords.v = 0.5 - (asin(d.y) / M_PI);
-// 
-        // Normalize texture coordinates to [0, 1] range
-        // pfm::normalize(_vertices[i].tex_coords);
+	for (size_t i = 0 ; i < _num_vertices ; i++) {
+		_vertices[i].tex_coords.u += std::abs(min_u);
+		_vertices[i].tex_coords.v += std::abs(min_v);
+
+		_vertices[i].tex_coords.u /= max_u;
+		_vertices[i].tex_coords.v /= max_v;
+
+		std::cout << _vertices[i].tex_coords.u << std::endl;
+		std::cout << _vertices[i].tex_coords.v << std::endl;
 	}
 }
 
