@@ -96,13 +96,13 @@ void Skydome::ComputeTexCoords()
 	float min_u = 0.f;
 	float max_v = 0.f;
 	float min_v = 0.f;
-	bool b = false;
 
 	for (size_t i = 0 ; i < _num_vertices ; i++) {
 		pfm::vec3 v = _vertices[i].position;
+		float kR = 100.f;
 
-		_vertices[i].tex_coords.u = v.x / (1.f - v.y);
-		_vertices[i].tex_coords.v = v.z / (1.f - v.y);
+		_vertices[i].tex_coords.u = kR * tan(v.x / kR);
+		_vertices[i].tex_coords.v = kR * tan(v.z / kR);
 
 		max_u = std::max(max_u, _vertices[i].tex_coords.u);
 		max_v = std::max(max_v, _vertices[i].tex_coords.v);
@@ -119,9 +119,6 @@ void Skydome::ComputeTexCoords()
 
 		_vertices[i].tex_coords.u /= max_u;
 		_vertices[i].tex_coords.v /= max_v;
-
-		std::cout << _vertices[i].tex_coords.u << std::endl;
-		std::cout << _vertices[i].tex_coords.v << std::endl;
 	}
 }
 
