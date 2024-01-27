@@ -147,3 +147,19 @@ void Skydome::SendBuffers()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+void Skydome::CreateTexture()
+{
+	glUseProgram(shader.program);
+	glGenTextures(1, &texture_id);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUniform1i(glGetUniformLocation(shader.program, "texture1"), 0);
+	glUseProgram(0);
+}
