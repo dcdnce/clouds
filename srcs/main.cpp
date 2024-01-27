@@ -101,18 +101,18 @@ int	main(void)
 		// Draw skydome
 		skydome.Draw(frames);
 
-		// Draw noise panel
-		glUseProgram(shader.program);
-		glBindVertexArray(vao);
+		// // Draw noise panel
+		// glUseProgram(shader.program);
+		// glBindVertexArray(vao);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, skydome.texture);
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, texture_id);
+		// glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, skydome.texture);
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glBindVertexArray(0);
-		glUseProgram(0);
+		// glBindVertexArray(0);
+		// glUseProgram(0);
 
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
