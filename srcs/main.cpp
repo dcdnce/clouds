@@ -19,7 +19,7 @@ int	main(void)
 	clouds.Init();
 	shader.LoadShaders("./shaders/panel.vs", "./shaders/panel.fs");
 	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
-	skydome.ComputePositions(100.f, 60, 60);
+	skydome.ComputePositions(10.f, 60, 60);
 	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 	skydome.CreateTexture();
