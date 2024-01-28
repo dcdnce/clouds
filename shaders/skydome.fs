@@ -36,16 +36,16 @@ float interpolate(int step, vec2 v)
 	return(nx0*(1.f-yf)+nx1*yf);
 }
 
-float composition(vec2 v)
+int composition(vec2 v)
 {
 	//composition
 	float sum = 0;
-	for (int k = 8 ; k < 9 ; k++) { // octaves
+	for (int k = 1 ; k < 8 ; k++) { // octaves
 		vec2 new_v = v;
 		sum += interpolate(1<<k, new_v) * (1<<k);
 	}
 	sum += 128; 
-	return(sum / 256);
+	return(int(sum) >> 8);
 }
 
 void main()
