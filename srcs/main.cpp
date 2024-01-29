@@ -18,7 +18,7 @@ int	main(void)
 	// Initialization
 	clouds.Init();
 	shader.LoadShaders("./shaders/panel.vs", "./shaders/panel.fs");
-	skydome.shader.LoadShaders("./shaders/skydome.vs", "./shaders/skydome.fs");
+	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
 	skydome.ComputePositions(10.f, 60, 60);
 	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
