@@ -41,21 +41,21 @@ float interpolate(float step, vec2 v)
 
 float composition(vec2 v)
 {
-    offsets[0] = uFrames * 0.2   * 0.5f;
-    offsets[1] = uFrames * 0.060 * 0.5f;
-    offsets[2] = uFrames * 0.065 * 0.5f;
-    offsets[3] = uFrames * 0.25  * 0.5f;
-    offsets[4] = uFrames * 0.3   * 0.5f;
-    offsets[5] = uFrames * 0.1   * 0.5f;
-    offsets[6] = uFrames * 0.15  * 0.5f;
-    offsets[7] = uFrames * 0.26  * 0.5f;
+    offsets[0] = -uFrames * 0.1;
+    offsets[1] = -uFrames * 0.02;
+    offsets[2] = uFrames * 0.05;
+    offsets[3] = -uFrames * 0.1;
+    offsets[4] = uFrames * 0.02;
+    offsets[5] = uFrames * 0.03;
+    offsets[6] = uFrames * 0.02;
+    offsets[7] = uFrames * 0.3;
 
     float sum = 0;
     float sum_weights = 0;
 
     for (int k = 0  ; k < 8 ; k++) { // octaves
         float weight = float(1 << k);
-        sum += interpolate(weight, vec2(v.x + (fract(offsets[k] / noise_res) * noise_res), v.y + floor(offsets[k] / noise_res))) * weight;
+        sum += interpolate(weight, vec2(v.x + offsets[k], v.y)) * weight;
         sum_weights += weight;
     }
 
@@ -65,12 +65,11 @@ float composition(vec2 v)
 
 void main()
 {
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res);
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 3.f;
 	float value = composition(pos);
 
     //value = texture(texture1, fragTexCoord).r;
-	value = smoothstep(0.5, 1.3, value);
-	vec3 color = vec3(value, value, value);
+	value = smoothstep(0.8, 1.3, value);
 	float alpha = max(value, 0.2);
-	gl_FragColor = vec4(color.r, color.g, color.b, alpha);
+	gl_FragColor = vec4(mix(vec3(0.16, 0.32, 0.75), vec3(value), alpha), 1.);
 }
