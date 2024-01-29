@@ -15,29 +15,20 @@ float random(vec2 v)
 
 float interpolate(float step, vec2 v)
 {
-	//vec2 i = floor(v);
-    //vec2 f = vec2(fract(v.x), fract(v.y));
-	float step_sq = step*step;
-	float index = v.y * 256.0 + v.x;
-	float integer = floor(index / step) * step; // a
-	float frac = fract(index / step) * step;
-
-	vec2 i = vec2(fract(integer/ 256.0) * 256.0, floor(integer / 256.0));
-	vec2 f = vec2(fract(frac / 256.0)* 256.0, floor(frac / 256.0));
-
+	vec2 i = floor(v / step) * step;
+	vec2 f = fract(v / step);
 
 	// Four corners
-	float a = random(vec2(i.x, i.y));
-	float b = random(vec2(i.x+step, i.y));
-	float c = random(vec2(i.x, i.y+step));
-	float d = random(vec2(i.x+step, i.y+step));
+	float a = random(i);
+	float b = random(i + vec2(step, 0));
+	float c = random(i + vec2(0, step));
+	float d = random(i + vec2(step, step));
 
 	float xf = f.x;
 	float yf = f.y;
 	// Cubic Hermine Curve
 	xf = xf*xf*(3.f-2.f*xf);
 	yf = yf*yf*(3.f-2.f*yf);
-
 	// Mix - interpolation
 	float nx0 = a*(1.f-xf)+b*xf;
 	float nx1 = c*(1.f-xf)+d*xf;
@@ -50,11 +41,11 @@ float composition(vec2 v)
 	float sum = 0;
 	for (int k = 8 ; k <= 8 ; k++) { // octaves
 		vec2 new_v = v;
-		//sum += interpolate(float(1<<k), new_v) * (1<<k);
-		sum += interpolate(16.f, new_v) * 1.f;
+		//sum += interpolate(float(1<<k), new_v) * float((1<<k));
+		sum += interpolate(16.f, new_v) * 16.f;
 	}
-	sum += 128; 
-	return(sum / 256);
+	sum += 128.f; 
+	return(sum / 256.f);
 }
 
 void main()
@@ -63,7 +54,7 @@ void main()
 	float value = composition(pos);
 
     // float value = texture(texture1, fragTexCoord).r;
-	// value = smoothstep(0.5, 0.8, value);
+	//value = smoothstep(0.5, 0.8, value);
 	vec3 color = vec3(value, value, value);
 	gl_FragColor = vec4(color.r, color.g, color.b, color.r);
 }
