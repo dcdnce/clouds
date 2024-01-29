@@ -37,15 +37,18 @@ float interpolate(float step, vec2 v)
 
 float composition(vec2 v)
 {
-	//composition
-	float sum = 0;
-	for (int k = 8 ; k <= 8 ; k++) { // octaves
-		vec2 new_v = v;
-		//sum += interpolate(float(1<<k), new_v) * float((1<<k));
-		sum += interpolate(16.f, new_v) * 16.f;
-	}
-	sum += 128.f; 
-	return(sum / 256.f);
+    float sum = 0;
+    float sum_weights = 0;
+
+    for (int k = 1 ; k <= 8 ; k++) { // octaves
+        vec2 new_v = v;
+        float weight = float(1 << k);
+        sum += interpolate(weight, new_v) * weight;
+        sum_weights += weight;
+    }
+
+    sum += 128.f;
+    return sum / sum_weights;
 }
 
 void main()
@@ -54,7 +57,7 @@ void main()
 	float value = composition(pos);
 
     // float value = texture(texture1, fragTexCoord).r;
-	//value = smoothstep(0.5, 0.8, value);
+	value = smoothstep(0.5, 0.8, value);
 	vec3 color = vec3(value, value, value);
 	gl_FragColor = vec4(color.r, color.g, color.b, color.r);
 }
