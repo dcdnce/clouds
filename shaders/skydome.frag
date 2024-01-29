@@ -6,14 +6,15 @@ in vec2 fragTexCoord;
 uniform sampler2D texture1;
 uniform int uFrames;
 
+const float noise_res = 256.f;
 float offsets[8];
 
 // 2D Random
 float random(vec2 v)
 {
     return fract(sin(dot(v.xy,
-                         vec2(12.9898,78.233)))
-                 * 43758.5453123);
+                         vec2(14.9898,78.233)))
+                 * 403758.5453123);
 }
 
 float interpolate(float step, vec2 v)
@@ -40,35 +41,36 @@ float interpolate(float step, vec2 v)
 
 float composition(vec2 v)
 {
-    offsets[0] = uFrames * 0.055;
-    offsets[1] = uFrames * 0.060;
-    offsets[2] = uFrames * 0.065;
-    offsets[3] = uFrames * 0.080;
-    offsets[4] = uFrames * 0.085;
-    offsets[5] = uFrames * 0.1;
-    offsets[6] = uFrames * 0.15;
-    offsets[7] = uFrames * 0.16;
+    offsets[0] = uFrames * 0.2   * 0.5f;
+    offsets[1] = uFrames * 0.060 * 0.5f;
+    offsets[2] = uFrames * 0.065 * 0.5f;
+    offsets[3] = uFrames * 0.25  * 0.5f;
+    offsets[4] = uFrames * 0.3   * 0.5f;
+    offsets[5] = uFrames * 0.1   * 0.5f;
+    offsets[6] = uFrames * 0.15  * 0.5f;
+    offsets[7] = uFrames * 0.26  * 0.5f;
 
     float sum = 0;
     float sum_weights = 0;
 
-    for (int k = 1 ; k <= 8 ; k++) { // octaves
+    for (int k = 0  ; k < 8 ; k++) { // octaves
         float weight = float(1 << k);
-        sum += interpolate(weight, vec2(v.x + (fract(offsets[k-1] / 256.f) * 256.f), v.y + floor(offsets[k-1] / 256.f))) * weight;
+        sum += interpolate(weight, vec2(v.x + (fract(offsets[k] / noise_res) * noise_res), v.y + floor(offsets[k] / noise_res))) * weight;
         sum_weights += weight;
     }
 
     sum += 128.f;
-    return sum / sum_weights;
+    return sum / 256.f;
 }
 
 void main()
 {
-	vec2 pos = vec2(fragTexCoord.x * 256, fragTexCoord.y * 256);
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res);
 	float value = composition(pos);
 
     //value = texture(texture1, fragTexCoord).r;
-	value = smoothstep(0.5, 0.8, value);
+	value = smoothstep(0.5, 1.3, value);
 	vec3 color = vec3(value, value, value);
-	gl_FragColor = vec4(color.r, color.g, color.b, color.r);
+	float alpha = max(value, 0.2);
+	gl_FragColor = vec4(color.r, color.g, color.b, alpha);
 }

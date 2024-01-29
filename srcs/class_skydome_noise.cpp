@@ -43,14 +43,14 @@ void Skydome::_NoiseComposition(int const frames)
 		//offsets
 		int offsets[8];
 		int t = frames;
-		offsets[0] = static_cast<int>(t * 0.055f) << 8;
-		offsets[1] = static_cast<int>(t * 0.060f) << 8;
-		offsets[2] = static_cast<int>(t * 0.065f) << 8;
-		offsets[3] = static_cast<int>(t * 0.080f) << 8;
-		offsets[4] = static_cast<int>(t * 0.085f) << 8;
-		offsets[5] = static_cast<int>(t * 0.010f) << 8;
-		offsets[6] = static_cast<int>(t * 0.15f) << 8;
-		offsets[7] = static_cast<int>(t * 0.160f) << 8;
+		offsets[0] = static_cast<int>(t * 0.055f);
+		offsets[1] = static_cast<int>(t * 0.060f);
+		offsets[2] = static_cast<int>(t * 0.065f);
+		offsets[3] = static_cast<int>(t * 0.080f);
+		offsets[4] = static_cast<int>(t * 0.085f);
+		offsets[5] = static_cast<int>(t * 0.010f);
+		offsets[6] = static_cast<int>(t * 0.15f);
+		offsets[7] = static_cast<int>(t * 0.160f);
 
 		//composition
 		for (int i = 0 ; i < 65536 ; i++) {
