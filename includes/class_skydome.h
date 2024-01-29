@@ -37,6 +37,8 @@ class Skydome {
 			glBindTexture(GL_TEXTURE_2D, texture_id);
 			_NoiseComposition(frames);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, texture);
+			
+			glUniform1i(glGetUniformLocation(shader.program, "uFrames"), frames);
 
 			glBindVertexArray(_VAO);
 
