@@ -65,7 +65,7 @@ float composition(vec2 v)
 
 void main()
 {
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 3.f;
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
 	float value = composition(pos);
 
     //value = texture(texture1, fragTexCoord).r;
