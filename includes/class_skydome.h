@@ -14,6 +14,7 @@ class Skydome {
 		GLuint texture_id;
 		size_t _num_vertices;
 		std::vector<Vertex> _vertices;
+		pfm::vec3 sun_position;
 
 
 		void _NoiseComposition(int const frames);
@@ -38,11 +39,14 @@ class Skydome {
 			_NoiseComposition(frames);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, texture);
 			
+			pfm::mat4 rotated_sun_mat = pfm::rotate(
+				pfm::mat4(1.f),
+				static_cast<float>(frames) * pfm::radians(0.2),
+				pfm::vec3(0.f, 0.f, 1.f)
+			);
+			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);
 			glUniform1i(glGetUniformLocation(shader.program, "uFrames"), frames);
-			glUniform3f(glGetUniformLocation(shader.program, "uCameraPosition"), 
-						camera_position.x,
-						camera_position.y,
-						camera_position.z);
+			glUniform3f(glGetUniformLocation(shader.program, "uCameraPosition"), camera_position.x, camera_position.y, camera_position.z);
 
 			glBindVertexArray(_VAO);
 

@@ -7,8 +7,9 @@ in vec2 fragTexCoord;
 uniform sampler2D texture1;
 uniform int uFrames;
 uniform vec3 uCameraPosition;
+uniform mat4 uRotatedSun;
 
-const vec3 sun_position = vec3(0.0, 10000.0, 0.0);
+vec3 sun_position = vec3(0.0, 11.0, 0.0);
 const vec3 beta_R = vec3(0.0000037463718226553836, 0.00001, 0.00001573519360000001);
 const float beta_M = 0.00001;
 const float g = 0.9;
@@ -71,36 +72,29 @@ float composition(vec2 v)
     return sum / 256.f;
 }
 
-
-vec4 toRGBE(vec3 c) {
-	vec3 c_abs = abs(c);
-	float x = max(c_abs.r, max(c_abs.g, c_abs.b));
-	float y = ceil(log2(x));
-	return x <= 0.0 ? vec4(0) : vec4(c / exp2(y), (y + 128.0) / 255.0);
-}
-
-vec3 rotateVectorAroundOrigin(vec3 vector, float angleInRadians) {
-    mat3 rotationMatrix = mat3(
-        cos(angleInRadians), 0.0, sin(angleInRadians),
-        0.0, 1.0, 0.0,
-        -sin(angleInRadians), 0.0, cos(angleInRadians)
+vec3 rgbToXyz(vec3 color) {
+    // Matrice de conversion pour l'espace sRVB (standard RVB)
+    mat3 rgbToXyzMatrix = mat3(
+        0.4124564, 0.3575761, 0.1804375,
+        0.2126729, 0.7151522, 0.0721750,
+        0.0193339, 0.1191920, 0.9503041
     );
 
-    return rotationMatrix * vector;
+    // Appliquer la matrice de conversion
+    return rgbToXyzMatrix * color;
 }
 
 void main()
 {
     float angle = uFrames;
-    //vec3 rotatedSunPosition = rotateVectorAroundOrigin(sun_position, angle);
-    vec3 rotatedSunPosition = sun_position;
+    sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
 
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
-	vec3 light_dir = normalize(rotatedSunPosition - uCameraPosition);
+	vec3 light_dir = normalize(sun_position - uCameraPosition);
   	float cos_theta = dot(view_dir, light_dir);
 	
 	float view_dist = length(fragPosition - uCameraPosition);
-	float sun_dist = length(rotatedSunPosition - uCameraPosition);
+	float sun_dist = length(sun_position - uCameraPosition);
 
 	// phase function
 	const float pi = 3.14159265;
@@ -120,7 +114,7 @@ void main()
 
 	color += L_in;
 	
-	// color = toRGBE(color).rgb;
+	// color = rgbToXyz(color);
 
 
 
