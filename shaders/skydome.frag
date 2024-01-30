@@ -92,10 +92,11 @@ vec3 rotateVectorAroundOrigin(vec3 vector, float angleInRadians) {
 void main()
 {
     float angle = uFrames;
-    vec3 rotatedSunPosition = rotateVectorAroundOrigin(sun_position, angle);
-    //vec3 rotatedSunPosition = sun_position;
+    //vec3 rotatedSunPosition = rotateVectorAroundOrigin(sun_position, angle);
+    vec3 rotatedSunPosition = sun_position;
 
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
+	vec3 shitty_dir = normalize(uCameraPosition - fragPosition);
 	vec3 light_dir = normalize(rotatedSunPosition - uCameraPosition);
   	float cos_theta = dot(view_dir, light_dir);
 	
@@ -108,18 +109,19 @@ void main()
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 	const int steps = 10;
-	vec3  F_ex = exp(-(beta_R + beta_M) * sun_dist);
+	float step_size = view_dist / float(steps);
+	vec3 current_position = fragPosition;
 	vec3 color = vec3(0.f, 0.f, 0.f);
 	for (int i = 0; i < steps; ++i) {
-		float t = view_dist * (1.0 - (float(i) + 0.5) / float(steps));
-		vec3 orig = t * view_dir;
-		
-		float current_sun_dist = length(orig - uCameraPosition);
+		float s = length(current_position - uCameraPosition);
 
-		vec3 L_in = E_sun * (beta_R * Phi_R + beta_M * Phi_M) * exp(-(beta_R + beta_M) * current_sun_dist);
+		vec3  F_ex = exp(-(beta_R + beta_M) * s);
+		vec3 L_in = (1.f / (beta_R + beta_M)) * E_sun * ((beta_R*Phi_R + beta_M*Phi_M) * (1.f - exp(-(beta_R+beta_M) * s)));
 		
 	    color *= F_ex;
 		color += L_in;
+
+		current_position += step_size * shitty_dir;
 	}
 	
 	color = toRGBE(color).rgb;
