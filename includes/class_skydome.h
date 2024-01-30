@@ -29,7 +29,7 @@ class Skydome {
 		void CreateTexture();
 		void NoiseInterpolation(int const seed);
 
-		inline void Draw(int const frames)
+		inline void Draw(int const frames, pfm::vec3 const camera_position)
 		{
 			glUseProgram(this->shader.program);
 
@@ -39,6 +39,10 @@ class Skydome {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, texture);
 			
 			glUniform1i(glGetUniformLocation(shader.program, "uFrames"), frames);
+			glUniform3f(glGetUniformLocation(shader.program, "uCameraPosition"), 
+						camera_position.x,
+						camera_position.y,
+						camera_position.z);
 
 			glBindVertexArray(_VAO);
 

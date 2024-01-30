@@ -1,10 +1,18 @@
 #version 330 core
 
+in vec3 fragPosition;
 in vec3 fragColor;
 in vec2 fragTexCoord;
 
 uniform sampler2D texture1;
 uniform int uFrames;
+uniform vec3 uCameraPosition;
+
+const vec3 sun_position = vec3(0.f, 100.f, 0.f);
+const vec3 beta_R = vec3(0.0000037463718226553836, 0.00001, 0.00001573519360000001);
+const float beta_M = 0.00001;
+const float g = 0.9;
+const vec3 E_sun = vec3(250, 235, 200);
 
 const float noise_res = 256.f;
 float offsets[8];
@@ -63,13 +71,69 @@ float composition(vec2 v)
     return sum / 256.f;
 }
 
+
+vec4 toRGBE(vec3 c) {
+	vec3 c_abs = abs(c);
+	float x = max(c_abs.r, max(c_abs.g, c_abs.b));
+	float y = ceil(log2(x));
+	return x <= 0.0 ? vec4(0) : vec4(c / exp2(y), (y + 128.0) / 255.0);
+}
+
+vec3 rotateVectorAroundOrigin(vec3 vector, float angleInRadians) {
+    mat3 rotationMatrix = mat3(
+        cos(angleInRadians), 0.0, sin(angleInRadians),
+        0.0, 1.0, 0.0,
+        -sin(angleInRadians), 0.0, cos(angleInRadians)
+    );
+
+    return rotationMatrix * vector;
+}
+
 void main()
 {
+    float angle = uFrames;
+    vec3 rotatedSunPosition = rotateVectorAroundOrigin(sun_position, angle);
+    //vec3 rotatedSunPosition = sun_position;
+
+	vec3 view_dir = normalize(fragPosition - uCameraPosition);
+	vec3 light_dir = normalize(rotatedSunPosition - uCameraPosition);
+  	float cos_theta = dot(view_dir, light_dir);
+	
+	float view_dist = length(fragPosition - uCameraPosition);
+	float sun_dist = length(rotatedSunPosition - uCameraPosition);
+
+	// phase function
+	const float pi = 3.14159265;
+	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
+	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+
+	const int steps = 10;
+	vec3  F_ex = exp(-(beta_R + beta_M) * sun_dist);
+	vec3 color = vec3(0.f, 0.f, 0.f);
+	for (int i = 0; i < steps; ++i) {
+		float t = view_dist * (1.0 - (float(i) + 0.5) / float(steps));
+		vec3 orig = t * view_dir;
+		
+		float current_sun_dist = length(orig - uCameraPosition);
+
+		vec3 L_in = E_sun * (beta_R * Phi_R + beta_M * Phi_M) * exp(-(beta_R + beta_M) * current_sun_dist);
+		
+	    color *= F_ex;
+		color += L_in;
+	}
+	
+	color = toRGBE(color).rgb;
+
+
+
+
+
+	/* Noise */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
 	float value = composition(pos);
-
     //value = texture(texture1, fragTexCoord).r;
 	value = smoothstep(0.8, 1.3, value);
 	float alpha = max(value, 0.2);
-	gl_FragColor = vec4(mix(vec3(0.16, 0.32, 0.75), vec3(value), alpha), 1.);
+	//gl_FragColor = vec4(mix((0.16, 0.32, 0.75), vec3(value), alpha), 1.);
+	gl_FragColor = vec4(mix(color, vec3(value), value), 1.);
 }

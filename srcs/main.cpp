@@ -100,7 +100,7 @@ int	main(void)
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 		// Draw skydome
-		skydome.Draw(frames);
+		skydome.Draw(frames, clouds.camera.position);
 
 		// // Draw noise panel
 		// glUseProgram(shader.program);
