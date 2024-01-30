@@ -8,11 +8,11 @@ uniform sampler2D texture1;
 uniform int uFrames;
 uniform vec3 uCameraPosition;
 
-const vec3 sun_position = vec3(0.f, 100.f, 0.f);
+const vec3 sun_position = vec3(0.0, 10000.0, 0.0);
 const vec3 beta_R = vec3(0.0000037463718226553836, 0.00001, 0.00001573519360000001);
 const float beta_M = 0.00001;
 const float g = 0.9;
-const vec3 E_sun = vec3(250, 235, 200);
+const vec3 E_sun = vec3(250.0, 235.0, 200.0);
 
 const float noise_res = 256.f;
 float offsets[8];
@@ -96,7 +96,6 @@ void main()
     vec3 rotatedSunPosition = sun_position;
 
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
-	vec3 shitty_dir = normalize(uCameraPosition - fragPosition);
 	vec3 light_dir = normalize(rotatedSunPosition - uCameraPosition);
   	float cos_theta = dot(view_dir, light_dir);
 	
@@ -108,24 +107,20 @@ void main()
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-	const int steps = 10;
-	float step_size = view_dist / float(steps);
-	vec3 current_position = fragPosition;
-	vec3 color = vec3(0.f, 0.f, 0.f);
-	for (int i = 0; i < steps; ++i) {
-		float s = length(current_position - uCameraPosition);
+	vec3 color = vec3(0.0, 0.0, 0.0);
 
-		vec3  F_ex = exp(-(beta_R + beta_M) * s);
-		vec3 L_in = (1.f / (beta_R + beta_M)) * E_sun * ((beta_R*Phi_R + beta_M*Phi_M) * (1.f - exp(-(beta_R+beta_M) * s)));
-		
-	    color *= F_ex;
-		color += L_in;
-
-		current_position += step_size * shitty_dir;
-	}
+	vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
+	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	L_in *= (1.0 - F_ex);
+	L_in *= E_sun;
 	
-	color = toRGBE(color).rgb;
+	// Normalisez votre intensité
+	float maxIntensity = max(L_in.r, max(L_in.g, L_in.b));
+	L_in /= maxIntensity;
 
+	color += L_in;
+	
+	// color = toRGBE(color).rgb;
 
 
 
