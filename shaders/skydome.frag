@@ -9,7 +9,7 @@ uniform int uFrames;
 uniform vec3 uCameraPosition;
 uniform mat4 uRotatedSun;
 
-vec3 sun_position = vec3(0.0, 11.0, 0.0);
+vec3 sun_position = vec3(-11.0, 11.0, 0.0);
 vec3 beta_R = vec3(1.95e-2, 1.1e-1, 2.94e-1);
 vec3 beta_M = vec3(4e-2, 4e-2, 4e-2);
 const float g = 0.9;
@@ -86,21 +86,16 @@ void main()
 {
     float angle = uFrames;
     sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
-
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
-	//  vec3 light_dir = vec3(0.f, 1.f, 0.f);
   	float cos_theta = clamp(dot(view_dir, light_dir), 0.0, 1.0);
-	
 	float view_dist = length(fragPosition - uCameraPosition);
 	float sun_dist = length(sun_position - uCameraPosition);
 
-	// phase function
+	// phases functions
 	const float pi = 3.14159265;
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
-	// float g2 = g*g;
-	// float Phi_M = 1. * pow(1. + g2 + 2. * g * cos_theta, -1.5) * (1. - g2) / (2. + g2);
 
 	vec3 color = vec3(0.0, 0.0, 0.0);
 
@@ -111,14 +106,12 @@ void main()
 
 	vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
 	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
+	// vec3 F_ex = exp(-(beta_R+beta_M) * s);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	L_in *= 0.08; // kSunIntensity
 	color += L_in;
-
-	// Atténuation basée sur cos(theta)
-	// color *= (max(cos_theta, 0.0));  // Atténuation lorsque cos(theta) est proche de zéro
 
  	// sun
 	color += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
@@ -127,7 +120,7 @@ void main()
 	// color = ACESFilm(color);
 
 
-	// Sky Color
+	/* SKY COLOR */
 	// sM = 1.5 / 1500;
 	// L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	// L_in *= 1.0 - exp(-(beta_R+beta_M)*sM);
@@ -139,13 +132,29 @@ void main()
 	// vec3 sky_color = L_in;
 	// color = mix(color, sky_color, sky_color);
 
-	/* Noise */
+	/* NOISE */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
 	float value = composition(pos);
-    //value = texture(texture1, fragTexCoord).r;
-	// value *= (max(cos_theta, 0.0));  // Atténuation lorsque cos(theta) est proche de zéro
 	value = smoothstep(0.8, 1.3, value);
-	float alpha = max(value, 0.2);
-	//gl_FragColor = vec4(mix((0.16, 0.32, 0.75), vec3(value), alpha), 1.);
-	gl_FragColor = vec4(mix(color, vec3(value), value), 1.);
+
+	// AERIAL PERSPECTIVE on clouds
+	vec3 light_dir_from_center = normalize(sun_position - vec3(0.0, 0.0, 0.0));
+	vec3 view_dir_from_center = normalize(fragPosition - vec3(0.0, 0.0, 0.0));
+	float cos_theta_degrees = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
+	float theta_degrees = acos(cos_theta_degrees);
+	vec3 value_color = vec3(value);
+	if (cos_theta_degrees < 0.0) { // too far for sunlight
+		value_color = vec3(0.0);
+		value = 0.0;
+	}
+	else {
+		float zenith = 2.0;
+		float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
+		F_ex = exp(-(beta_R+beta_M) * s);
+		value_color *= F_ex;
+		value_color += L_in;
+	}
+
+	// float alpha = max(value, 0.2);
+	gl_FragColor = vec4(mix(color, value_color, value), 1.);
 }
