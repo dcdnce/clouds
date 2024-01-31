@@ -79,6 +79,7 @@ void main()
 
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
+	//  vec3 light_dir = vec3(0.f, 1.f, 0.f);
   	float cos_theta = clamp(dot(view_dir, light_dir), 0.0, 1.0);
 	
 	float view_dist = length(fragPosition - uCameraPosition);
@@ -86,10 +87,8 @@ void main()
 
 	// phase function
 	const float pi = 3.14159265;
-	// float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
-	float Phi_R = 1.0;
-	// float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
-	float Phi_M = 1.0 * pow(1. + g*g + 2. * g * cos_theta, -1.5) * (1. - g*g) / (2. + g*g);
+	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
+	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 	vec3 color = vec3(0.0, 0.0, 0.0);
 
@@ -99,14 +98,13 @@ void main()
 	float sM = 1.2 / t ;
 
 	vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
+	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
-	// L_in *= E_sun;
-	
+	L_in *= E_sun;
+	L_in *= 0.08; // kSunIntensity
+
 	color += L_in;
-
-	// color /= max(color.x, max(color.y, color.z));
-
 
 	/* Noise */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
