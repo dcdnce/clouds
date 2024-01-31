@@ -10,8 +10,8 @@ uniform vec3 uCameraPosition;
 uniform mat4 uRotatedSun;
 
 vec3 sun_position = vec3(0.0, 11.0, 0.0);
-const vec3 beta_R = vec3(3.746371822655383e-7, 0.0000001, 1.5735193600000005e-7);
-const float beta_M = 0.00001;
+vec3 beta_R = vec3(1.95e-2, 1.1e-1, 2.94e-1);
+vec3 beta_M = vec3(4e-2, 4e-2, 4e-2);
 const float g = 0.9;
 const vec3 E_sun = vec3(250.0, 235.0, 200.0);
 
@@ -72,18 +72,6 @@ float composition(vec2 v)
     return sum / 256.f;
 }
 
-vec3 rgbToXyz(vec3 color) {
-    // Matrice de conversion pour l'espace sRVB (standard RVB)
-    mat3 rgbToXyzMatrix = mat3(
-        0.4124564, 0.3575761, 0.1804375,
-        0.2126729, 0.7151522, 0.0721750,
-        0.0193339, 0.1191920, 0.9503041
-    );
-
-    // Appliquer la matrice de conversion
-    return rgbToXyzMatrix * color;
-}
-
 void main()
 {
     float angle = uFrames;
@@ -91,32 +79,33 @@ void main()
 
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
-  	float cos_theta = dot(view_dir, light_dir);
+  	float cos_theta = clamp(dot(view_dir, light_dir), 0.0, 1.0);
 	
 	float view_dist = length(fragPosition - uCameraPosition);
 	float sun_dist = length(sun_position - uCameraPosition);
 
 	// phase function
 	const float pi = 3.14159265;
-	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
-	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	// float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
+	float Phi_R = 1.0;
+	// float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	float Phi_M = 1.0 * pow(1. + g*g + 2. * g * cos_theta, -1.5) * (1. - g*g) / (2. + g*g);
 
 	vec3 color = vec3(0.0, 0.0, 0.0);
 
-	vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
+	// optical depth -> zenithAngle
+	float t = max(0.001, view_dir.y) + max(-view_dir.y, -0.001);
+	float sR = 1.0 / t ;
+	float sM = 1.2 / t ;
+
+	vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
+	// L_in *= E_sun;
 	
-	// Normalisez votre intensité
-	float maxIntensity = max(L_in.r, max(L_in.g, L_in.b));
-	L_in /= maxIntensity;
-
 	color += L_in;
-	
-	// color = rgbToXyz(color);
 
-
+	// color /= max(color.x, max(color.y, color.z));
 
 
 	/* Noise */
