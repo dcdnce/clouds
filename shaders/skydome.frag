@@ -9,7 +9,8 @@ uniform int uFrames;
 uniform vec3 uCameraPosition;
 uniform mat4 uRotatedSun;
 
-vec3 sun_position = vec3(-11.0, 11.0, 0.0);
+// vec3 sun_position = vec3(-11.0, 11.0, 0.0);
+vec3 sun_position = vec3(0.0, 11.0, 0.0);
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(4e-2, 4e-2, 4e-2);
 const float g = 0.9;
@@ -84,25 +85,18 @@ void main()
 {
 	// CLASSIC SCATTERING
     sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
-	vec3 view_dir = normalize(fragPosition - uCameraPosition);
-	vec3 light_dir = normalize(sun_position - uCameraPosition);
-  	float cos_theta = clamp(dot(view_dir, light_dir), 0.0, 1.0);
-	float view_dist = length(fragPosition - uCameraPosition);
-	float sun_dist = length(sun_position - uCameraPosition);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
-	// optical depth -> zenithAngle
-	float t = max(0.001, view_dir.y) + max(-view_dir.y, -0.001);
-	float sR = 1. / t ;
-	float sM = 1.5 / t ;
-
-	// test optical depth
 	vec3 light_dir_from_center = normalize(sun_position - vec3(0.0, 0.0, 0.0));
 	vec3 view_dir_from_center = normalize(fragPosition - vec3(0.0, 0.0, 0.0));
 	float cos_theta_degrees = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
+	float cos_theta = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
+	cos_theta = max(0.0, cos_theta_degrees); // no more sunlight
 	cos_theta_degrees = max(0.0, cos_theta_degrees); // no more sunlight
 	float theta_degrees = acos(cos_theta_degrees);
-	float zA = 8.4;
-	float zH = 1.25;
+
+	//optical depth (computed from zenith constants)
+	float zA = 2.4; // meh
+	float zH = 0.3; // meh
 	float sA = zA / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 	float sH = zH / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 
@@ -125,7 +119,6 @@ void main()
 	sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex;
 	sky_rgb = ACESFilm(sky_rgb);
 	sky_rgb = pow(sky_rgb, vec3(2.2));
-
 
 	/* NOISE */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
