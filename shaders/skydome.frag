@@ -117,6 +117,9 @@ void main()
 	L_in *= 0.08; // kSunIntensity
 	color += L_in;
 
+	// Atténuation basée sur cos(theta)
+	// color *= (max(cos_theta, 0.0));  // Atténuation lorsque cos(theta) est proche de zéro
+
  	// sun
 	color += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
 	// sun haze
@@ -140,6 +143,7 @@ void main()
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
 	float value = composition(pos);
     //value = texture(texture1, fragTexCoord).r;
+	// value *= (max(cos_theta, 0.0));  // Atténuation lorsque cos(theta) est proche de zéro
 	value = smoothstep(0.8, 1.3, value);
 	float alpha = max(value, 0.2);
 	//gl_FragColor = vec4(mix((0.16, 0.32, 0.75), vec3(value), alpha), 1.);
