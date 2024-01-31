@@ -114,21 +114,9 @@ void main()
 	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
 	// sun haze
 	sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex;
-	// sky_rgb = ACESFilm(sky_rgb);
-	// sky_rgb = pow(sky_rgb, vec3(2.2));
+	sky_rgb = ACESFilm(sky_rgb);
+	sky_rgb = pow(sky_rgb, vec3(2.2));
 
-
-	/* SKY COLOR */
-	// sM = 1.5 / 1500;
-	// L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	// L_in *= 1.0 - exp(-(beta_R+beta_M)*sM);
-	// L_in *= ((beta_R * Phi_R)/(beta_R));
-	// L_in *= 1.0 - exp(-beta_R*(sR-sM));
-	// L_in *= exp(-(beta_R+beta_M)*sM);
-	// L_in *= E_sun;
-	// L_in *= 8.; // kSunIntensity
-	// vec3 sky_color = L_in;
-	// color = mix(color, sky_color, sky_color);
 
 	/* NOISE */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
@@ -151,8 +139,9 @@ void main()
 	else {
 		cloud_rgb *= F_ex;
 		cloud_rgb += L_in;
+		cloud_rgb *= 0.6f; //constant
 	}
 
-	// float alpha = max(value, 0.2);
+	// float alpha = max(cloud, 0.2);
 	gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
 }
