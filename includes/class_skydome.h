@@ -41,7 +41,7 @@ class Skydome {
 			
 			pfm::mat4 rotated_sun_mat = pfm::rotate(
 				pfm::mat4(1.f),
-				static_cast<float>(frames) * pfm::radians(0.05),
+				static_cast<float>(frames) * pfm::radians(0.02),
 				pfm::vec3(0.f, 0.f, 1.f)
 			);
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);

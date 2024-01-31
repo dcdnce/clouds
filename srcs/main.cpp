@@ -17,7 +17,7 @@ int	main(void)
 
 	// Initialization
 	clouds.Init();
-	clouds.camera.position = pfm::vec3(0.f, 9.f, 0.f);
+	clouds.camera.position = pfm::vec3(0.f, 9.90f, 0.f);
 	shader.LoadShaders("./shaders/panel.vs", "./shaders/panel.fs");
 	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
 	skydome.ComputePositions(10.f, 60, 60);

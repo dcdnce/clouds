@@ -1,4 +1,7 @@
-- Skydome - no modulo jumps
+- Scattering - Understand every coefficient and constants
+- Scattering - True sky color
+- Scattering - Documentation
+- Skydome - Centrer sur camera pos
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline
 - F.6 If your function must not throw, declare it noexcept

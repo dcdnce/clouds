@@ -72,6 +72,16 @@ float composition(vec2 v)
     return sum / 256.f;
 }
 
+vec3 ACESFilm( vec3 x )
+{
+    float tA = 2.51;
+    float tB = 0.03;
+    float tC = 2.43;
+    float tD = 0.59;
+    float tE = 0.14;
+    return clamp((x*(tA*x+tB))/(x*(tC*x+tD)+tE),0.0,1.0);
+}
+
 void main()
 {
     float angle = uFrames;
@@ -96,17 +106,35 @@ void main()
 
 	// optical depth -> zenithAngle
 	float t = max(0.001, view_dir.y) + max(-view_dir.y, -0.001);
-	float sR = 1.0 / t ;
-	float sM = 1.2 / t ;
+	float sR = 1. / t ;
+	float sM = 1.5 / t ;
 
 	vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
 	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
-	L_in *= 0.05; // kSunIntensity
-
+	L_in *= 0.08; // kSunIntensity
 	color += L_in;
+
+ 	// sun
+	color += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
+	// sun haze
+	color += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex;
+	// color = ACESFilm(color);
+
+
+	// Sky Color
+	// sM = 1.5 / 1500;
+	// L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	// L_in *= 1.0 - exp(-(beta_R+beta_M)*sM);
+	// L_in *= ((beta_R * Phi_R)/(beta_R));
+	// L_in *= 1.0 - exp(-beta_R*(sR-sM));
+	// L_in *= exp(-(beta_R+beta_M)*sM);
+	// L_in *= E_sun;
+	// L_in *= 8.; // kSunIntensity
+	// vec3 sky_color = L_in;
+	// color = mix(color, sky_color, sky_color);
 
 	/* Noise */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
