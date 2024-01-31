@@ -14,7 +14,7 @@ vec3 sun_position = vec3(0.0, 11.0, 0.0);
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(4e-2, 4e-2, 4e-2);
 const float g = 0.9;
-const vec3 E_sun = vec3(250.0, 235.0, 200.0);
+vec3 E_sun = vec3(250.0, 235.0, 200.0);
 
 const float noise_res = 256.f;
 float offsets[8];
@@ -85,9 +85,11 @@ void main()
 {
 	// CLASSIC SCATTERING
     sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
+	vec3 center = vec3(0.0, -5.0, 0.0);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
-	vec3 light_dir_from_center = normalize(sun_position - vec3(0.0, 0.0, 0.0));
-	vec3 view_dir_from_center = normalize(fragPosition - vec3(0.0, 0.0, 0.0));
+	vec3 light_dir_from_center = normalize(sun_position - center);
+	vec3 view_dir_from_center = normalize(fragPosition - center);
+	float view_dist_from_center = length(fragPosition - center);
 	float cos_theta_degrees = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
 	float cos_theta = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
 	cos_theta = max(0.0, cos_theta_degrees); // no more sunlight
@@ -110,7 +112,22 @@ void main()
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	L_in *= 0.08; // kSunIntensity
-	sky_rgb += L_in;
+	// sky_rgb += L_in;
+
+	int steps = 10;
+	float t_steps = view_dist_from_center / float(steps);
+	vec3 sample_point = center;
+	for (int i = 0 ; i < 10 ; i++) {
+		sample_point = center + ((t_steps * float(i)) * view_dir_from_center); 
+		vec3 light_dir_from_sample_point = normalize(sun_position - sample_point);
+		float light_dist_from_sample_point = length(sun_position - sample_point);
+		vec3 sp_F_ex = exp(-(beta_R*sA+beta_M*sH));
+		vec3 sp_L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+		sp_L_in *= (1.0 - sp_F_ex);
+		sp_L_in *= E_sun;
+		sky_rgb += sp_L_in;
+	}
+
  	// sun
 	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
 	// sun haze
@@ -123,8 +140,8 @@ void main()
 	float cloud = composition(pos);
 	cloud = smoothstep(0.8, 1.3, cloud);
 
-	// SUNLIGHT on clouds
-	float zenith = 2.4;
+	// AERIAL PERSPECTIVE on clouds
+	float zenith = 2.0; //meh
 	float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 	F_ex = exp(-(beta_R+beta_M) * s);
 	vec3 cloud_rgb = vec3(cloud);
@@ -134,6 +151,6 @@ void main()
 
 	// float alpha = max(cloud, 0.2);
 	// gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
-	vec4 view_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
+	vec4 view_rgb = vec4(mix(sky_rgb, cloud_rgb, cos_theta), 1.);
 	gl_FragColor = mix(vec4(0.0), view_rgb, cos_theta);
 }
