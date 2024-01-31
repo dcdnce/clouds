@@ -89,6 +89,8 @@ void main()
 	const float pi = 3.14159265;
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	// float g2 = g*g;
+	// float Phi_M = 1. * pow(1. + g2 + 2. * g * cos_theta, -1.5) * (1. - g2) / (2. + g2);
 
 	vec3 color = vec3(0.0, 0.0, 0.0);
 
@@ -102,7 +104,7 @@ void main()
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
-	L_in *= 0.08; // kSunIntensity
+	L_in *= 0.05; // kSunIntensity
 
 	color += L_in;
 
