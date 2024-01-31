@@ -10,7 +10,7 @@ uniform vec3 uCameraPosition;
 uniform mat4 uRotatedSun;
 
 vec3 sun_position = vec3(-11.0, 11.0, 0.0);
-vec3 beta_R = vec3(1.95e-2, 1.1e-1, 2.94e-1);
+vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(4e-2, 4e-2, 4e-2);
 const float g = 0.9;
 const vec3 E_sun = vec3(250.0, 235.0, 200.0);
@@ -30,13 +30,11 @@ float interpolate(float step, vec2 v)
 {
 	vec2 i = floor(v / step) * step;
 	vec2 f = fract(v / step);
-
 	// Four corners
 	float a = random(i);
 	float b = random(i + vec2(step, 0));
 	float c = random(i + vec2(0, step));
 	float d = random(i + vec2(step, step));
-
 	float xf = f.x;
 	float yf = f.y;
 	// Cubic Hermine Curve
@@ -97,7 +95,7 @@ void main()
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-	vec3 color = vec3(0.0, 0.0, 0.0);
+	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 
 	// optical depth -> zenithAngle
 	float t = max(0.001, view_dir.y) + max(-view_dir.y, -0.001);
@@ -106,18 +104,18 @@ void main()
 
 	vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
 	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
-	// vec3 F_ex = exp(-(beta_R+beta_M) * s);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	L_in *= 0.08; // kSunIntensity
-	color += L_in;
+	sky_rgb += L_in;
 
  	// sun
-	color += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
+	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
 	// sun haze
-	color += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex;
-	// color = ACESFilm(color);
+	sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex;
+	// sky_rgb = ACESFilm(sky_rgb);
+	// sky_rgb = pow(sky_rgb, vec3(2.2));
 
 
 	/* SKY COLOR */
@@ -134,27 +132,27 @@ void main()
 
 	/* NOISE */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
-	float value = composition(pos);
-	value = smoothstep(0.8, 1.3, value);
+	float cloud = composition(pos);
+	cloud = smoothstep(0.8, 1.3, cloud);
 
 	// AERIAL PERSPECTIVE on clouds
 	vec3 light_dir_from_center = normalize(sun_position - vec3(0.0, 0.0, 0.0));
 	vec3 view_dir_from_center = normalize(fragPosition - vec3(0.0, 0.0, 0.0));
 	float cos_theta_degrees = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
 	float theta_degrees = acos(cos_theta_degrees);
-	vec3 value_color = vec3(value);
+	float zenith = 2.0;
+	float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
+	F_ex = exp(-(beta_R+beta_M) * s);
+	vec3 cloud_rgb = vec3(cloud);
 	if (cos_theta_degrees < 0.0) { // too far for sunlight
-		value_color = vec3(0.0);
-		value = 0.0;
+		cloud_rgb = vec3(0.0);
+		cloud = 0.0;
 	}
 	else {
-		float zenith = 2.0;
-		float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
-		F_ex = exp(-(beta_R+beta_M) * s);
-		value_color *= F_ex;
-		value_color += L_in;
+		cloud_rgb *= F_ex;
+		cloud_rgb += L_in;
 	}
 
 	// float alpha = max(value, 0.2);
-	gl_FragColor = vec4(mix(color, value_color, value), 1.);
+	gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
 }
