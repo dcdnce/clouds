@@ -10,7 +10,7 @@ uniform vec3 uCameraPosition;
 uniform mat4 uRotatedSun;
 
 vec3 sun_position = vec3(0.0, 11.0, 0.0);
-const vec3 beta_R = vec3(0.0000037463718226553836, 0.00001, 0.00001573519360000001);
+const vec3 beta_R = vec3(3.746371822655383e-7, 0.0000001, 1.5735193600000005e-7);
 const float beta_M = 0.00001;
 const float g = 0.9;
 const vec3 E_sun = vec3(250.0, 235.0, 200.0);
