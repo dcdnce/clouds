@@ -90,7 +90,8 @@ int	main(void)
 	while (!glfwWindowShouldClose(clouds.window)) {
 		clouds.ComputeDeltaTime();
 		static int frames = 0;
-		glClearColor(0.16f, 0.32f, 0.75f, 1.f);
+		// glClearColor(0.16f, 0.32f, 0.75f, 1.f);
+		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Matrices - model and view

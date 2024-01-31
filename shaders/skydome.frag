@@ -105,9 +105,7 @@ void main()
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 	// coefficients
-	// vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
@@ -126,7 +124,7 @@ void main()
 	cloud = smoothstep(0.8, 1.3, cloud);
 
 	// SUNLIGHT on clouds
-	float zenith = 2.0;
+	float zenith = 2.4;
 	float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 	F_ex = exp(-(beta_R+beta_M) * s);
 	vec3 cloud_rgb = vec3(cloud);
@@ -135,5 +133,7 @@ void main()
 	cloud_rgb *= 0.6f; //constant
 
 	// float alpha = max(cloud, 0.2);
-	gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
+	// gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
+	vec4 view_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
+	gl_FragColor = mix(vec4(0.0), view_rgb, cos_theta);
 }
