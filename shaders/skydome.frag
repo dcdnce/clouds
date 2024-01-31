@@ -94,12 +94,25 @@ void main()
 	float t = max(0.001, view_dir.y) + max(-view_dir.y, -0.001);
 	float sR = 1. / t ;
 	float sM = 1.5 / t ;
+
+	// test optical depth
+	vec3 light_dir_from_center = normalize(sun_position - vec3(0.0, 0.0, 0.0));
+	vec3 view_dir_from_center = normalize(fragPosition - vec3(0.0, 0.0, 0.0));
+	float cos_theta_degrees = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
+	cos_theta_degrees = max(0.0, cos_theta_degrees); // no more sunlight
+	float theta_degrees = acos(cos_theta_degrees);
+	float zA = 8.4;
+	float zH = 1.25;
+	float sA = zA / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
+	float sH = zH / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
+
 	// phases functions
 	const float pi = 3.14159265;
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 	// coefficients
-	vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
+	// vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
+	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
@@ -120,11 +133,6 @@ void main()
 	cloud = smoothstep(0.8, 1.3, cloud);
 
 	// SUNLIGHT on clouds
-	vec3 light_dir_from_center = normalize(sun_position - vec3(0.0, 0.0, 0.0));
-	vec3 view_dir_from_center = normalize(fragPosition - vec3(0.0, 0.0, 0.0));
-	float cos_theta_degrees = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
-	cos_theta_degrees = max(0.0, cos_theta_degrees); // no more sunlight
-	float theta_degrees = acos(cos_theta_degrees);
 	float zenith = 2.0;
 	float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 	F_ex = exp(-(beta_R+beta_M) * s);
