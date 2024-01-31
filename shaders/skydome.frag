@@ -85,7 +85,7 @@ void main()
 {
 	// CLASSIC SCATTERING
     sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
-	vec3 center = vec3(0.0, -5.0, 0.0);
+	vec3 center = vec3(0.0, 0.0, 0.0);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir_from_center = normalize(sun_position - center);
 	vec3 view_dir_from_center = normalize(fragPosition - center);
@@ -95,52 +95,39 @@ void main()
 	cos_theta = max(0.0, cos_theta_degrees); // no more sunlight
 	cos_theta_degrees = max(0.0, cos_theta_degrees); // no more sunlight
 	float theta_degrees = acos(cos_theta_degrees);
-
-	//optical depth (computed from zenith constants)
+	// optical depth
+		// computed from zenith constants
 	float zA = 2.4; // meh
 	float zH = 0.3; // meh
 	float sA = zA / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 	float sH = zH / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
-
+		// from -> zenithAngle
+	// float t = max(0.001, view_dir_from_center.y) + max(-view_dir_from_center.y, -0.001);
+	// float sR = 1. / t ;
+	// float sM = 1.5 / t; 
 	// phases functions
 	const float pi = 3.14159265;
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 	// coefficients
+	// vec3 F_ex = exp(-(beta_R*sR+beta_M*sM)); // with zenith angle
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	L_in *= 0.08; // kSunIntensity
-	// sky_rgb += L_in;
-
-	int steps = 10;
-	float t_steps = view_dist_from_center / float(steps);
-	vec3 sample_point = center;
-	for (int i = 0 ; i < 10 ; i++) {
-		sample_point = center + ((t_steps * float(i)) * view_dir_from_center); 
-		vec3 light_dir_from_sample_point = normalize(sun_position - sample_point);
-		float light_dist_from_sample_point = length(sun_position - sample_point);
-		vec3 sp_F_ex = exp(-(beta_R*sA+beta_M*sH));
-		vec3 sp_L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-		sp_L_in *= (1.0 - sp_F_ex);
-		sp_L_in *= E_sun;
-		sky_rgb += sp_L_in;
-	}
-
- 	// sun
-	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
-	// sun haze
-	sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex;
+	sky_rgb += L_in;
+	// aesthetic
+	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex; //sun
+	sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex; // sun haze
 	sky_rgb = ACESFilm(sky_rgb);
 	sky_rgb = pow(sky_rgb, vec3(2.2));
 
-	/* NOISE */
+	/* CLOUDS */
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
 	float cloud = composition(pos);
 	cloud = smoothstep(0.8, 1.3, cloud);
-
-	// AERIAL PERSPECTIVE on clouds
+	// SUNLIGHT on clouds
 	float zenith = 2.0; //meh
 	float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 	F_ex = exp(-(beta_R+beta_M) * s);
@@ -149,8 +136,8 @@ void main()
 	cloud_rgb += L_in;
 	cloud_rgb *= 0.6f; //constant
 
-	// float alpha = max(cloud, 0.2);
-	// gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
-	vec4 view_rgb = vec4(mix(sky_rgb, cloud_rgb, cos_theta), 1.);
+	vec4 view_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
 	gl_FragColor = mix(vec4(0.0), view_rgb, cos_theta);
+	// gl_FragColor = view_rgb; // the old way
+	// gl_FragColor = mix(vec4(0.0), view_rgb, view_dir_from_center.y); // test
 }
