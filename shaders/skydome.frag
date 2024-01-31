@@ -82,26 +82,23 @@ vec3 ACESFilm( vec3 x )
 
 void main()
 {
-    float angle = uFrames;
+	// CLASSIC SCATTERING
     sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
   	float cos_theta = clamp(dot(view_dir, light_dir), 0.0, 1.0);
 	float view_dist = length(fragPosition - uCameraPosition);
 	float sun_dist = length(sun_position - uCameraPosition);
-
-	// phases functions
-	const float pi = 3.14159265;
-	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
-	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
-
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
-
 	// optical depth -> zenithAngle
 	float t = max(0.001, view_dir.y) + max(-view_dir.y, -0.001);
 	float sR = 1. / t ;
 	float sM = 1.5 / t ;
-
+	// phases functions
+	const float pi = 3.14159265;
+	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
+	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	// coefficients
 	vec3 F_ex = exp(-(beta_R*sR+beta_M*sM));
 	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
@@ -109,7 +106,6 @@ void main()
 	L_in *= E_sun;
 	L_in *= 0.08; // kSunIntensity
 	sky_rgb += L_in;
-
  	// sun
 	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex;
 	// sun haze
@@ -123,24 +119,19 @@ void main()
 	float cloud = composition(pos);
 	cloud = smoothstep(0.8, 1.3, cloud);
 
-	// AERIAL PERSPECTIVE on clouds
+	// SUNLIGHT on clouds
 	vec3 light_dir_from_center = normalize(sun_position - vec3(0.0, 0.0, 0.0));
 	vec3 view_dir_from_center = normalize(fragPosition - vec3(0.0, 0.0, 0.0));
 	float cos_theta_degrees = clamp(dot(view_dir_from_center, light_dir_from_center), -1.0, 1.0);
+	cos_theta_degrees = max(0.0, cos_theta_degrees); // no more sunlight
 	float theta_degrees = acos(cos_theta_degrees);
 	float zenith = 2.0;
 	float s = zenith / (cos_theta_degrees + 0.15 * pow(93.885 - theta_degrees, -1.253));
 	F_ex = exp(-(beta_R+beta_M) * s);
 	vec3 cloud_rgb = vec3(cloud);
-	if (cos_theta_degrees < 0.0) { // too far for sunlight
-		cloud_rgb = vec3(0.0);
-		cloud = 0.0;
-	}
-	else {
-		cloud_rgb *= F_ex;
-		cloud_rgb += L_in;
-		cloud_rgb *= 0.6f; //constant
-	}
+	cloud_rgb *= F_ex;
+	cloud_rgb += L_in;
+	cloud_rgb *= 0.6f; //constant
 
 	// float alpha = max(cloud, 0.2);
 	gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
