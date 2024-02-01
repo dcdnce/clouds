@@ -84,7 +84,7 @@ void main()
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
-	float cos_theta = clamp(dot(view_dir, light_dir), 0., 1.0);
+	float cos_theta = clamp(dot(view_dir, light_dir), -1., 1.0);
 	cos_theta = max(0.0, cos_theta); // no more sunlight
 	float theta = acos(cos_theta);
 	// optical depth
@@ -102,10 +102,10 @@ void main()
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 	// coefficients
-	// vec3 F_ex = exp(-(beta_R+beta_M) * view_dist * 0.3);
 	// vec3 F_ex = exp(-(beta_R*sR+beta_M*sM)); // with zenith angle
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH) * view_dist * 0.03);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	E_sun *= F_ex;
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	L_in *= 0.08; // kSunIntensity
@@ -130,7 +130,7 @@ void main()
 	cloud_rgb *= 0.6f; //constant
 
 	vec4 view_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
-	// gl_FragColor = mix(vec4(0.0), view_rgb, cos_theta);
-	gl_FragColor = view_rgb; // the old way
+	gl_FragColor = mix(vec4(0.0), view_rgb, cos_theta);
+	// gl_FragColor = view_rgb; // the old way
 	// gl_FragColor = mix(vec4(0.0), view_rgb, view_dir.y); // test
 }
