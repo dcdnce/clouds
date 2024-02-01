@@ -11,7 +11,7 @@ uniform mat4 uRotatedSun;
 
 vec3 sun_position = vec3(0.0, 100000.0, 0.0);
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
-vec3 beta_M = vec3(4e-2, 4e-2, 4e-2);
+vec3 beta_M = vec3(3e-1, 3e-1, 3e-1);
 const float g = 0.9;
 vec3 E_sun = vec3(250.0, 235.0, 200.0);
 
@@ -85,16 +85,16 @@ void main()
 	float view_dist = length(fragPosition - uCameraPosition);
 	// float cos_theta = clamp(dot(view_dir, light_dir), 0., 1.0);
 	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.;
-	// cos_theta = max(0.0, cos_theta); // no more sunlight
+	cos_theta = max(0.1, cos_theta); // no more sunlight
 	float theta = acos(cos_theta);
 
 	// SUNLIGHT SCATTERING ?
 	// optical depth
 		// computed from zenith constants
-	float zA = 2.4; // meh
-	float zH = 0.3; // meh
-	float sA = zA / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
-	float sH = zH / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
+	//float zA = 2.4; // meh
+	//float zH = 0.3; // meh
+	//float sA = zA / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
+	//float sH = zH / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
 	// phases functions
 	const float pi = 3.14159265;
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
@@ -106,19 +106,13 @@ void main()
 	E_sun *= F_ex;
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
-	L_in *= 0.08; // kSunIntensity
+	if (light_dir.y < 0.0) // earth shadow - ugly
+		L_in *= mix(1., 0., light_dir.y * -1);
 	sky_rgb += L_in;
 
-	// SKY SCATTERING
-	// F_ex = exp(-(beta_R+beta_M) * view_dist);
-	// L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	// L_in *= (1.0 - F_ex);
-	// L_in *= E_sun;
-	// sky_rgb += L_in;
-
 	// aesthetic
-	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex; //sun
-	sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex; // sun haze
+	//sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex; //sun
+	//sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex; // sun haze
 	sky_rgb = ACESFilm(sky_rgb);
 	sky_rgb = pow(sky_rgb, vec3(2.2));
 
@@ -130,7 +124,6 @@ void main()
 	float zenith = 2.0; //meh
 	float s = zenith / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
 	F_ex = exp(-(beta_R+beta_M) * s * view_dist * 0.03);
-	// F_ex = exp(-(beta_R+beta_M) * s);
 	vec3 cloud_rgb = vec3(cloud);
 	cloud_rgb *= F_ex;
 	cloud_rgb += L_in;
