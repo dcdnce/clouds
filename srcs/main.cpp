@@ -17,10 +17,10 @@ int	main(void)
 
 	// Initialization
 	clouds.Init();
-	clouds.camera.position = pfm::vec3(0.f, 997.f, 0.f);
+	clouds.camera.position = pfm::vec3(0.f, 6371.f, 0.f);
 	shader.LoadShaders("./shaders/panel.vs", "./shaders/panel.fs");
 	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
-	skydome.ComputePositions(1000.f, 60, 60);
+	skydome.ComputePositions(6381.f, 60, 60);
 	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 	skydome.CreateTexture();

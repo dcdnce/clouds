@@ -11,7 +11,7 @@ uniform mat4 uRotatedSun;
 
 vec3 sun_position = vec3(0.0, 1000000.0, 0.0);
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
-vec3 beta_M = vec3(2e-1, 2e-1, 2e-1);
+vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
 const float g = 0.95;
 vec3 E_sun = vec3(250.0, 235.0, 200.0);
 
@@ -85,20 +85,42 @@ void main()
 	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
 	float theta = acos(cos_theta);
 
-	// SUNLIGHT SCATTERING ?
-	// phases functions
 	const float pi = 3.14159265;
+	float theta_degree = theta * 180.f / pi;
+
+	// phases functions
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
-	// coefficients
-	vec3 F_ex = exp(-(beta_R+beta_M) * view_dist * 0.06);
+
+
+	// SKY COLOR
+	float sA = view_dist * 8.4 / 10.f; // need to compute zenith
+	float sH = view_dist * 1.25 / 10.f;
+	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	E_sun *= F_ex;
+	L_in *= 1.f - exp(-(beta_R+beta_M)*sH);
+	L_in *= (beta_R * Phi_R) / beta_R;
+	L_in *= 1.f - exp(-(beta_R*(sA - sH)));
+	L_in *= exp(-(beta_R+beta_M)*sH);
+	L_in *= E_sun;
+	if (light_dir.y < 0.0) // earth shadow
+		L_in *= mix(1., 0., light_dir.y * -1);
+	sky_rgb += L_in;
+
+
+	// SUNLIGHT 
+	sA = 8.4 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	sH = 1.25 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	F_ex = exp(-(beta_R*sA+beta_M*sH));
+	//E_sun *= F_ex;
+	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	if (light_dir.y < 0.0) // earth shadow
 		L_in *= mix(1., 0., light_dir.y * -1);
 	sky_rgb += L_in;
+
+
 
 	// aesthetic
 	//sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex; //sun
@@ -107,7 +129,7 @@ void main()
 	sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 100.f;
 	float cloud = composition(pos);
 	cloud = smoothstep(0.8, 1.3, cloud);
 	// SUNLIGHT on clouds
@@ -115,9 +137,9 @@ void main()
 	float s = zenith / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
 	F_ex = exp(-(beta_R+beta_M) * s * view_dist * 0.03);
 	vec3 cloud_rgb = vec3(cloud);
-	cloud_rgb *= F_ex;
-	cloud_rgb += L_in;
-	cloud_rgb *= 0.6f; //constant
+	//cloud_rgb *= F_ex;
+	//cloud_rgb += L_in;
+	//cloud_rgb *= 0.6f; //constant
 
 	gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
 	// gl_FragColor = mix(vec4(0.0), view_rgb, view_dir.y); // test
