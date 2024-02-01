@@ -1,5 +1,5 @@
-- Scattering - Enlever shade par cos_theta
-- Scattering - True global sky color
+- Scattering - vraie position camera (trop tweak la)
+- Scattering - earth shadow x ou z
 - Skydome - Centrer sur camera pos
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline

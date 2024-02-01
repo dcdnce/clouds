@@ -9,10 +9,10 @@ uniform int uFrames;
 uniform vec3 uCameraPosition;
 uniform mat4 uRotatedSun;
 
-vec3 sun_position = vec3(0.0, 100000.0, 0.0);
+vec3 sun_position = vec3(0.0, 1000000.0, 0.0);
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
-vec3 beta_M = vec3(3e-1, 3e-1, 3e-1);
-const float g = 0.9;
+vec3 beta_M = vec3(2e-1, 2e-1, 2e-1);
+const float g = 0.95;
 vec3 E_sun = vec3(250.0, 235.0, 200.0);
 
 const float noise_res = 256.f;
@@ -77,36 +77,26 @@ vec3 ACESFilm( vec3 x )
 
 void main()
 {
-	// CLASSIC SCATTERING
     sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
-	// float cos_theta = clamp(dot(view_dir, light_dir), 0., 1.0);
-	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.;
-	cos_theta = max(0.1, cos_theta); // no more sunlight
+	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
 	float theta = acos(cos_theta);
 
 	// SUNLIGHT SCATTERING ?
-	// optical depth
-		// computed from zenith constants
-	//float zA = 2.4; // meh
-	//float zH = 0.3; // meh
-	//float sA = zA / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
-	//float sH = zH / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
 	// phases functions
 	const float pi = 3.14159265;
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 	// coefficients
-	// vec3 F_ex = exp(-(beta_R*sA+beta_M*sH) * view_dist * 0.03);
-	vec3 F_ex = exp(-(beta_R+beta_M) * view_dist * 0.03);
+	vec3 F_ex = exp(-(beta_R+beta_M) * view_dist * 0.06);
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	E_sun *= F_ex;
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
-	if (light_dir.y < 0.0) // earth shadow - ugly
+	if (light_dir.y < 0.0) // earth shadow
 		L_in *= mix(1., 0., light_dir.y * -1);
 	sky_rgb += L_in;
 
@@ -129,9 +119,6 @@ void main()
 	cloud_rgb += L_in;
 	cloud_rgb *= 0.6f; //constant
 
-	vec4 view_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
-	gl_FragColor = mix(vec4(0.0), view_rgb, cos_theta);
-	// gl_FragColor = mix(vec4(0.0), vec4(1.0), cos_theta);
-	// gl_FragColor = view_rgb;
+	gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
 	// gl_FragColor = mix(vec4(0.0), view_rgb, view_dir.y); // test
 }
