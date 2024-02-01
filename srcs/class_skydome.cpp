@@ -99,7 +99,7 @@ void Skydome::ComputeTexCoords()
 
 	for (size_t i = 0 ; i < _num_vertices ; i++) {
 		pfm::vec3 v = _vertices[i].position;
-		float kR = 10.f;
+		float kR = 1000.f;
 
 		_vertices[i].tex_coords.u = kR * tan(v.x / kR);
 		_vertices[i].tex_coords.v = kR * tan(v.z / kR);

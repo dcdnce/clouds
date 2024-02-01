@@ -17,10 +17,10 @@ int	main(void)
 
 	// Initialization
 	clouds.Init();
-	clouds.camera.position = pfm::vec3(0.f, 9.f, 0.f);
+	clouds.camera.position = pfm::vec3(0.f, 990.f, 0.f);
 	shader.LoadShaders("./shaders/panel.vs", "./shaders/panel.fs");
 	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
-	skydome.ComputePositions(10.f, 60, 60);
+	skydome.ComputePositions(1000.f, 60, 60);
 	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 	skydome.CreateTexture();
@@ -79,10 +79,10 @@ int	main(void)
 
 	// Set projection matrix
 	shader.SetProjMat(
-	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
+	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f)
 	);
 	skydome.shader.SetProjMat(
-	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f)
+	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f)
 	);
 
 
