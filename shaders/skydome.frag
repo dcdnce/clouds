@@ -84,18 +84,17 @@ void main()
 	float view_dist = length(fragPosition - uCameraPosition);
 	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
 	float theta = acos(cos_theta);
-
 	const float pi = 3.14159265;
 	float theta_degree = theta * 180.f / pi;
-
 	// phases functions
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 
-	// SKY COLOR
-	float sA = view_dist * 8.4 / 10.f; // need to compute zenith
-	float sH = view_dist * 1.25 / 10.f;
+	// SKY COLOR - edge gradient
+	float z = length(uCameraPosition - vec3(0., 6381., 0.));
+	float sA = view_dist * 8.4 / z; // need to compute zenith
+	float sH = view_dist * 1.25 / z;
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= 1.f - exp(-(beta_R+beta_M)*sH);
@@ -112,7 +111,6 @@ void main()
 	sA = 8.4 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
 	sH = 1.25 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	//E_sun *= F_ex;
 	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
@@ -120,11 +118,7 @@ void main()
 		L_in *= mix(1., 0., light_dir.y * -1);
 	sky_rgb += L_in;
 
-
-
 	// aesthetic
-	//sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex; //sun
-	//sky_rgb += 0.4*vec3(0.8,0.9,1.0)*pow(cos_theta, 2.0 )* F_ex; // sun haze
 	sky_rgb = ACESFilm(sky_rgb);
 	sky_rgb = pow(sky_rgb, vec3(2.2));
 
@@ -132,14 +126,21 @@ void main()
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 100.f;
 	float cloud = composition(pos);
 	cloud = smoothstep(0.8, 1.3, cloud);
-	// SUNLIGHT on clouds
-	float zenith = 2.0; //meh
-	float s = zenith / (cos_theta + 0.15 * pow(93.885 - theta, -1.253));
-	F_ex = exp(-(beta_R+beta_M) * s * view_dist * 0.03);
+
+	// SUNLIGHT on clouds - TEMPORAIRE
+	sA = (view_dist * 0.5) * 8.4 / z; 
+	sH = (view_dist * 0.5) * 1.25 / z;
+	F_ex = exp(-(beta_R*sA+beta_M*sH));
+	E_sun *= F_ex;
+	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	L_in *= (1.0 - F_ex);
+	L_in *= E_sun;
 	vec3 cloud_rgb = vec3(cloud);
-	//cloud_rgb *= F_ex;
-	//cloud_rgb += L_in;
-	//cloud_rgb *= 0.6f; //constant
+	cloud_rgb *= F_ex;
+	cloud_rgb += L_in;
+	if (light_dir.y < 0.0) // earth shadow
+		cloud_rgb *= mix(1., 0., light_dir.y * -1);
+
 
 	gl_FragColor = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
 	// gl_FragColor = mix(vec4(0.0), view_rgb, view_dir.y); // test
