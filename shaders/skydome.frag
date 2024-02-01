@@ -110,11 +110,11 @@ void main()
 	sky_rgb += L_in;
 
 	// SKY SCATTERING
-	F_ex = exp(-(beta_R+beta_M) * view_dist * 0.01);
-	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
-	sky_rgb += L_in;
+	// F_ex = exp(-(beta_R+beta_M) * view_dist);
+	// L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	// L_in *= (1.0 - F_ex);
+	// L_in *= E_sun;
+	// sky_rgb += L_in;
 
 	// aesthetic
 	sky_rgb += 0.47*vec3(1.6,1.4,1.0)*pow(cos_theta, 350.0 ) * F_ex; //sun
