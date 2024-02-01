@@ -1,6 +1,5 @@
-- Scattering - sky color based on relative sun angle
-- Scattering - Understand every coefficient and constants
-- Scattering - Documentation
+- Scattering - Enlever shade par cos_theta
+- Scattering - True global sky color
 - Skydome - Centrer sur camera pos
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline
