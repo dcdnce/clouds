@@ -5,7 +5,6 @@ SRCS =	srcs/main.cpp \
 		srcs/class_engine/class_engine.cpp \
 		srcs/class_engine/class_engine_init.cpp \
 		srcs/class_skydome.cpp \
-		srcs/class_skydome_noise.cpp \
 
 OBJS = $(SRCS:%.cpp=%.o)
 

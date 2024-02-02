@@ -24,7 +24,6 @@ int	main(void)
 	skydome.ComputeTexCoords();
 	skydome.SendBuffers();
 	skydome.CreateTexture();
-	skydome.NoiseInterpolation(1998);
 
 	// Noise panel
 	GLfloat vertices[] = {

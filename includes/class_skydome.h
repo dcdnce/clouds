@@ -17,7 +17,6 @@ class Skydome {
 		pfm::vec3 sun_position;
 		float _radius;
 
-		void _NoiseComposition(int const frames);
 	public:
 		Shader shader;
 		unsigned char texture[256*256];
@@ -28,7 +27,6 @@ class Skydome {
 		void ComputeTexCoords();
 		void SendBuffers();
 		void CreateTexture();
-		void NoiseInterpolation(int const seed);
 
 		inline void Draw(int const frames, pfm::vec3 const camera_position)
 		{
@@ -36,7 +34,6 @@ class Skydome {
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texture_id);
-			_NoiseComposition(frames);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, texture);
 			
 			pfm::mat4 rotated_sun_mat = pfm::rotate(
