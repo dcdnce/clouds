@@ -27,7 +27,7 @@ float random(vec2 v)
                  * 403758.5453123);
 }
 
-float interpolate(float step, vec2 v)
+float noise(float step, vec2 v)
 {
 	vec2 i = floor(v / step) * step;
 	vec2 f = fract(v / step);
@@ -44,8 +44,11 @@ float interpolate(float step, vec2 v)
 	return(nx0*(1.f-yf)+nx1*yf);
 }
 
-float composition(vec2 v)
+vec4 fbm(vec2 v, vec2 s)
 {
+	vec2 dir = normalize(s - v);
+	float steps = 20.0;
+
     offsets[0] = -uFrames * 0.1;
     offsets[1] = -uFrames * 0.02;
     offsets[2] = uFrames * 0.05;
@@ -54,16 +57,23 @@ float composition(vec2 v)
     offsets[5] = uFrames * 0.03;
     offsets[6] = uFrames * 0.02;
     offsets[7] = uFrames * 0.3;
-    float sum = 0;
+    float sum[4];
     float sum_weights = 0;
 
-    for (int k = 0  ; k < 8 ; k++) { // octaves
-        float weight = float(1 << k);
-        sum += interpolate(weight, vec2(v.x + offsets[k], v.y)) * weight;
-        sum_weights += weight;
-    }
-    sum += 128.f;
-    return sum / 256.f;
+	for (int i = 0 ; i < 4 ; i++) {
+		sum[i] = 0;
+		sum_weights = 0;
+		if (i != 0)
+			v += dir * steps;
+		for (int k = 0  ; k < 8 ; k++) { // octaves
+			float weight = float(1 << k);
+			sum[i] += noise(weight, vec2(v.x + offsets[k], v.y)) * weight;
+			sum_weights += weight;
+		}
+    	sum[i] += 128.f;
+    	sum[i] /= 256.f;
+	}
+    return vec4(sum[0], sum[1], sum[2], sum[3]);
 }
 
 vec3 ACESFilm( vec3 x )
@@ -118,23 +128,29 @@ void main()
 	sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 10.f;
-	float cloud = composition(pos);
-	cloud = smoothstep(0.8, 1.3, cloud);
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 100.f;
+	vec4 cloud = fbm(pos, vec2(sun_position.x, sun_position.z));
+	float average_density = (cloud.x + cloud.y + cloud.z + cloud.z) / 4.f; 
+	average_density = mix(1.0, 0.0, average_density);
+
+	cloud.x = smoothstep(1., 1.3, cloud.x);
+	float alpha = cloud.x; // alpha value before applying average density !
 	// SUNLIGHT on clouds - TEMPORAIRE
-	sA = (view_dist * 0.5) * 8.4 / zenith; 
-	sH = (view_dist * 0.5) * 1.25 / zenith;
-	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	E_sun *= F_ex;
-	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
-	vec3 cloud_rgb = vec3(cloud);
-	cloud_rgb *= F_ex;
-	cloud_rgb += L_in;
+	//sA = (view_dist * 0.5) * 8.4 / zenith; 
+	//sH = (view_dist * 0.5) * 1.25 / zenith;
+	//F_ex = exp(-(beta_R*sA+beta_M*sH));
+	//E_sun *= F_ex;
+	//L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	//L_in *= (1.0 - F_ex);
+	//L_in *= E_sun;
+
+	cloud.x = smoothstep(-1, 0.5, average_density);
+	vec3 cloud_rgb = vec3(cloud.x);
+	//cloud_rgb *= F_ex;
+	//cloud_rgb += L_in;
 
 	// Final Color
-	vec4 tot_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
+	vec4 tot_rgb = vec4(mix(sky_rgb, cloud_rgb, alpha), 1.);
 	if (light_dir.y < 0.0) // earth shadow
 		tot_rgb *= mix(1., 0., light_dir.y * -1);
 	gl_FragColor = tot_rgb;
