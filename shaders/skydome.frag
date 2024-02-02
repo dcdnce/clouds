@@ -118,7 +118,7 @@ void main()
 	sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 100.f;
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 10.f;
 	float cloud = composition(pos);
 	cloud = smoothstep(0.8, 1.3, cloud);
 	// SUNLIGHT on clouds - TEMPORAIRE
@@ -134,8 +134,7 @@ void main()
 	cloud_rgb += L_in;
 
 	// Final Color
-	//vec4 tot_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
-	vec4 tot_rgb = vec4(sky_rgb, 1.);
+	vec4 tot_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
 	if (light_dir.y < 0.0) // earth shadow
 		tot_rgb *= mix(1., 0., light_dir.y * -1);
 	gl_FragColor = tot_rgb;
