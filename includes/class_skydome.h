@@ -15,7 +15,7 @@ class Skydome {
 		size_t _num_vertices;
 		std::vector<Vertex> _vertices;
 		pfm::vec3 sun_position;
-
+		float _radius;
 
 		void _NoiseComposition(int const frames);
 	public:
@@ -47,6 +47,7 @@ class Skydome {
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);
 			glUniform1i(glGetUniformLocation(shader.program, "uFrames"), frames);
 			glUniform3f(glGetUniformLocation(shader.program, "uCameraPosition"), camera_position.x, camera_position.y, camera_position.z);
+			glUniform1f(glGetUniformLocation(shader.program, "uSkydomeRadius"), _radius);
 
 			glBindVertexArray(_VAO);
 

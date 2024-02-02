@@ -8,6 +8,7 @@ uniform sampler2D texture1;
 uniform int uFrames;
 uniform vec3 uCameraPosition;
 uniform mat4 uRotatedSun;
+uniform float uSkydomeRadius;
 
 vec3 sun_position = vec3(0.0, 1000000.0, 0.0);
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
@@ -100,7 +101,7 @@ void main()
 	sky_rgb += L_in;
 
 	// SKY COLOR - edge gradient
-	float zenith = length(uCameraPosition - vec3(0., 6381., 0.));
+	float zenith = length(uCameraPosition - vec3(0., uSkydomeRadius, 0.));
 	sA = view_dist * 8.4 / zenith; // need to compute zenith
 	sH = view_dist * 1.25 / zenith;
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
@@ -121,8 +122,8 @@ void main()
 	float cloud = composition(pos);
 	cloud = smoothstep(0.8, 1.3, cloud);
 	// SUNLIGHT on clouds - TEMPORAIRE
-	sA = (view_dist * 0.5) * 8.4 / z; 
-	sH = (view_dist * 0.5) * 1.25 / z;
+	sA = (view_dist * 0.5) * 8.4 / zenith; 
+	sH = (view_dist * 0.5) * 1.25 / zenith;
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
 	E_sun *= F_ex;
 	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
@@ -133,7 +134,8 @@ void main()
 	cloud_rgb += L_in;
 
 	// Final Color
-	vec4 tot_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
+	//vec4 tot_rgb = vec4(mix(sky_rgb, cloud_rgb, cloud), 1.);
+	vec4 tot_rgb = vec4(sky_rgb, 1.);
 	if (light_dir.y < 0.0) // earth shadow
 		tot_rgb *= mix(1., 0., light_dir.y * -1);
 	gl_FragColor = tot_rgb;
