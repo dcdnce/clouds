@@ -8,6 +8,7 @@ class Engine {
 	private:
 		void	_InitWindow();
 		void	_InitGlad();
+		void    _InitImGui();
 		void	_InitEvents();
 		void	_InitGl();
 	public:

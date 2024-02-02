@@ -5,6 +5,9 @@ SRCS =	srcs/main.cpp \
 		srcs/class_engine/class_engine.cpp \
 		srcs/class_engine/class_engine_init.cpp \
 		srcs/class_skydome.cpp \
+		$(wildcard libs/imgui/*.cpp) \
+		libs/imgui/backends/imgui_impl_opengl3.cpp \
+		libs/imgui/backends/imgui_impl_glfw.cpp	\
 
 OBJS = $(SRCS:%.cpp=%.o)
 
@@ -17,6 +20,8 @@ OS = $(shell uname)
 
 CFLAGS = -Wall -Wextra -Wno-deprecated -g
 CFLAGS += -Iincludes
+CFLAGS += -Ilibs/imgui
+CFLAGS += -Ilibs/imgui/backends
 
 ifeq ($(OS), Darwin)
 	LFLAGS 	= -framework OpenGL 

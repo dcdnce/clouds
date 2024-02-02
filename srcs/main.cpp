@@ -1,13 +1,16 @@
-#include "glad/glad.h"
-#include "pfm/pfm.hpp"
 #include <cmath>
 #include <iostream>
 #include <string>
+#include "glad/glad.h"
+#include "pfm/pfm.hpp"
 #include "main.h"
 #include "class_engine.h"
 #include "class_logger.h"
 #include "class_shader.h"
 #include "class_skydome.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 int	main(void)
 {
@@ -28,9 +31,14 @@ int	main(void)
 
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window)) {
-		clouds.ComputeDeltaTime();
 		static int frames = 0;
-		// glClearColor(0.16f, 0.32f, 0.75f, 1.f);
+		ImGui_ImplGlfw_NewFrame();
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::ShowDemoWindow(); // Show demo window! :)
+
+		clouds.ComputeDeltaTime();
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -41,6 +49,8 @@ int	main(void)
 		// Draw skydome
 		skydome.Draw(frames, clouds.camera.position);
 
+		ImGui::Render();// save DrawData
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
 		frames++;

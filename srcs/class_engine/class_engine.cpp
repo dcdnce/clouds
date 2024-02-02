@@ -1,6 +1,9 @@
 #include "class_engine.h"
 #include "class_logger.h"
 #include <iostream>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 Engine::Engine(void) : framebuffer_width(0), framebuffer_height(0), window(NULL)
 {
@@ -11,6 +14,10 @@ Engine::~Engine(void)
 	if (window)
 		glfwDestroyWindow(this->window);
 	glfwTerminate();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
 }
 
 void	Engine::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods) noexcept
