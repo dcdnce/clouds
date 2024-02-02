@@ -128,29 +128,18 @@ void main()
 	sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
+	// Cumulus
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 100.f;
-	vec4 cloud = fbm(pos, vec2(sun_position.x, sun_position.z));
-	float average_density = (cloud.x + cloud.y + cloud.z + cloud.z) / 4.f; 
+	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z));
+	float average_density = (cumulus.x + cumulus.y + cumulus.z + cumulus.z) / 4.f; 
 	average_density = mix(1.0, 0.0, average_density);
-
-	cloud.x = smoothstep(1., 1.3, cloud.x);
-	float alpha = cloud.x; // alpha value before applying average density !
-	// SUNLIGHT on clouds - TEMPORAIRE
-	//sA = (view_dist * 0.5) * 8.4 / zenith; 
-	//sH = (view_dist * 0.5) * 1.25 / zenith;
-	//F_ex = exp(-(beta_R*sA+beta_M*sH));
-	//E_sun *= F_ex;
-	//L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	//L_in *= (1.0 - F_ex);
-	//L_in *= E_sun;
-
-	cloud.x = smoothstep(-1, 0.5, average_density);
-	vec3 cloud_rgb = vec3(cloud.x);
-	//cloud_rgb *= F_ex;
-	//cloud_rgb += L_in;
+	cumulus.x = smoothstep(1., 1.3, cumulus.x); // cumulus like
+	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
+	cumulus.x = smoothstep(-1., 0.2, average_density);
+	vec3 cumulus_rgb = vec3(cumulus.x);
 
 	// Final Color
-	vec4 tot_rgb = vec4(mix(sky_rgb, cloud_rgb, alpha), 1.);
+	vec4 tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
 	if (light_dir.y < 0.0) // earth shadow
 		tot_rgb *= mix(1., 0., light_dir.y * -1);
 	gl_FragColor = tot_rgb;
