@@ -44,19 +44,19 @@ float noise(float step, vec2 v)
 	return(nx0*(1.f-yf)+nx1*yf);
 }
 
-vec4 fbm(vec2 v, vec2 s)
+vec4 fbm(vec2 v, vec2 s, const float speed)
 {
 	vec2 dir = normalize(s - v);
 	float steps = 20.0;
 
-    offsets[0] = -uFrames * 0.1;
-    offsets[1] = -uFrames * 0.02;
-    offsets[2] = uFrames * 0.05;
-    offsets[3] = -uFrames * 0.1;
-    offsets[4] = uFrames * 0.02;
-    offsets[5] = uFrames * 0.03;
-    offsets[6] = uFrames * 0.02;
-    offsets[7] = uFrames * 0.3;
+    offsets[0] = -uFrames * 0.1 * speed;
+    offsets[1] = -uFrames * 0.02 * speed;
+    offsets[2] = uFrames * 0.05 * speed;
+    offsets[3] = -uFrames * 0.1 * speed;
+    offsets[4] = uFrames * 0.02 * speed;
+    offsets[5] = uFrames * 0.03 * speed;
+    offsets[6] = uFrames * 0.02 * speed;
+    offsets[7] = uFrames * 0.3 * speed;
     float sum[4];
     float sum_weights = 0;
 
@@ -130,18 +130,24 @@ void main()
 	/* CLOUDS */
 	// Cumulus
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 100.f;
-	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z));
+	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 1.0);
 	float average_density = (cumulus.x + cumulus.y + cumulus.z + cumulus.z) / 4.f; 
+	cumulus.x = smoothstep(1.1, 1.3, cumulus.x); // cumulus like
 	average_density = mix(1.0, 0.0, average_density);
-	cumulus.x = smoothstep(1., 1.3, cumulus.x); // cumulus like
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
 	cumulus.x = smoothstep(-1., 0.2, average_density);
 	vec3 cumulus_rgb = vec3(cumulus.x);
+ 	// Cirrus
+	pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 5.f;
+	vec4 cirrus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.1);
+	cirrus.x = smoothstep(0.5, 2., cirrus.x);
+	float cirrus_alpha = cirrus.x; // keep alpha value before applying average density !
+	vec3 cirrus_rgb = vec3(cirrus.x);
 
 	// Final Color
 	vec4 tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
+	tot_rgb = mix(tot_rgb, vec4(cirrus_rgb, 1.0), cirrus_alpha);
 	if (light_dir.y < 0.0) // earth shadow
 		tot_rgb *= mix(1., 0., light_dir.y * -1);
 	gl_FragColor = tot_rgb;
-	// gl_FragColor = mix(vec4(0.0), view_rgb, view_dir.y); // test
 }
