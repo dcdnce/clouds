@@ -26,19 +26,14 @@ class Skydome {
 		void ComputePositions(float const& radius, size_t const& num_rows, size_t const& num_cols);
 		void ComputeTexCoords();
 		void SendBuffers();
-		void CreateTexture();
 
 		inline void Draw(int const frames, pfm::vec3 const camera_position)
 		{
 			glUseProgram(this->shader.program);
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture_id);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_UNSIGNED_BYTE, texture);
-			
 			pfm::mat4 rotated_sun_mat = pfm::rotate(
 				pfm::mat4(1.f),
-				static_cast<float>(frames) * pfm::radians(0.009),
+				static_cast<float>(frames) * pfm::radians(0.01),
 				pfm::vec3(0.f, 0.f, 1.f)
 			);
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);
