@@ -36,7 +36,8 @@ int	main(void)
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::ShowDemoWindow(); // Show demo window! :)
+		// ImGui::ShowDemoWindow(); // Show demo window! :)
+		clouds.Gui();
 
 		clouds.ComputeDeltaTime();
 		glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -47,7 +48,7 @@ int	main(void)
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 		// Draw skydome
-		skydome.Draw(frames, clouds.camera.position);
+		skydome.Draw(frames, clouds);
 
 		ImGui::Render();// save DrawData
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata

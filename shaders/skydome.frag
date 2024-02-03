@@ -7,10 +7,13 @@ in vec2 fragTexCoord;
 uniform sampler2D texture1;
 uniform int uFrames;
 uniform vec3 uCameraPosition;
+uniform vec3 uSunPosition;
 uniform mat4 uRotatedSun;
 uniform float uSkydomeRadius;
 
-vec3 sun_position = vec3(0.0, 1000000.0, 0.0);
+
+uniform float uAverageDensityStepSize;
+
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
 const float g = 0.95;
@@ -47,7 +50,6 @@ float noise(float step, vec2 v)
 vec4 fbm(vec2 v, vec2 s, const float speed)
 {
 	vec2 dir = normalize(s - v);
-	float steps = 20.0;
 
     offsets[0] = -uFrames * 0.1 * speed;
     offsets[1] = -uFrames * 0.02 * speed;
@@ -64,7 +66,7 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 		sum[i] = 0;
 		sum_weights = 0;
 		if (i != 0)
-			v += dir * steps;
+			v += dir * uAverageDensityStepSize;
 		// k = 0 is too much granularity at high scale
 		for (int k = 3  ; k < 8 ; k++) { // octaves
 			float weight = float(1 << k);
@@ -89,7 +91,7 @@ vec3 ACESFilm( vec3 x )
 
 void main()
 {
-    sun_position = vec3(vec4(uRotatedSun * vec4(sun_position, 1.0)).rgb);
+    vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);

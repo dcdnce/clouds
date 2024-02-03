@@ -29,9 +29,9 @@ void	Engine::_InitWindow()
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	#endif
 
-    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window = glfwCreateWindow(mode->width, mode->height, "clouds", glfwGetPrimaryMonitor(), NULL);
-	// window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "clouds", NULL, NULL);
+    // const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    // window = glfwCreateWindow(mode->width, mode->height, "clouds", glfwGetPrimaryMonitor(), NULL);
+	window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "clouds", NULL, NULL);
 	if (window == NULL)
 		throw std::runtime_error("Failed to create glfw window");
 
@@ -44,7 +44,9 @@ void Engine::_InitImGui()
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-	// ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& imgui_io = ImGui::GetIO();
+	imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 }

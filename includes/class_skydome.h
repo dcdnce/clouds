@@ -5,16 +5,14 @@
 #include <vector>
 #include "class_vertex.h"
 #include "class_shader.h"
+#include "class_engine.h"
 
 class Skydome {
 	private:
 		GLuint _VBO;
 		GLuint _VAO;
-		unsigned char noise[8][256*256];
-		GLuint texture_id;
 		size_t _num_vertices;
 		std::vector<Vertex> _vertices;
-		pfm::vec3 sun_position;
 		float _radius;
 
 	public:
@@ -27,7 +25,7 @@ class Skydome {
 		void ComputeTexCoords();
 		void SendBuffers();
 
-		inline void Draw(int const frames, pfm::vec3 const camera_position)
+		inline void Draw(int const frames, Engine & e)
 		{
 			glUseProgram(this->shader.program);
 
@@ -38,8 +36,10 @@ class Skydome {
 			);
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);
 			glUniform1i(glGetUniformLocation(shader.program, "uFrames"), frames);
-			glUniform3f(glGetUniformLocation(shader.program, "uCameraPosition"), camera_position.x, camera_position.y, camera_position.z);
+			glUniform3f(glGetUniformLocation(shader.program, "uCameraPosition"), e.camera.position.x, e.camera.position.y, e.camera.position.z);
+			glUniform3f(glGetUniformLocation(shader.program, "uSunPosition"), e.sun_position.x, e.sun_position.y, e.sun_position.z);
 			glUniform1f(glGetUniformLocation(shader.program, "uSkydomeRadius"), _radius);
+			glUniform1f(glGetUniformLocation(shader.program, "uAverageDensityStepSize"), e.average_density_step_size);
 
 			glBindVertexArray(_VAO);
 

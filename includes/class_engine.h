@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include "class_camera.h"
+#include "pfm/pfm.hpp"
+#include "imgui.h"
 
 class Engine {
 	private:
@@ -12,9 +14,9 @@ class Engine {
 		void	_InitEvents();
 		void	_InitGl();
 	public:
-		Engine(void);
-		~Engine(void);
-		void Init(void);
+		Engine();
+		~Engine();
+		void Init();
 		static void	KeyCallback(GLFWwindow* w, int key, int scancode, int action, int mods) noexcept;
 		static void MouseCallback(GLFWwindow* w, double current_mouse_x, double current_mouse_y) noexcept;
 		inline void ComputeDeltaTime() noexcept
@@ -23,12 +25,16 @@ class Engine {
 			delta_time = current_frame - last_frame;
 			last_frame = current_frame;
 		}
+		void Gui();
 
 		Camera camera;
+		pfm::vec3 sun_position;
+		float average_density_step_size;
 		float delta_time;
 		float last_frame;
 		int			framebuffer_width;
 		int			framebuffer_height;
 		GLFWwindow* window;
+		// ImGuiIO& imgui_io;
 };
 
