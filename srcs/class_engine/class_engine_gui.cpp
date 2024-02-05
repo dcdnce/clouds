@@ -13,21 +13,28 @@ void Engine::Gui()
 	}
 
 	// Framerate
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     ImGui::Text("TAB to change focus");
 
 	// Infos header
 	if (ImGui::CollapsingHeader("Infos")) {
-		ImGui::SetNextItemWidth(200.f);
+		ImGui::SetNextItemWidth(150.f);
 		ImGui::InputFloat3("Camera Position", &camera.position, "%.0f");
-		ImGui::SetNextItemWidth(200.f);
+		ImGui::SetNextItemWidth(150.f);
 		ImGui::InputFloat3("Sun Position", &sun_position, "%.0f");
 	}
 
-	if (ImGui::CollapsingHeader("Shader Data")) {
+	if (ImGui::CollapsingHeader("Clouds")) {
 		ImGui::SeparatorText("Noise");
-		ImGui::SetNextItemWidth(200.f);
+		ImGui::SetNextItemWidth(100.f);
 		ImGui::DragFloat("Average Density Steps Size", &average_density_step_size);
+	}
+
+	if (ImGui::CollapsingHeader("Light")) {
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::DragFloat("Air Optical Length", &optical_length_air, 0.1f, 0.f, 100.f);
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::DragFloat("Haze Optical Length", &optical_length_haze, 0.1f, 0.f, 17.f);
 	}
 
 	ImGui::End();

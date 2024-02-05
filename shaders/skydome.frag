@@ -10,8 +10,8 @@ uniform vec3 uCameraPosition;
 uniform vec3 uSunPosition;
 uniform mat4 uRotatedSun;
 uniform float uSkydomeRadius;
-
-
+uniform float uOpticalLengthAir;
+uniform float uOpticalLengthHaze;
 uniform float uAverageDensityStepSize;
 
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
@@ -105,8 +105,8 @@ void main()
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 	// SUNLIGHT 
-	float sA = 8.4 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	float sH = 1.25 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	float sA = uOpticalLengthAir / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	float sH = uOpticalLengthHaze / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= (1.0 - F_ex);
@@ -115,8 +115,8 @@ void main()
 
 	// SKY COLOR - edge gradient
 	float zenith = length(uCameraPosition - vec3(0., uSkydomeRadius, 0.));
-	sA = view_dist * 8.4 / zenith; // need to compute zenith
-	sH = view_dist * 1.25 / zenith;
+	sA = view_dist * uOpticalLengthAir / zenith; // need to compute zenith
+	sH = view_dist * uOpticalLengthHaze / zenith;
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
 	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= 1.f - exp(-(beta_R+beta_M)*sH);

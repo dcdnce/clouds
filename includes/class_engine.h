@@ -30,6 +30,8 @@ class Engine {
 		Camera camera;
 		pfm::vec3 sun_position;
 		float average_density_step_size;
+		float optical_length_air;
+		float optical_length_haze;
 		float delta_time;
 		float last_frame;
 		int			framebuffer_width;
