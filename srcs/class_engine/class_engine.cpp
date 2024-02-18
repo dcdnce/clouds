@@ -10,9 +10,13 @@ bool isImGuiMouseCaptured = true;
 Engine::Engine(void) : framebuffer_width(0), framebuffer_height(0), window(NULL)
 {
 	sun_position = pfm::vec3(0.0, 1000000.0, 0.0);
+	clouds_type = TYPE_CUMULUS;
+	average_density = true;
 	average_density_step_size = 10.f;
 	optical_length_air = 8.4f;
 	optical_length_haze = 1.25f;
+	clouds_render = true;
+	CloudsTypeCallback();
 }
 
 Engine::~Engine(void)
@@ -79,5 +83,20 @@ void Engine::MouseCallback(GLFWwindow* w, double current_mouse_x, double current
 	}
 	else {
 		ImGui_ImplGlfw_CursorPosCallback(w, current_mouse_x, current_mouse_y);
+	}
+}
+
+void Engine::CloudsTypeCallback()
+{
+	if (clouds_type & TYPE_CUMULUS) {
+		clouds_smoothstep_edge_min = 0.950f;
+		clouds_smoothstep_edge_max = 1.150f;
+		noise_scale = 23.f;
+	}
+
+	if (clouds_type & TYPE_CIRRUS) {
+		clouds_smoothstep_edge_min = 0.7f;
+		clouds_smoothstep_edge_max = 2.3f;
+		noise_scale = 15.f;
 	}
 }

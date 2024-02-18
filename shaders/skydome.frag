@@ -9,10 +9,15 @@ uniform int uFrames;
 uniform vec3 uCameraPosition;
 uniform vec3 uSunPosition;
 uniform mat4 uRotatedSun;
-uniform float uSkydomeRadius;
+uniform float uCloudsSmoothstepEdgeMin;
+uniform float uCloudsSmoothstepEdgeMax;
+uniform float uZenith;
 uniform float uOpticalLengthAir;
 uniform float uOpticalLengthHaze;
+uniform int uCloudsRender;
+uniform int uAverageDensity;
 uniform float uAverageDensityStepSize;
+uniform float uNoiseScale;
 
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
@@ -62,13 +67,13 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
     float sum[4];
     float sum_weights = 0;
 
-	for (int i = 0 ; i < 4 ; i++) {
+	for (int i = 0 ; i < (bool(uAverageDensity) ? 3 : 1) ; i++) {
 		sum[i] = 0;
 		sum_weights = 0;
 		if (i != 0)
 			v += dir * uAverageDensityStepSize;
 		// k = 0 is too much granularity at high scale
-		for (int k = 3  ; k < 8 ; k++) { // octaves
+		for (int k = 4  ; k < 8 ; k++) { // octaves
 			float weight = float(1 << k);
 			sum[i] += noise(weight, vec2(v.x + offsets[k], v.y)) * weight;
 			sum_weights += weight;
@@ -76,7 +81,7 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
     	sum[i] += 128.f;
     	sum[i] /= 256.f;
 	}
-    return vec4(sum[0], sum[1], sum[2], sum[3]);
+	return vec4(sum[0], sum[1], sum[2], sum[3]);
 }
 
 vec3 ACESFilm( vec3 x )
@@ -114,9 +119,8 @@ void main()
 	sky_rgb += L_in;
 
 	// SKY COLOR - edge gradient
-	float zenith = length(uCameraPosition - vec3(0., uSkydomeRadius, 0.));
-	sA = view_dist * uOpticalLengthAir / zenith; // need to compute zenith
-	sH = view_dist * uOpticalLengthHaze / zenith;
+	sA = view_dist * uOpticalLengthAir / uZenith; // need to compute zenith
+	sH = view_dist * uOpticalLengthHaze / uZenith;
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
 	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
 	L_in *= 1.f - exp(-(beta_R+beta_M)*sH);
@@ -132,15 +136,17 @@ void main()
 
 	/* CLOUDS */
 	// Cumulus
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 100.f;
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
 	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
-	float average_density = (cumulus.x + cumulus.y + cumulus.z + cumulus.z) / 4.f; 
-	cumulus.x = smoothstep(0.9, 1., cumulus.x); // cumulus like
-	average_density = mix(1.0, 0.0, average_density);
+	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
-	cumulus.x = smoothstep(-0.8, 0.3, average_density);
+	if (bool(uAverageDensity)) {
+		float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
+		average_density = mix(1.0, 0.0, average_density);
+		cumulus.x = smoothstep(-0.8, 0.3, average_density);
+	}
 	vec3 cumulus_rgb = vec3(cumulus.x);
- 	// Cirrus
+	// Cirrus
 	// pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 10.f;
 	// vec4 cirrus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.1);
 	// cirrus.x = smoothstep(0.9, 1.5, cirrus.x);
@@ -148,8 +154,14 @@ void main()
 	// vec3 cirrus_rgb = vec3(cirrus.x);
 
 	// Final Color
-	vec4 tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
-	// tot_rgb = mix(tot_rgb, vec4(cirrus_rgb, 1.0), cirrus_alpha);
+	vec4 tot_rgb;
+	if (bool(uCloudsRender)) {
+		tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
+		// tot_rgb = mix(tot_rgb, vec4(cirrus_rgb, 1.0), cirrus_alpha);
+	}
+	else {
+		tot_rgb = vec4(sky_rgb, 1.);
+	}
 	if (light_dir.y < 0.0) // earth shadow
 		tot_rgb *= mix(1., 0., light_dir.y * -1);
 	if (view_dir.y < 0.0) // under earth

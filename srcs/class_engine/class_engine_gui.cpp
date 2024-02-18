@@ -25,7 +25,22 @@ void Engine::Gui()
 	}
 
 	if (ImGui::CollapsingHeader("Clouds")) {
-		ImGui::SeparatorText("Noise");
+		// ImGui::SeparatorText("Noise");
+		ImGui::Checkbox("Render", &clouds_render);
+		ImGui::SetNextItemWidth(100.f);
+		int old_clouds_type = clouds_type;
+		ImGui::RadioButton("Cumulus", &clouds_type, TYPE_CUMULUS); ImGui::SameLine();
+		ImGui::RadioButton("Cirrus", &clouds_type, TYPE_CIRRUS);
+		if (clouds_type != old_clouds_type) CloudsTypeCallback();
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::DragFloat("Smoothstep Edge Min", &clouds_smoothstep_edge_min, 0.05f, -4.f, 4.f);
+        ImGui::SetItemTooltip("Smoothstep redistributes noise value. The less the difference between the two values, the denser the clouds will appear.");
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::DragFloat("Smoothstep Edge Max", &clouds_smoothstep_edge_max, 0.05f, -4.f, 4.f);
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::DragFloat("Noise Scale", &noise_scale);
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::Checkbox("Average Density", &average_density);
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::DragFloat("Average Density Steps Size", &average_density_step_size);
 	}
