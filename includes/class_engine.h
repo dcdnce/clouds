@@ -4,8 +4,6 @@
 #include <glfw/glfw3.h>
 #include "class_camera.h"
 #include "pfm/pfm.hpp"
-#include "imgui.h"
-
 #define TYPE_CUMULUS	0b0001
 #define TYPE_CIRRUS		0b0010
 

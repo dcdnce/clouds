@@ -8,9 +8,6 @@
 #include "class_logger.h"
 #include "class_shader.h"
 #include "class_skydome.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 
 int	main(void)
 {
@@ -32,12 +29,6 @@ int	main(void)
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window)) {
 		static int frames = 0;
-		ImGui_ImplGlfw_NewFrame();
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui::NewFrame();
-
-		// ImGui::ShowDemoWindow(); // Show demo window! :)
-		clouds.Gui();
 
 		clouds.ComputeDeltaTime();
 		glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -50,8 +41,6 @@ int	main(void)
 		// Draw skydome
 		skydome.Draw(frames, clouds);
 
-		ImGui::Render();// save DrawData
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
 		frames++;

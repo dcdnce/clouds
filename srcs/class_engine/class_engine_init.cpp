@@ -2,17 +2,12 @@
 #include "main.h"
 #include "class_engine.h"
 #include "class_logger.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
 
 void Engine::Init(void)
 {
 	glfwInit();
 	_InitWindow();
 	_InitGlad();
-	_InitImGui();
 	_InitEvents();
 	_InitGl();
 }
@@ -29,9 +24,9 @@ void	Engine::_InitWindow()
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	#endif
 
-    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window = glfwCreateWindow(mode->width, mode->height, "clouds", glfwGetPrimaryMonitor(), NULL);
-	// window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "clouds", NULL, NULL);
+    //const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    //window = glfwCreateWindow(mode->width, mode->height, "clouds", glfwGetPrimaryMonitor(), NULL);
+	window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "clouds", NULL, NULL);
 	if (window == NULL)
 		throw std::runtime_error("Failed to create glfw window");
 
@@ -40,22 +35,11 @@ void	Engine::_InitWindow()
 	glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
 }
 
-void Engine::_InitImGui()
-{
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-	ImGuiIO& imgui_io = ImGui::GetIO();
-	imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
-}
-
 void	Engine::_InitEvents()
 {
 	glfwSetWindowUserPointer(window, this);
 
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, Engine::MouseCallback);
 	if (glfwRawMouseMotionSupported())
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
