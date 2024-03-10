@@ -73,7 +73,7 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 		if (i != 0)
 			v += dir * uAverageDensityStepSize;
 		// k = 0 is too much granularity at high scale
-		for (int k = 4  ; k < 8 ; k++) { // octaves
+		for (int k = 1  ; k < 8 ; k++) { // octaves
 			float weight = float(1 << k);
 			sum[i] += noise(weight, vec2(v.x + offsets[k], v.y)) * weight;
 			sum_weights += weight;

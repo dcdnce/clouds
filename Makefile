@@ -6,6 +6,7 @@ SRCS =	srcs/main.cpp \
 		srcs/class_engine/class_engine_init.cpp \
 		srcs/class_engine/class_engine_gui.cpp \
 		srcs/class_skydome.cpp \
+		srcs/class_plane.cpp \
 		$(wildcard libs/imgui/*.cpp) \
 		libs/imgui/backends/imgui_impl_opengl3.cpp \
 		libs/imgui/backends/imgui_impl_glfw.cpp	\

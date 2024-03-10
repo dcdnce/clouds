@@ -8,6 +8,7 @@
 #include "class_logger.h"
 #include "class_shader.h"
 #include "class_skydome.h"
+#include "class_plane.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -16,7 +17,7 @@ int	main(void)
 {
 	Engine 	clouds;
 	Skydome skydome;
-
+ 
 	// Initialization
 	clouds.Init();
 	clouds.camera.position = pfm::vec3(0.f, 6000.f, 0.f);
@@ -26,6 +27,12 @@ int	main(void)
 	skydome.SendBuffers();
 
 	skydome.shader.SetProjMat(
+	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f)
+	);
+
+	Plane plane;
+	plane.shader.LoadShaders("./shaders/plane.vert", "./shaders/plane.frag");
+	plane.shader.SetProjMat(
 	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f)
 	);
 
@@ -46,9 +53,14 @@ int	main(void)
 		// Matrices - model and view
 		skydome.shader.SetModelMat(pfm::mat4(1.f));
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
+		
+		plane.shader.SetModelMat(pfm::mat4(1.f));
+		plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 		// Draw skydome
 		skydome.Draw(frames, clouds);
+
+		plane.Draw();
 
 		ImGui::Render();// save DrawData
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata
