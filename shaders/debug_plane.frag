@@ -3,8 +3,12 @@
 uniform sampler2D texture1;
 in vec2 fragTexCoord;
 
+float nearPlane = 0.1;
+float farPlane = 10000.0;
+
 void main()
 {
-	gl_FragColor = vec4(texture(texture1, fragTexCoord).rrr, 1.0);
-	// gl_FragColor = vec4(1.0);
+	float value = texture(texture1, fragTexCoord).r;
+	
+	gl_FragColor = vec4(vec3(value), 1.0);
 }

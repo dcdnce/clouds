@@ -5,7 +5,7 @@ Plane::Plane()
 	const float y = 5999.f;
 	Vertex v;
 	v.position = pfm::vec3(-5000.f, y, -5000.f);
-	v.color = pfm::vec3(0.8f, 1.f, 0.8f);
+	v.color = pfm::vec3(0.8f, 0.f, 0.f);
 	_vertices.push_back(v);
 	v.position = pfm::vec3(5000.f, y, -5000.f);
 	_vertices.push_back(v);

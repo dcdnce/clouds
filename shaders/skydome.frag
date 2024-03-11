@@ -139,14 +139,14 @@ void main()
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
 	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
-	if (cumulus.x < 0.1)
+	if (cumulus.x < 0.9)
 		discard ;
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
-	if (bool(uAverageDensity)) {
-		float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
-		average_density = mix(1.0, 0.0, average_density);
-		cumulus.x = smoothstep(-0.8, 0.3, average_density);
-	}
+	// if (bool(uAverageDensity)) {
+	// 	float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
+	// 	average_density = mix(1.0, 0.0, average_density);
+	// 	cumulus.x = smoothstep(-0.8, 0.3, average_density);
+	// }
 	vec3 cumulus_rgb = vec3(cumulus.x);
 	// Cirrus
 	// pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 10.f;
