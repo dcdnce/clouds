@@ -73,7 +73,7 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 		if (i != 0)
 			v += dir * uAverageDensityStepSize;
 		// k = 0 is too much granularity at high scale
-		for (int k = 1  ; k < 8 ; k++) { // octaves
+		for (int k = 3  ; k < 8 ; k++) { // octaves
 			float weight = float(1 << k);
 			sum[i] += noise(weight, vec2(v.x + offsets[k], v.y)) * weight;
 			sum_weights += weight;
@@ -98,47 +98,49 @@ void main()
 {
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
-	vec3 light_dir = normalize(sun_position - uCameraPosition);
-	vec3 view_dir = normalize(fragPosition - uCameraPosition);
-	float view_dist = length(fragPosition - uCameraPosition);
-	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
-	float theta = acos(cos_theta);
-	const float pi = 3.14159265;
-	float theta_degree = theta * 180.f / pi;
-	// phases functions
-	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
-	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	// vec3 light_dir = normalize(sun_position - uCameraPosition);
+	// vec3 view_dir = normalize(fragPosition - uCameraPosition);
+	// float view_dist = length(fragPosition - uCameraPosition);
+	// float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
+	// float theta = acos(cos_theta);
+	// const float pi = 3.14159265;
+	// float theta_degree = theta * 180.f / pi;
+	// // phases functions
+	// float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
+	// float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-	// SUNLIGHT 
-	float sA = uOpticalLengthAir / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	float sH = uOpticalLengthHaze / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
-	sky_rgb += L_in;
+	// // SUNLIGHT 
+	// float sA = uOpticalLengthAir / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	// float sH = uOpticalLengthHaze / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	// vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
+	// vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	// L_in *= (1.0 - F_ex);
+	// L_in *= E_sun;
+	// sky_rgb += L_in;
 
-	// SKY COLOR - edge gradient
-	sA = view_dist * uOpticalLengthAir / uZenith; // need to compute zenith
-	sH = view_dist * uOpticalLengthHaze / uZenith;
-	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	L_in *= 1.f - exp(-(beta_R+beta_M)*sH);
-	L_in *= (beta_R * Phi_R) / beta_R;
-	L_in *= 1.f - exp(-(beta_R*(sA - sH)));
-	L_in *= exp(-(beta_R+beta_M)*sH);
-	L_in *= E_sun;
-	sky_rgb += L_in;
+	// // SKY COLOR - edge gradient
+	// sA = view_dist * uOpticalLengthAir / uZenith; // need to compute zenith
+	// sH = view_dist * uOpticalLengthHaze / uZenith;
+	// F_ex = exp(-(beta_R*sA+beta_M*sH));
+	// L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	// L_in *= 1.f - exp(-(beta_R+beta_M)*sH);
+	// L_in *= (beta_R * Phi_R) / beta_R;
+	// L_in *= 1.f - exp(-(beta_R*(sA - sH)));
+	// L_in *= exp(-(beta_R+beta_M)*sH);
+	// L_in *= E_sun;
+	// sky_rgb += L_in;
 
-	// aesthetic
-	sky_rgb = ACESFilm(sky_rgb);
-	sky_rgb = pow(sky_rgb, vec3(2.2));
+	// // aesthetic
+	// sky_rgb = ACESFilm(sky_rgb);
+	// sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
 	// Cumulus
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
 	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
+	if (cumulus.x < 0.1)
+		discard ;
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
 	if (bool(uAverageDensity)) {
 		float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
@@ -154,17 +156,18 @@ void main()
 	// vec3 cirrus_rgb = vec3(cirrus.x);
 
 	// Final Color
-	vec4 tot_rgb;
-	if (bool(uCloudsRender)) {
-		tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
-		// tot_rgb = mix(tot_rgb, vec4(cirrus_rgb, 1.0), cirrus_alpha);
-	}
-	else {
-		tot_rgb = vec4(sky_rgb, 1.);
-	}
-	if (light_dir.y < 0.0) // earth shadow
-		tot_rgb *= mix(1., 0., light_dir.y * -1);
-	if (view_dir.y < 0.0) // under earth
-		tot_rgb *= mix(1., 0., (view_dir.y * -1) * 5.f);
-	gl_FragColor = tot_rgb;
+	// vec4 tot_rgb;
+	// if (bool(uCloudsRender)) {
+	// 	tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
+	// 	// tot_rgb = mix(tot_rgb, vec4(cirrus_rgb, 1.0), cirrus_alpha);
+	// }
+	// else {
+	// 	tot_rgb = vec4(sky_rgb, 1.);
+	// }
+	// if (light_dir.y < 0.0) // earth shadow
+	// 	tot_rgb *= mix(1., 0., light_dir.y * -1);
+	// if (view_dir.y < 0.0) // under earth
+	// 	tot_rgb *= mix(1., 0., (view_dir.y * -1) * 5.f);
+	// gl_FragColor = tot_rgb;
+	gl_FragColor = vec4(cumulus_rgb, 1.0);
 }
