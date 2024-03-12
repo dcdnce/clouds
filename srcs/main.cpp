@@ -91,11 +91,11 @@ int	main(void)
 			glBindFramebuffer(GL_FRAMEBUFFER, depth_map_FBO);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glDepthMask(GL_TRUE);
-			depth_map_shader.SetViewMat(clouds.camera.GetViewMatrix());
-			// depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(0.f, 7000.f, 15.f), pfm::vec3(0.f, -1.f, 0.f), pfm::vec3(1.f, 0.f, 0.f)));
+			// depth_map_shader.SetViewMat(clouds.camera.GetViewMatrix());
+			depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(0.f, 6500.f, 15.f), pfm::vec3(0.f, -1.f, 0.f), pfm::vec3(1.f, 0.f, 0.f)));
 			skydome.DrawWith(frames, clouds, depth_map_shader);
-			plane.DrawWith(depth_map_shader);
-			debug_plane.DrawWith(depth_map_shader);
+			// plane.DrawWith(depth_map_shader);
+			// debug_plane.DrawWith(depth_map_shader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, W_WIDTH, W_HEIGHT);
@@ -109,7 +109,6 @@ int	main(void)
 		
 		plane.shader.SetModelMat(pfm::mat4(1.f));
 		plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
-
 
 		// Draw
 		skydome.Draw(frames, clouds);

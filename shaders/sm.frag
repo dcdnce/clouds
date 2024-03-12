@@ -94,6 +94,6 @@ void main()
 	// 	average_density = mix(1.0, 0.0, average_density);
 	// 	cumulus.x = smoothstep(-0.8, 0.3, average_density);
 	// }
-	gl_FragDepth = 1.0;
+	gl_FragDepth = cumulus.x;
 }
 

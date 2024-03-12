@@ -1,6 +1,11 @@
-- Understand ortho
 - Gui - Regrouper uniforms/data
 - Skydome - Centrer sur camera pos
+
+- Depth buffer for clouds
+- Shadow Map
+- Grass Blending
+- Grass wind
+- Grass instancing
 
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline
