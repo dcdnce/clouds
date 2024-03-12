@@ -13,6 +13,11 @@ uniform int uFrames;
 uniform mat4 uRotatedSun;
 uniform vec3 uSunPosition;
 
+vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
+vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
+const float g = 0.95;
+vec3 E_sun = vec3(250.0, 235.0, 200.0);
+
 const float noise_res = 256.f;
 float offsets[8];
 
@@ -76,13 +81,19 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 void main()
 {
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
+	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 
 	/* CLOUDS */
 	// Cumulus
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
 	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
-	if (cumulus.x < 0.9)
-		cumulus.x = 0;
-	gl_FragDepth = cumulus.x;
+	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
+	// if (bool(uAverageDensity)) {
+	// 	float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
+	// 	average_density = mix(1.0, 0.0, average_density);
+	// 	cumulus.x = smoothstep(-0.8, 0.3, average_density);
+	// }
+	gl_FragDepth = 1.0;
 }
+
