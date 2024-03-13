@@ -22,7 +22,7 @@ int	main(void)
 	// Initialization
 	clouds.Init();
 	clouds.camera.position = pfm::vec3(5.f, 6005.f, 20.f);
-	// clouds.camera.position = pfm::vec3(0.f, 6000.f, 15.f);
+	// clouds.camera.position = pfm::vec3(0.f, 6500.f, 15.f);
 	// clouds.camera.front = pfm::vec3(0.f, -1.f, 0.f);
 	// clouds.camera.up = pfm::vec3(-1.f, 0.f, 0.f);
 	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
@@ -48,6 +48,7 @@ int	main(void)
 		glGenTextures(1, &depth_map);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depth_map);
+		// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); // Color
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -58,6 +59,7 @@ int	main(void)
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		// Attach texture to framebuffer as depth buffer
 		glBindFramebuffer(GL_FRAMEBUFFER, depth_map_FBO);
+		// glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, depth_map, 0); // Color
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_map, 0);
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
@@ -90,14 +92,13 @@ int	main(void)
 			/* SHADOW MAP */
 			glViewport(0, 0, 1024, 1024);
 			glBindFramebuffer(GL_FRAMEBUFFER, depth_map_FBO);
+			glClearColor(0.f, 0.2f, 1.f, 1.f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_ALWAYS);
 			glEnable(GL_DEPTH_TEST);
-			depth_map_shader.SetViewMat(clouds.camera.GetViewMatrix());
-			// depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(0.f, 6500.f, 15.f), pfm::vec3(0.f, -1.f, 0.f), pfm::vec3(1.f, 0.f, 0.f)));
+			depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(0.f, 8000.f, 15.f), pfm::vec3(0.f, -1.f, 0.f), pfm::vec3(1.f, 0.f, 0.f)));
 			skydome.DrawWith(frames, clouds, depth_map_shader);
-			plane.DrawWith(depth_map_shader);
-			debug_plane.DrawWith(depth_map_shader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, W_WIDTH, W_HEIGHT);

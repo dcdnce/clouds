@@ -4,14 +4,20 @@ in vec3 fragPosition;
 in vec3 fragColor;
 in vec2 fragTexCoord;
 
+uniform sampler2D texture1;
+uniform int uFrames;
+uniform vec3 uCameraPosition;
+uniform vec3 uSunPosition;
+uniform mat4 uRotatedSun;
 uniform float uCloudsSmoothstepEdgeMin;
 uniform float uCloudsSmoothstepEdgeMax;
-uniform float uNoiseScale;
+uniform float uZenith;
+uniform float uOpticalLengthAir;
+uniform float uOpticalLengthHaze;
+uniform int uCloudsRender;
 uniform int uAverageDensity;
 uniform float uAverageDensityStepSize;
-uniform int uFrames;
-uniform mat4 uRotatedSun;
-uniform vec3 uSunPosition;
+uniform float uNoiseScale;
 
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
@@ -78,24 +84,31 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 	return vec4(sum[0], sum[1], sum[2], sum[3]);
 }
 
-
+vec3 ACESFilm( vec3 x )
+{
+    float tA = 2.51;
+    float tB = 0.03;
+    float tC = 2.43;
+    float tD = 0.59;
+    float tE = 0.14;
+    return clamp((x*(tA*x+tB))/(x*(tC*x+tD)+tE),0.0,1.0);
+}
 
 void main()
 {
-    // vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
-	// vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
+	if (fragPosition.y < 6000.0)
+		discard;
 
-	// /* CLOUDS */
-	// // Cumulus
-	// vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
-	// vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
-	// cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
-	// float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
-	// // if (bool(uAverageDensity)) {
-	// // 	float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
-	// // 	average_density = mix(1.0, 0.0, average_density);
-	// // 	cumulus.x = smoothstep(-0.8, 0.3, average_density);
-	// // }
-	// gl_FragDepth = 0.5;
+    vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
+	/* CLOUDS */
+	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
+	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
+	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
+	if (cumulus.x < 0.9) {
+		gl_FragDepth = 1.0;
+		discard ;
+	}
+	else {
+		gl_FragDepth = 0.0;
+	}
 }
-

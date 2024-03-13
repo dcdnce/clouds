@@ -15,6 +15,6 @@ void main()
 {
 	float value = texture(texture1, fragTexCoord).r;
 	
-	gl_FragColor = vec4(vec3(linearize_depth(value)), 1.0);
-	// gl_FragColor = vec4(vec3(value), 1.0);
+	// gl_FragColor = vec4(vec3(linearize_depth(value)), 1.0);
+	gl_FragColor = vec4(vec3(value), 1.0);
 }
