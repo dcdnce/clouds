@@ -8,13 +8,17 @@ layout (location = 3) in vec3 vertexColor;
 uniform mat4 uProj;
 uniform mat4 uModel;
 uniform mat4 uView;
+uniform mat4 uProjSun;
+uniform mat4 uViewSun;
 
 out vec3 fragColor;
 out vec3 fragPosition;
+out vec4 fragPositionLightSpace;
 
 void main()
 {
 	gl_Position = uProj * uView * uModel * vec4(vertexPosition, 1.0);
 	fragColor = vertexColor;
-	fragPosition = vertexPosition;
+	fragPosition = (uModel * vec4(vertexPosition, 1.0)).rgb;
+	fragPositionLightSpace = uProjSun * uViewSun * vec4(fragPosition, 1.0);
 }

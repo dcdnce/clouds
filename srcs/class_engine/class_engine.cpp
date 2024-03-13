@@ -36,13 +36,13 @@ void	Engine::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int m
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(w, true);
-	if (key == GLFW_KEY_W && action == (GLFW_REPEAT | GLFW_PRESS))
+	if (key == GLFW_KEY_W && action == GLFW_REPEAT | GLFW_PRESS)
 		engine->camera.ProcessKeyboard(FORWARD, engine->delta_time);
-	if (key == GLFW_KEY_S && action == (GLFW_REPEAT | GLFW_PRESS))
+	if (key == GLFW_KEY_S && action == GLFW_REPEAT | GLFW_PRESS)
 		engine->camera.ProcessKeyboard(BACKWARD, engine->delta_time);
-	if (key == GLFW_KEY_A && action == (GLFW_REPEAT | GLFW_PRESS))
+	if (key == GLFW_KEY_A && action == GLFW_REPEAT | GLFW_PRESS)
 		engine->camera.ProcessKeyboard(LEFT, engine->delta_time);
-	if (key == GLFW_KEY_D && action == (GLFW_REPEAT | GLFW_PRESS))
+	if (key == GLFW_KEY_D && action == GLFW_REPEAT | GLFW_PRESS)
 		engine->camera.ProcessKeyboard(RIGHT, engine->delta_time);
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
           isImGuiMouseCaptured = !isImGuiMouseCaptured;

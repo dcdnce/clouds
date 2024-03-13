@@ -106,9 +106,8 @@ void main()
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	if (cumulus.x < 0.9) {
 		gl_FragDepth = 1.0;
-		discard ;
 	}
 	else {
-		gl_FragDepth = 0.0;
+		gl_FragDepth = 1.0 - cumulus.x;
 	}
 }

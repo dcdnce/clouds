@@ -82,6 +82,7 @@ int	main(void)
  
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window)) {
+		clouds.ComputeDeltaTime();
 		static int frames = 0;
 		ImGui_ImplGlfw_NewFrame();
 		ImGui_ImplOpenGL3_NewFrame();
@@ -97,14 +98,13 @@ int	main(void)
 			glDepthMask(GL_TRUE);
 			glDepthFunc(GL_ALWAYS);
 			glEnable(GL_DEPTH_TEST);
-			depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(0.f, 8000.f, 15.f), pfm::vec3(0.f, -1.f, 0.f), pfm::vec3(1.f, 0.f, 0.f)));
+			depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(0.f, 8000.f, 15.f), clouds.camera.position, pfm::vec3(1.f, 0.f, 0.f)));
 			skydome.DrawWith(frames, clouds, depth_map_shader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, W_WIDTH, W_HEIGHT);
 		glClearColor(0.f, 0.2f, 1.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		clouds.ComputeDeltaTime();
 
 		// Matrices - model and view
 		skydome.shader.SetModelMat(pfm::mat4(1.f));
@@ -115,7 +115,11 @@ int	main(void)
 
 		// Draw
 		skydome.Draw(frames, clouds);
-		plane.Draw(frames, clouds);
+		glUseProgram(plane.shader.program);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depth_map);
+		glUniform1i(glGetUniformLocation(plane.shader.program, "texture_depth"), 0);
+		plane.Draw(frames, clouds, depth_map_shader.GetProjMat(), depth_map_shader.GetViewMat());
 
 			//Debug plane
 			debug_plane.shader.SetModelMat(pfm::mat4(1.f));

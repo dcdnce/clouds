@@ -1,11 +1,17 @@
 - Gui - Regrouper uniforms/data
 - Skydome - Centrer sur camera pos
 
-- Understand Linear Z buffer
-- Shadow Map
+- lightVP 
+	- camera pos
+	- sun pos
+- Refactor/Clean
+- Better looking shadow
 - Grass Blending
 - Grass wind
 - Grass instancing
+- Phong model
+- Scattering - sunlight
+- Scattering - ambient
 
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline
