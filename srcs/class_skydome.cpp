@@ -188,7 +188,9 @@ void Skydome::DrawDepthMap(int frames, Engine & e)
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_DEPTH_TEST);
-	depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(0.f, 8000.f, 15.f), e.camera.position, pfm::vec3(1.f, 0.f, 0.f)));
+	pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.01), pfm::vec3(0.f, 0.f, 1.f));
+	pfm::vec4 sp = rotated_sun_mat * pfm::vec4(e.sun_position.x, e.sun_position.y, e.sun_position.z, 1.f);
+	depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(sp.x, sp.y, sp.z), e.camera.position, pfm::vec3(1.f, 0.f, 0.f)));
 	depth_map_shader.SetModelMat(pfm::mat4(1.f));
 	DrawWith(frames, e, depth_map_shader);
 }

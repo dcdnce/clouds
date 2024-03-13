@@ -26,7 +26,7 @@ void main()
 {
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 normal = vec3(0.0, 1.0, 0.0);
-	float i = dot(normal, normalize(sun_position - fragPosition));
+	float i = dot(normal, normalize(sun_position - vec3(0.0)));
 
 	float shadow = InShadow();
 	i *= (1.0 - shadow) + 0.15;

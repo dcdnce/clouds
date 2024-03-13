@@ -146,12 +146,6 @@ void main()
 		cumulus.x = smoothstep(-0.8, 0.3, average_density);
 	}
 	vec3 cumulus_rgb = vec3(cumulus.x);
-	// Cirrus
-	// pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * 10.f;
-	// vec4 cirrus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.1);
-	// cirrus.x = smoothstep(0.9, 1.5, cirrus.x);
-	// float cirrus_alpha = cirrus.x; // keep alpha value before applying average density !
-	// vec3 cirrus_rgb = vec3(cirrus.x);
 
 	// Final Color
 	vec4 tot_rgb;

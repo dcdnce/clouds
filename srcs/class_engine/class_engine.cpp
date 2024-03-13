@@ -9,7 +9,7 @@ bool isImGuiMouseCaptured = true;
 
 Engine::Engine(void) : framebuffer_width(0), framebuffer_height(0), window(NULL)
 {
-	sun_position = pfm::vec3(0.0, 1000000.0, 0.0);
+	sun_position = pfm::vec3(0.0, 7000.0, 0.0);
 	clouds_type = TYPE_CUMULUS;
 	average_density = true;
 	average_density_step_size = 10.f;

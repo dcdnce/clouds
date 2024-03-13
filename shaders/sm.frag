@@ -96,6 +96,7 @@ vec3 ACESFilm( vec3 x )
 
 void main()
 {
+	gl_FragDepth = 1.0;
 	if (fragPosition.y < 6000.0)
 		discard;
 
