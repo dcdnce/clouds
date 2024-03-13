@@ -2,9 +2,7 @@
 - Skydome - Centrer sur camera pos
 
 - lightVP 
-	- camera pos
 	- sun pos
-- Refactor/Clean
 - Better looking shadow
 - Grass Blending
 - Grass wind

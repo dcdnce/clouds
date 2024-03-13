@@ -17,6 +17,9 @@ class Skydome {
 
 	public:
 		Shader shader;
+		Shader depth_map_shader;
+		GLuint depth_map_FBO;
+		GLuint depth_map_texture;
 		unsigned char texture[256*256];
 
 		Skydome();
@@ -24,6 +27,8 @@ class Skydome {
 		void ComputePositions(float const& radius, size_t const& num_rows, size_t const& num_cols);
 		void ComputeTexCoords();
 		void SendBuffers();
+		void InitDepthMap();
+		void DrawDepthMap(int frames, Engine & e);
 
 		inline void Draw(int const frames, Engine & e)
 		{
