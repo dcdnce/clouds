@@ -2,14 +2,16 @@
 
 Grass::Grass()
 {
-	pfm::vec3 p = pfm::vec3(-5.f, 0.f, -5.f);
-	for (; p.x < 5.f; p.x++) {
-		for (p.z = -5.f ; p.z < 5.f; p.z++) {
+	pfm::vec3 p = pfm::vec3(-5.f, 6000.f, -5.f);
+	for (; p.x < 5.f; p.x += 1.f) {
+		for (p.z = -5.f ; p.z < 5.f; p.z += 1.f) {
 			Vertex curr;
 			curr.position = p;
 			_vertices.push_back(curr);
 		}
 	}
+
+	std::cout << _vertices.size() << std::endl;
 
 	_SetupBuffers();
 }

@@ -44,7 +44,7 @@ int	main(void)
 	// Grass
 	Grass grass;
 	grass.shader.LoadShaders("./shaders/grass.vert", "./shaders/grass.geom", "./shaders/grass.frag");
-	grass.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f));
+	grass.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 1000.f));
  
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window)) {
@@ -70,11 +70,7 @@ int	main(void)
 		plane.shader.SetModelMat(pfm::mat4(1.f));
 		plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
-		pfm::mat4 cam_mat(1.f);
-		cam_mat[0][0] = clouds.camera.position.x;
-		cam_mat[1][1] = clouds.camera.position.y;
-		cam_mat[2][2] = clouds.camera.position.z;
-		grass.shader.SetModelMat(cam_mat);
+		grass.shader.SetModelMat(pfm::mat4(1.f));
 		grass.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 		// Draw

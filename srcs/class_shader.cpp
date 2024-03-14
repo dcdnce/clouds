@@ -89,7 +89,7 @@ static int	CreateShader(GLuint* shader_ref, GLenum type, const char* path)
 		while (std::getline(file, tmp))
 			src += tmp + "\n";
 	else {
-		Logger::error(true) << "Shader class couldn't open shader file" << std::endl;
+		Logger::error(true) << "Shader class can't open shader file" << std::endl;
 		return (0);
 	}
 	*shader_ref = glCreateShader(type);
