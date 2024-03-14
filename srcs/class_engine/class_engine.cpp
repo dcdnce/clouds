@@ -14,7 +14,7 @@ Engine::Engine(void) : framebuffer_width(0), framebuffer_height(0), window(NULL)
 	average_density = true;
 	average_density_step_size = 10.f;
 	optical_length_air = 8.4f;
-	optical_length_haze = 1.25f;
+	optical_length_haze = 0.5f;
 	clouds_render = true;
 	CloudsTypeCallback();
 }
@@ -90,7 +90,7 @@ void Engine::CloudsTypeCallback()
 {
 	if (clouds_type & TYPE_CUMULUS) {
 		clouds_smoothstep_edge_min = 0.950f;
-		clouds_smoothstep_edge_max = 1.150f;
+		clouds_smoothstep_edge_max = 1.250f;
 		noise_scale = 23.f;
 	}
 
