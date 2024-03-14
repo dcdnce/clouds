@@ -44,7 +44,7 @@ vec3 ACESFilm( vec3 x )
 void main()
 {
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
-	vec3 color = vec3(86.0, 125.0, 70.0);
+	vec3 color = vec3(86.0, 125.0, 70.0) / 255.0;
 	// vec3 color = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
@@ -56,24 +56,6 @@ void main()
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-	// SUNLIGHT ?
-	float sA = uOpticalLengthAir / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	float sH = uOpticalLengthHaze / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
-	// color += L_in;
-
-	// AERIAL PERSPECTIVE
-	sA = view_dist * uOpticalLengthAir / 6000.f;
-	F_ex = exp(-(beta_R*sA));
-	L_in = (beta_R * Phi_R) / (beta_R);
-	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
-	color *= F_ex;
-	color += L_in;
-	// color = ACESFilm(color);
 
 	// Diffuse
 	vec3 normal = vec3(0.0, 1.0, 0.0);
@@ -82,7 +64,18 @@ void main()
 	float shadow = CloudsShadowScalar();
 	i *= shadow + 0.15;
 
-	// gl_FragColor = vec4(i, i, i, 1.0);
-	gl_FragColor = vec4((color/255.0) * i, 1.0);
-	// gl_FragColor = vec4((color/255.0), 1.0);
+	color *= i;
+
+	// AERIAL PERSPECTIVE
+	float sA = view_dist * uOpticalLengthAir / 40000.f; // fucking constant
+	vec3 F_ex = exp(-(beta_R*sA));
+	vec3 L_in = (beta_R * Phi_R) / (beta_R);
+	L_in *= (1.0 - F_ex);
+	L_in *= E_sun;
+	color *= F_ex;
+	color += L_in;
+	color = ACESFilm(color);
+	color = pow(color, vec3(2.2));
+
+	gl_FragColor = vec4(color, 1.0);
 }

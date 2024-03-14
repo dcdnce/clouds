@@ -34,7 +34,7 @@ int	main(void)
 	Plane plane;
 	plane.shader.LoadShaders("./shaders/plane.vert", "./shaders/plane.frag");
 	plane.shader.SetProjMat(
-	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f)
+	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 1000.f)
 	);
 		// Debug Plane
 		Plane debug_plane;
@@ -58,7 +58,7 @@ int	main(void)
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, W_WIDTH, W_HEIGHT);
-		glClearColor(0.f, 0.2f, 1.f, 1.f);
+		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Matrices - model and view
