@@ -9,6 +9,7 @@
 #include "class_shader.h"
 #include "class_skydome.h"
 #include "class_plane.h"
+#include "class_grass.h"
 #include "class_camera.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -33,16 +34,17 @@ int	main(void)
 	// Plane
 	Plane plane;
 	plane.shader.LoadShaders("./shaders/plane.vert", "./shaders/plane.frag");
-	plane.shader.SetProjMat(
-	    pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 1000.f)
-	);
+	plane.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 1000.f));
 		// Debug Plane
 		Plane debug_plane;
 		debug_plane.Debug();
 		debug_plane.shader.LoadShaders("./shaders/debug_plane.vert", "./shaders/debug_plane.frag");
-		debug_plane.shader.SetProjMat(
-			pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f)
-		);
+		debug_plane.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
+
+	// Grass
+	Grass grass;
+	grass.shader.LoadShaders("./shaders/grass.vert", "./shaders/grass.geom", "./shaders/grass.frag");
+	grass.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 100.f));
  
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window)) {
@@ -68,8 +70,16 @@ int	main(void)
 		plane.shader.SetModelMat(pfm::mat4(1.f));
 		plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
+		pfm::mat4 cam_mat(1.f);
+		cam_mat[0][0] = clouds.camera.position.x;
+		cam_mat[1][1] = clouds.camera.position.y;
+		cam_mat[2][2] = clouds.camera.position.z;
+		grass.shader.SetModelMat(cam_mat);
+		grass.shader.SetViewMat(clouds.camera.GetViewMatrix());
+
 		// Draw
 		skydome.Draw(frames, clouds);
+		grass.Draw(frames);
 		glUseProgram(plane.shader.program);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);

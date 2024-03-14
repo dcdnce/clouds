@@ -42,6 +42,39 @@ int	Shader::LoadShaders(char* const vertex_shader_path, char* const fragment_sha
 	return (ret_value);
 }
 
+int	Shader::LoadShaders(char* const vertex_shader_path, char* const geometry_shader_path, char* const fragment_shader_path)
+{
+	int			ret_value = 1;
+	char		infoLog[512];
+	GLint		status;
+	GLuint		vertex_shader_ref;
+	GLuint		geometry_shader_ref;
+	GLuint		fragment_shader_ref;
+
+	if (!CreateShader(&vertex_shader_ref, GL_VERTEX_SHADER, vertex_shader_path))
+		return (0);
+	if (!CreateShader(&geometry_shader_ref, GL_GEOMETRY_SHADER, geometry_shader_path))
+		return (0);
+	if (!CreateShader(&fragment_shader_ref, GL_FRAGMENT_SHADER, fragment_shader_path))
+		return (0);
+	program = glCreateProgram();
+	glAttachShader(program, vertex_shader_ref);
+	glAttachShader(program, geometry_shader_ref);
+	glAttachShader(program, fragment_shader_ref);
+	glLinkProgram(program);
+	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	if (!status) {
+		glGetProgramInfoLog(program, 512, NULL, infoLog);
+		Logger::error(true) << "Shader class linking error" << std::endl;
+		Logger::error(false) << infoLog << std::endl;
+		ret_value = 0;
+	}
+	glDeleteShader(vertex_shader_ref);
+	glDeleteShader(geometry_shader_ref);
+	glDeleteShader(fragment_shader_ref);
+	return (ret_value);
+}
+
 static int	CreateShader(GLuint* shader_ref, GLenum type, const char* path)
 {
 	GLint			status;

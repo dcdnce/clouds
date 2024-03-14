@@ -16,6 +16,7 @@ class Shader {
 		~Shader();
 
 		int	LoadShaders(char* const vertex_shader_path, char* const fragment_shader_path);
+		int	LoadShaders(char* const vertex_shader_path, char* const geometry_shader_path, char* const fragment_shader_path);
 
 		inline void  SetProjMat(pfm::mat4 const& new_proj_mat)
 		{
