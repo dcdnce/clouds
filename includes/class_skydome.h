@@ -34,7 +34,7 @@ class Skydome {
 		{
 			glUseProgram(this->shader.program);
 
-			pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.01), pfm::vec3(0.f, 0.f, 1.f));
+			pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f, 0.f, 1.f));
 			float zenith = static_cast<float>(pfm::magnitude(e.camera.position - pfm::vec3(0.f, _radius, 0.f)));
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);
 			glUniform1i(glGetUniformLocation(shader.program, "uFrames"), frames);
@@ -60,7 +60,7 @@ class Skydome {
 		inline void DrawWith(int const frames, Engine & e, Shader & shadow_map_shader)
 		{
 			glUseProgram(shadow_map_shader.program);
-			pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.01), pfm::vec3(0.f, 0.f, 1.f));
+			pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f, 0.f, 1.f));
 			float zenith = static_cast<float>(pfm::magnitude(e.camera.position - pfm::vec3(0.f, _radius, 0.f)));
 			glUniformMatrix4fv(glGetUniformLocation(shadow_map_shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);
 			glUniform1i(glGetUniformLocation(shadow_map_shader.program, "uFrames"), frames);
@@ -75,7 +75,6 @@ class Skydome {
 			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uNoiseScale"), e.noise_scale);
 			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uOpticalLengthAir"), e.optical_length_air);
 			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uOpticalLengthHaze"), e.optical_length_haze);
-
 
 			glBindVertexArray(_VAO);
 			glDrawArrays(GL_TRIANGLES, 0, _vertices.size());

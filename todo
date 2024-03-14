@@ -1,15 +1,18 @@
 - Gui - Regrouper uniforms/data
 - Skydome - Centrer sur camera pos
 
-- lightVP 
-	- sun pos
-- Better looking shadow
 - Grass Blending
 - Grass wind
 - Grass instancing
 - Phong model
 - Scattering - sunlight
 - Scattering - ambient
+
+- Autres
+	- sm.frag opti
+	- Sun pos no matching
+	- No more night
+	- only one rotated_sun_mat
 
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline

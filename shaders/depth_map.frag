@@ -19,11 +19,6 @@ uniform int uAverageDensity;
 uniform float uAverageDensityStepSize;
 uniform float uNoiseScale;
 
-vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
-vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
-const float g = 0.95;
-vec3 E_sun = vec3(250.0, 235.0, 200.0);
-
 const float noise_res = 256.f;
 float offsets[8];
 
@@ -84,19 +79,9 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 	return vec4(sum[0], sum[1], sum[2], sum[3]);
 }
 
-vec3 ACESFilm( vec3 x )
-{
-    float tA = 2.51;
-    float tB = 0.03;
-    float tC = 2.43;
-    float tD = 0.59;
-    float tE = 0.14;
-    return clamp((x*(tA*x+tB))/(x*(tC*x+tD)+tE),0.0,1.0);
-}
-
 void main()
 {
-	gl_FragDepth = 1.0;
+	// gl_FragDepth = 1.0;
 	if (fragPosition.y < 6000.0)
 		discard;
 
@@ -109,6 +94,7 @@ void main()
 		gl_FragDepth = 1.0;
 	}
 	else {
-		gl_FragDepth = 1.0 - cumulus.x;
+		// gl_FragDepth = 1.0 - cumulus.x;
+		gl_FragDepth = 1.0 - mix(0.0, 1.0, (cumulus.x - 0.9)/ (1.2 - 0.9));
 	}
 }
