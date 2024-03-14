@@ -4,14 +4,11 @@
 - Grass Blending
 - Grass wind
 - Grass instancing
-- Phong model
 - Scattering - sunlight
-- Scattering - ambient
 
 - Autres
 	- sm.frag opti
 	- Sun pos no matching
-	- No more night
 	- only one rotated_sun_mat
 
 Guidelines
