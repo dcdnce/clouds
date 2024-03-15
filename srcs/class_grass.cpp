@@ -2,7 +2,7 @@
 
 Grass::Grass()
 {
-	pfm::vec3 p = pfm::vec3(-5.f, 6000.f, -5.f);
+	pfm::vec3 p = pfm::vec3(-5.f, 5999.f, -5.f);
 	for (; p.x < 5.f; p.x += 1.f) {
 		for (p.z = -5.f ; p.z < 5.f; p.z += 1.f) {
 			Vertex curr;
@@ -23,6 +23,8 @@ void Grass::_SetupBuffers()
 {
 	glGenVertexArrays(1, &_VAO);
 	glGenBuffers(1, &_VBO);
+	glBindVertexArray(_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
 	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), _vertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);

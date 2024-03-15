@@ -55,7 +55,7 @@ void main()
 	base_dirs[0] = vec3(1.0, 0.0, 0.0);
 	base_dirs[1] = vec3(float(cos(45.0*piover180)), 0.0f, float(sin(45.0*piover180)));
 	base_dirs[2] = vec3(float(cos(-45.0*piover180)), 0.0f, float(sin(-45.0*piover180)));
-	float grass_patch_size = 50.0;
+	float grass_patch_size = 5.0;
 
 	for (int i = 0 ; i < 3 ; i++) {
 		vec3 base_dir_rotated = (RotationMatrix(vec3(0, 1, 0), sin(uFrames*0.7f)*0.1f)*vec4(base_dirs[i], 1.0)).xyz;
@@ -81,7 +81,7 @@ void main()
 		geomEyeSpacePos = uView * uModel * vec4(BL, 1.0);
 		EmitVertex();
 		// top right
-		vec3 TR = grass_field_pos - base_dir_rotated*grass_patch_size*0.5f;
+		vec3 TR = grass_field_pos + base_dir_rotated*grass_patch_size*0.5f;
 		TR.y += grass_patch_height;
 		gl_Position = mvp*vec4(TR, 1.0);
 		// geomTexCoord = vec2(texcoord_end_x, 1.0);
@@ -89,7 +89,7 @@ void main()
 		geomEyeSpacePos = uView * uModel * vec4(TR, 1.0);
 		EmitVertex();
 		// bottom right
-		vec3 BR = grass_field_pos - base_dirs[i]*grass_patch_size*0.5f;
+		vec3 BR = grass_field_pos + base_dirs[i]*grass_patch_size*0.5f;
 		gl_Position = mvp*vec4(BR, 1.0);
 		// geomTexCoord = vec2(texcoord_end_x, 0.0);
 		geomWorldPos = BR;

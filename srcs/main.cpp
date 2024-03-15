@@ -66,10 +66,8 @@ int	main(void)
 		// Matrices - model and view
 		skydome.shader.SetModelMat(pfm::mat4(1.f));
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
-		
 		plane.shader.SetModelMat(pfm::mat4(1.f));
 		plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
-
 		grass.shader.SetModelMat(pfm::mat4(1.f));
 		grass.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
