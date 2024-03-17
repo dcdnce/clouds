@@ -1,8 +1,8 @@
 - Gui - Regrouper uniforms/data
 - Skydome - Centrer sur camera pos
 
+- Grass clouds shadow
 - Grass wind
-- Grass instancing (?)
 - Scattering - sunlight
 - Grass + Plane same shader
 
@@ -10,6 +10,7 @@
 	- sm.frag opti
 	- Sun pos no matching
 	- only one rotated_sun_mat
+	- grass around camera
 
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline
