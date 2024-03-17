@@ -6,7 +6,7 @@ layout(triangle_strip, max_vertices = 12) out;
 uniform mat4 uProj;
 uniform mat4 uModel;
 uniform mat4 uView;
-uniform float uFrames;
+uniform int uFrames;
 
 smooth out vec2 geomTexCoord;
 smooth out vec3 geomWorldPos;
@@ -27,22 +27,16 @@ mat4 RotationMatrix(vec3 axis, float angle)
                 0.0,                                0.0,                                0.0,                                1.0);
 }
 
-// This function returns random number from zero to one
-float RandZeroOne()
+float random(vec2 uv)
 {
-    uint n = floatBitsToUint(local_seed.y * 214013.0 + local_seed.x * 2531011.0 + local_seed.z * 141251.0);
-    n = n * (n * n * 15731u + 789221u);
-    n = (n >> 9u) | 0x3F800000u;
- 
-    float fRes =  2.0 - uintBitsToFloat(n);
-    local_seed = vec3(local_seed.x + 147158.0 * fRes, local_seed.y*fRes  + 415161.0 * fRes, local_seed.z + 324154.0*fRes);
-    return fRes;
+    return fract(sin(dot(uv, vec2(12.9898,78.233))) * 43758.5453);
 }
 
-int RandomInt(int min, int max)
+int RandomInt(int min, int max, vec2 uv)
 {
-	float fRandomFloat = RandZeroOne();
+	float fRandomFloat = random(uv);
 	return int(float(min)+fRandomFloat*float(max-min));
+	// return (int(fRandomFloat * 3.0));
 }
 
 void main()
@@ -57,12 +51,13 @@ void main()
 	base_dirs[2] = vec3(float(cos(-45.0*piover180)), 0.0f, float(sin(-45.0*piover180)));
 	float grass_patch_size = 5.0;
 
+	int grass_patch = RandomInt(0, 3, gl_in[0].gl_Position.xz);
 	for (int i = 0 ; i < 3 ; i++) {
-		vec3 base_dir_rotated = (RotationMatrix(vec3(0, 1, 0), sin(uFrames*0.7f)*0.1f)*vec4(base_dirs[i], 1.0)).xyz;
+		vec3 base_dir_rotated = (RotationMatrix(vec3(0, 1, 0), sin(uFrames*0.01f)*0.1f)*vec4(base_dirs[i], 1.0)).xyz;
 		local_seed = grass_field_pos * float(i);
-		float grass_patch_height = 3.5+RandZeroOne()*2.0;
+		float grass_patch_height = 3.5+random(gl_in[0].gl_Position.xz)*2.0;
 		// Texture Coords
-		int grass_patch = RandomInt(0, 3);
+		grass_patch = (grass_patch + 1) % 4;
 		float texcoord_start_x = float(grass_patch)*0.25f;
 		float texcoord_end_x = texcoord_start_x+0.25f;
 

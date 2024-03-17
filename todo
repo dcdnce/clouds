@@ -1,10 +1,10 @@
 - Gui - Regrouper uniforms/data
 - Skydome - Centrer sur camera pos
 
-- Grass Blending
 - Grass wind
-- Grass instancing
+- Grass instancing (?)
 - Scattering - sunlight
+- Grass + Plane same shader
 
 - Autres
 	- sm.frag opti

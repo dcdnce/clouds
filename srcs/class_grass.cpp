@@ -2,9 +2,9 @@
 
 Grass::Grass()
 {
-	pfm::vec3 p = pfm::vec3(-50.f, 6000.f, -50.f);
-	for (; p.x < 50.f; p.x += 10.f) {
-		for (p.z = -50.f ; p.z < 50.f; p.z += 10.f) {
+	pfm::vec3 p = pfm::vec3(-100.f, 5999.f, -100.f);
+	for (; p.x < 100.f; p.x += 1.f) {
+		for (p.z = -100.f ; p.z < 100.f; p.z += 1.f) {
 			Vertex curr;
 			curr.position = p;
 			_vertices.push_back(curr);
