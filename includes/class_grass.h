@@ -12,6 +12,7 @@ class Grass {
 		void _SetupBuffers();
 	public:
 	 	Shader shader;
+		GLuint grass_texture;
 		Grass();
 		~Grass();
 		inline void Draw(int const frames)

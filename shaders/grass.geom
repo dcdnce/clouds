@@ -60,23 +60,24 @@ void main()
 	for (int i = 0 ; i < 3 ; i++) {
 		vec3 base_dir_rotated = (RotationMatrix(vec3(0, 1, 0), sin(uFrames*0.7f)*0.1f)*vec4(base_dirs[i], 1.0)).xyz;
 		local_seed = grass_field_pos * float(i);
-		int grass_patch = RandomInt(0, 3);
 		float grass_patch_height = 3.5+RandZeroOne()*2.0;
-		// float texcoord_start_x = float(grass_patch)*0.25f;
-		// float texcoord_end_x = texcoord_start_x+0.25f;
+		// Texture Coords
+		int grass_patch = RandomInt(0, 3);
+		float texcoord_start_x = float(grass_patch)*0.25f;
+		float texcoord_end_x = texcoord_start_x+0.25f;
 
 		// top left
 		vec3 TL = grass_field_pos - base_dir_rotated * grass_patch_size * 0.5f;
 		TL.y += grass_patch_height;
 		gl_Position = mvp*vec4(TL, 1.0);
-		// geomTexCoord = vec2(texcoord_start_x, 1.0);
+		geomTexCoord = vec2(texcoord_start_x, 1.0);
 		geomWorldPos = TL;
 		geomEyeSpacePos = uView * uModel * vec4(TL, 1.0);
 		EmitVertex();
 		// bottom left
 		vec3 BL = grass_field_pos - base_dirs[i]*grass_patch_size*0.5f;
 		gl_Position = mvp*vec4(BL, 1.0);
-		// geomTexCoord = vec2(texcoord_start_x, 0.0);
+		geomTexCoord = vec2(texcoord_start_x, 0.0);
 		geomWorldPos = BL;
 		geomEyeSpacePos = uView * uModel * vec4(BL, 1.0);
 		EmitVertex();
@@ -84,14 +85,14 @@ void main()
 		vec3 TR = grass_field_pos + base_dir_rotated*grass_patch_size*0.5f;
 		TR.y += grass_patch_height;
 		gl_Position = mvp*vec4(TR, 1.0);
-		// geomTexCoord = vec2(texcoord_end_x, 1.0);
+		geomTexCoord = vec2(texcoord_end_x, 1.0);
 		geomWorldPos = TR;
 		geomEyeSpacePos = uView * uModel * vec4(TR, 1.0);
 		EmitVertex();
 		// bottom right
 		vec3 BR = grass_field_pos + base_dirs[i]*grass_patch_size*0.5f;
 		gl_Position = mvp*vec4(BR, 1.0);
-		// geomTexCoord = vec2(texcoord_end_x, 0.0);
+		geomTexCoord = vec2(texcoord_end_x, 0.0);
 		geomWorldPos = BR;
 		geomEyeSpacePos = uView * uModel * vec4(BR, 1.0);
 		EmitVertex();

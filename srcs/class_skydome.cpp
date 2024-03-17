@@ -186,7 +186,7 @@ void Skydome::DrawDepthMap(int frames, Engine & e)
 	glClearColor(0.f, 0.2f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);
 	pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f, 0.f, 1.f));
 	pfm::vec4 sp = rotated_sun_mat * pfm::vec4(e.sun_position.x, e.sun_position.y, e.sun_position.z, 1.f);
