@@ -8,7 +8,7 @@
 #include "class_logger.h"
 #include "class_shader.h"
 #include "class_skydome.h"
-#include "class_plane.h"
+#include "class_debug_plane.h"
 #include "class_grass.h"
 #include "class_camera.h"
 #include "imgui.h"
@@ -36,10 +36,6 @@ int	main(void)
 	skydome.InitDepthMap();
 	skydome.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(90.f), 1024.f/1024.f, 0.1f, 10000.f));
 
-	// Plane
-	Plane plane;
-	plane.shader.LoadShaders("./shaders/plane.vert", "./shaders/plane.frag");
-	plane.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 1000.f));
 		// Debug Plane
 		Plane debug_plane;
 		debug_plane.Debug();
@@ -72,27 +68,19 @@ int	main(void)
 		// Matrices - model and view
 		skydome.shader.SetModelMat(pfm::mat4(1.f));
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
-		plane.shader.SetModelMat(pfm::mat4(1.f));
-		plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
 		grass.shader.SetModelMat(pfm::mat4(1.f));
 		grass.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 		// Draw
 		skydome.Draw(frames, clouds);
-		// grass.Draw(frames);
-		glUseProgram(plane.shader.program);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
-		glUniform1i(glGetUniformLocation(plane.shader.program, "texture_depth"), 0);
-		plane.Draw(frames, clouds, skydome.depth_map_shader.GetProjMat(), skydome.depth_map_shader.GetViewMat());
-		glUseProgram(grass.shader.program);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, grass.grass_texture);
-		glUniform1i(glGetUniformLocation(grass.shader.program, "texture_grass"), 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
-		glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
-		grass.Draw(frames, clouds);
+		// glUseProgram(grass.shader.program);
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, grass.grass_texture);
+		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_grass"), 0);
+		// glActiveTexture(GL_TEXTURE1);
+		// glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
+		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
+		// grass.Draw(frames, clouds);
 
 			//Debug plane
 			debug_plane.shader.SetModelMat(pfm::mat4(1.f));

@@ -7,6 +7,7 @@
 - Grass + Plane same shader
 
 - Autres
+	- plane debug only
 	- sm.frag opti
 	- Sun pos no matching
 	- only one rotated_sun_mat

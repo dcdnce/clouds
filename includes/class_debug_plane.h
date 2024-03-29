@@ -4,13 +4,13 @@
 #include "class_vertex.h"
 #include "class_shader.h"
 #include "class_engine.h"
+#include "FastNoiseLite.h"
 
 class Plane {
 	private:
 		GLuint _VAO, _VBO, _EBO;
 		std::vector<Vertex> _vertices;
 		std::vector<GLuint> _indices;
-		void _SetupBuffers();
 	public:
 	 	Shader shader;
 		Plane();
@@ -29,21 +29,9 @@ class Plane {
 			glUniform1f(glGetUniformLocation(shader.program, "uOpticalLengthAir"), e.optical_length_air);
 			glUniform1f(glGetUniformLocation(shader.program, "uOpticalLengthHaze"), e.optical_length_haze);
 
-
-
 			glBindVertexArray(_VAO);
 			glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 			glUseProgram(0);
-		}
-
-		inline void DrawWith(Shader & new_shader)
-		{
-			glUseProgram(new_shader.program);
-			glBindVertexArray(_VAO);
-			glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-			glUseProgram(0);
-
 		}
 };
