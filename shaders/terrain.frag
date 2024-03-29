@@ -59,8 +59,8 @@ void main()
 
 	// Diffuse
 	vec3 normal = vec3(0.0, 1.0, 0.0);
-	vec3 ambient = 0.9 * (E_sun/255.0);
-	vec3 diffuse = (E_sun/255.0) * dot(normal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
+	vec3 ambient = 0.2 * (E_sun/255.0);
+	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(normal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
 	float shadow = CloudsShadowScalar();
 	color *= ambient + shadow * diffuse;    
 

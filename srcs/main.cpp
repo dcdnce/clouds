@@ -9,6 +9,7 @@
 #include "class_shader.h"
 #include "class_skydome.h"
 #include "class_debug_plane.h"
+#include "class_terrain.h"
 #include "class_grass.h"
 #include "class_camera.h"
 #include "imgui.h"
@@ -34,13 +35,19 @@ int	main(void)
 	skydome.SendBuffers();
 	skydome.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
 	skydome.InitDepthMap();
-	skydome.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(90.f), 1024.f/1024.f, 0.1f, 10000.f));
+	skydome.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(90.f), 1024.f/1024.f, 0.1f, 100000.f));
 
 		// Debug Plane
 		Plane debug_plane;
 		debug_plane.Debug();
 		debug_plane.shader.LoadShaders("./shaders/debug_plane.vert", "./shaders/debug_plane.frag");
 		debug_plane.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
+
+	// Terrain
+	Terrain terrain(1000);
+	terrain.shader.LoadShaders("./shaders/terrain.vert", "./shaders/terrain.frag");
+	terrain.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
+	terrain.SetupBuffers();
 
 	// Grass
 	Grass grass;
@@ -68,6 +75,8 @@ int	main(void)
 		// Matrices - model and view
 		skydome.shader.SetModelMat(pfm::mat4(1.f));
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
+		terrain.shader.SetModelMat(pfm::mat4(1.f));
+		terrain.shader.SetViewMat(clouds.camera.GetViewMatrix());
 		grass.shader.SetModelMat(pfm::mat4(1.f));
 		grass.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
@@ -81,6 +90,12 @@ int	main(void)
 		// glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
 		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
 		// grass.Draw(frames, clouds);
+		glUseProgram(terrain.shader.program);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
+		glUniform1i(glGetUniformLocation(terrain.shader.program, "texture_depth"), 0);
+		glUseProgram(0);
+		terrain.Draw(frames, clouds);
 
 			//Debug plane
 			debug_plane.shader.SetModelMat(pfm::mat4(1.f));
@@ -98,6 +113,7 @@ int	main(void)
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
 		frames++;
+		// frames += 100;
 	}
 
 	return (0);

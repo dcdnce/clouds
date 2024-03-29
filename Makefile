@@ -8,6 +8,7 @@ SRCS =	srcs/main.cpp \
 		srcs/class_skydome.cpp \
 		srcs/class_debug_plane.cpp \
 		srcs/class_grass.cpp \
+		srcs/class_terrain.cpp \
 		$(wildcard libs/imgui/*.cpp) \
 		libs/imgui/backends/imgui_impl_opengl3.cpp \
 		libs/imgui/backends/imgui_impl_glfw.cpp	\

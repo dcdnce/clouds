@@ -1,13 +1,14 @@
 - Gui - Regrouper uniforms/data
 - Skydome - Centrer sur camera pos
 
+- Mountain shadow
+- Grass (?)
 - Grass clouds shadow
 - Grass wind
 - Scattering - sunlight
 - Grass + Plane same shader
 
 - Autres
-	- plane debug only
 	- sm.frag opti
 	- Sun pos no matching
 	- only one rotated_sun_mat
