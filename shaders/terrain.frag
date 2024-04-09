@@ -56,7 +56,6 @@ void main()
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-
 	// Diffuse
 	vec3 normal = vec3(0.0, 1.0, 0.0);
 	vec3 ambient = 0.2 * (E_sun/255.0);

@@ -14,10 +14,16 @@ class Terrain {
 		FastNoiseLite _noise;
 		size_t _noise_size;
 	public:
-	 	Shader shader;
 		Terrain(size_t const size);
 		~Terrain();
+	 	Shader shader;
+		Shader depth_map_shader;
+		GLuint depth_map_FBO;
+		GLuint depth_map_texture;
 		void SetupBuffers();
+		void InitDepthMap();
+		void DrawDepthMap(int frames, Engine & e);
+
 		inline void Draw(int const frames, Engine & e, pfm::mat4 proj_sun = pfm::mat4(1.f), pfm::mat4 view_sun = pfm::mat4(1.f))
 		{
 			glUseProgram(shader.program);
