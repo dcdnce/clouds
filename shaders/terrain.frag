@@ -74,7 +74,8 @@ void main()
 	// Diffuse
 	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(fragNormal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
 	diffuse = max(vec3(0.0), diffuse.rgb);
-	float shadow = CloudsShadowScalar();
+	// diffuse = vec3(1.0);
+	float shadow = TerrainShadow();
 	color *= shadow * diffuse;    
 	// color *= ambient + diffuse;    
 

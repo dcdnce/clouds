@@ -36,6 +36,7 @@ int	main(void)
 	skydome.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
 	skydome.InitDepthMap();
 	skydome.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(90.f), 1024.f/1024.f, 0.1f, 100000.f));
+	// skydome.depth_map_shader.SetProjMat(pfm::orthographic(-10.f, 10.f, -10.f, 10.f));
 
 		// Debug Plane
 		Plane debug_plane;
@@ -47,9 +48,11 @@ int	main(void)
 	Terrain terrain(1000);
 	terrain.shader.LoadShaders("./shaders/terrain.vert", "./shaders/terrain.frag");
 	terrain.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
+	// terrain.shader.SetProjMat(pfm::orthographic(-1000.f, 1000.f, -1000.f, 1000.f, 0.1f, 10000.f));
 	terrain.SetupBuffers();
 	terrain.InitDepthMap();
-	terrain.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(90.f), 1024.f/1024.f, 0.1f, 100000.f));
+	// terrain.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(30.f), 1024.f/1024.f, 0.1f, 100000.f));
+	terrain.depth_map_shader.SetProjMat(pfm::orthographic(-1000.f, 1000.f, -1000.f, 1000.f, 0.1f, 10000.f));
 
 	// Grass
 	Grass grass(terrain.noise, clouds.camera.position);
@@ -87,36 +90,36 @@ int	main(void)
 		skydome.Draw(frames, clouds);
 		glUseProgram(terrain.shader.program);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
-		glUniform1i(glGetUniformLocation(skydome.shader.program, "texture_depth"), 0);
+		glBindTexture(GL_TEXTURE_2D, terrain.depth_map_texture);
+		glUniform1i(glGetUniformLocation(terrain.shader.program, "texture_depth"), 0);
 		glUseProgram(0);
-		terrain.Draw(frames, clouds, skydome.depth_map_shader.GetProjMat(), skydome.depth_map_shader.GetViewMat());
+		terrain.Draw(frames, clouds, terrain.depth_map_shader.GetProjMat(), terrain.depth_map_shader.GetViewMat());
 
 			//Debug plane
 			debug_plane.shader.SetModelMat(pfm::mat4(1.f));
 			debug_plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
 			glUseProgram(debug_plane.shader.program);
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
+			glBindTexture(GL_TEXTURE_2D, terrain.depth_map_texture);
 			glUniform1i(glGetUniformLocation(debug_plane.shader.program, "texture1"), 0);
 			glUseProgram(0);
 			debug_plane.Draw(frames, clouds);
 
-		glUseProgram(grass.shader.program);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, grass.grass_texture);
-		glUniform1i(glGetUniformLocation(grass.shader.program, "texture_grass"), 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
-		glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
-		grass.Draw(frames, clouds);
+		// glUseProgram(grass.shader.program);
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, grass.grass_texture);
+		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_grass"), 0);
+		// glActiveTexture(GL_TEXTURE1);
+		// glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
+		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
+		// grass.Draw(frames, clouds);
 
 		ImGui::Render();// save DrawData
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
-		frames++;
-		// frames += 10;
+		// frames++;
+		frames += 10;
 	}
 
 	return (0);

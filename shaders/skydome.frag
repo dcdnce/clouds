@@ -148,7 +148,7 @@ void main()
 	vec3 cumulus_rgb = vec3(cumulus.x);
 
 	// AERIAL PERSPECTIVE on clouds - I doubt it's useful
-	sA = view_dist; // shitty constant
+	sA = view_dist / 40000.0; // shitty constant
 	F_ex = exp(-(beta_R*sA));
 	L_in = (beta_R * Phi_R) / (beta_R);
 	L_in *= (1.0 - F_ex);

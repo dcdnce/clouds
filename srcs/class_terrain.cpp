@@ -28,7 +28,7 @@ void Terrain::SetupBuffers()
 		for (float j = -sizebytwo ; j < sizebytwo ; j++) {
 			float noise_value = (noise.GetNoise(i, j) + 1.0f) * 0.5f;
 			noise_value *= 50.f;
-			std::max(noise_value, 10.f);
+			std::max(noise_value, 20.f);
 			_vertices[index].position = pfm::vec3(i, 6000.f + noise_value, j);
 			index++;
 		}
@@ -84,7 +84,7 @@ void Terrain::InitDepthMap()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, depth_map_texture);
 	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); // Color
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 4024, 4024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
@@ -107,7 +107,7 @@ void Terrain::InitDepthMap()
 
 void Terrain::DrawDepthMap(int frames, Engine & e)
 {
-	glViewport(0, 0, 1024, 1024);
+	glViewport(0, 0, 4024, 4024);
 	glBindFramebuffer(GL_FRAMEBUFFER, depth_map_FBO); // drawing to	
 	glClearColor(0.f, 0.2f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

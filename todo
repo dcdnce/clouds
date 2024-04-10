@@ -2,17 +2,16 @@
 - Skydome - Centrer sur camera pos
 
 - Grass
+	- Grass color fix
 	- Grass clouds shadow
 	- Grass wind
 	- Grass around camera
-
-- Scattering
-	- Sunlight
 
 - Terrain
 	- Terrain shadow
 
 - Autres
+	- Understand bais
 	- sm.frag opti
 	- Sun pos no matching
 	- only one rotated_sun_mat
