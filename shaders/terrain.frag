@@ -72,23 +72,25 @@ void main()
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 	// Diffuse
-	vec3 ambient = 0.2 * (E_sun/255.0);
 	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(fragNormal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
 	diffuse = max(vec3(0.0), diffuse.rgb);
-	float shadow = TerrainShadow();
-	color *= ambient + shadow * diffuse;    
+	float shadow = CloudsShadowScalar();
+	color *= shadow * diffuse;    
 	// color *= ambient + diffuse;    
 
 	// AERIAL PERSPECTIVE
-	float sA = view_dist * uOpticalLengthAir / 40000.f; // fucking constant
+	float sA = view_dist * uOpticalLengthAir / 5000.f; // fucking constant
 	vec3 F_ex = exp(-(beta_R*sA));
-	vec3 L_in = (beta_R * Phi_R) / (beta_R);
+	vec3 L_in = (beta_R * Phi_R + beta_M * Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	color *= F_ex;
 	color += L_in;
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));
+
+	if (light_dir.y < 0.0) // earth shadow
+		color *= mix(1., 0., light_dir.y * -1);
 
 	gl_FragColor = vec4(color, 1.0);
 }

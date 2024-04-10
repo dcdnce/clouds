@@ -13,6 +13,7 @@ class Terrain {
 		std::vector<GLuint> _indices;
 		FastNoiseLite _noise;
 		size_t _noise_size;
+
 	public:
 		Terrain(size_t const size);
 		~Terrain();
