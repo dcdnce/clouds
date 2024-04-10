@@ -7,6 +7,12 @@ Terrain::Terrain(size_t const size)
 
 	_noise.SetSeed(1337);
 	_noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+	_noise.SetFrequency(0.019);
+	_noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+	_noise.SetFractalOctaves(5);
+	_noise.SetFractalLacunarity(2);
+	_noise.SetFractalGain(0.5f);
+	_noise.SetFractalWeightedStrength(0.1f);
 
 	glGenBuffers(1, &_VBO);
 	glGenBuffers(1, &_EBO);
@@ -27,23 +33,25 @@ void Terrain::SetupBuffers()
 		}
 	}
 
-	pfm::vec3 normal;
-	for (size_t i = 0 ; i < (_noise_size*_noise_size) - _noise_size ; i++) {
-		if ((i % _noise_size) == 0) continue ;
-		normal = pfm::cross(_vertices[i+1].position - _vertices[i].position, _vertices[i+_noise_size].position - _vertices[i].position);
-		_indices.push_back(i);
-		_indices.push_back(i+1);
-		_indices.push_back(i+_noise_size);
-		_vertices[i].normal = normal;
-		_vertices[i+1].normal = normal;
-		_vertices[i+_noise_size].normal = normal;
-		normal = pfm::cross(_vertices[i+_noise_size].position - _vertices[i+1].position, _vertices[i+_noise_size+1].position - _vertices[i+1].position);
-		_indices.push_back(i+1);
-		_indices.push_back(i+_noise_size);
-		_indices.push_back(i+_noise_size+1);
-		_vertices[i+1].normal = normal;
-		_vertices[i+_noise_size].normal = normal;
-		_vertices[i+_noise_size+1].normal = normal;
+	// Normal et indices
+	for (size_t i = 0; i < _noise_size - 1; ++i) {
+		for (size_t j = 0; j < _noise_size - 1; ++j) {
+			size_t index = i * _noise_size + j;
+			pfm::vec3 normal = pfm::normalize(pfm::cross(_vertices[index+1].position - _vertices[index].position, _vertices[index+_noise_size].position - _vertices[index].position));
+			_indices.push_back(index);
+			_indices.push_back(index+_noise_size);
+			_indices.push_back(index+1);
+			_vertices[index].normal = normal;
+			_vertices[index+1].normal = normal;
+			_vertices[index+_noise_size].normal = normal;
+			normal = pfm::normalize(pfm::cross(_vertices[index+_noise_size].position - _vertices[index+1].position, _vertices[index+_noise_size+1].position - _vertices[index+1].position));
+			_indices.push_back(index+1);
+			_indices.push_back(index+_noise_size+1);
+			_indices.push_back(index+_noise_size);
+			_vertices[index+1].normal = normal;
+			_vertices[index+_noise_size].normal = normal;
+			_vertices[index+_noise_size+1].normal = normal;
+		}
 	}
 
 	glBindVertexArray(_VAO);
@@ -107,8 +115,8 @@ void Terrain::DrawDepthMap(int frames, Engine & e)
 	glEnable(GL_DEPTH_TEST);
 
 	pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f, 0.f, 1.f));
-	pfm::vec4 sp = rotated_sun_mat * pfm::vec4(e.sun_position.x, e.sun_position.y - 6000, e.sun_position.z, 1.f);
-	depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(sp.x, sp.y, sp.z), e.camera.position, pfm::vec3(1.f, 0.f, 0.f)));
+	pfm::vec4 sp = rotated_sun_mat * pfm::vec4(e.sun_position.x, e.sun_position.y, e.sun_position.z, 1.f);
+	depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(sp.x, sp.y, sp.z), pfm::vec3(0.f, 6000.f, 0.f), pfm::vec3(1.f, 0.f, 0.f)));
 	depth_map_shader.SetModelMat(pfm::mat4(1.f));
 	glUseProgram(depth_map_shader.program);
 	glBindVertexArray(_VAO);

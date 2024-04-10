@@ -28,7 +28,7 @@ int	main(void)
  
 	// Initialization
 	clouds.Init();
-	clouds.camera.position = pfm::vec3(5.f, 6005.f, 20.f);
+	clouds.camera.position = pfm::vec3(5.f, 6030.f, 20.f);
 	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
 	skydome.ComputePositions(6381.f, 60, 60);
 	skydome.ComputeTexCoords();
@@ -95,10 +95,10 @@ int	main(void)
 		// grass.Draw(frames, clouds);
 		glUseProgram(terrain.shader.program);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
+		glBindTexture(GL_TEXTURE_2D, terrain.depth_map_texture);
 		glUniform1i(glGetUniformLocation(terrain.shader.program, "texture_depth"), 0);
 		glUseProgram(0);
-		terrain.Draw(frames, clouds, skydome.depth_map_shader.GetProjMat(), skydome.depth_map_shader.GetViewMat());
+		terrain.Draw(frames, clouds, terrain.depth_map_shader.GetProjMat(), terrain.depth_map_shader.GetViewMat());
 
 			//Debug plane
 			debug_plane.shader.SetModelMat(pfm::mat4(1.f));
@@ -115,8 +115,8 @@ int	main(void)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
-		frames++;
-		// frames += 100;
+		// frames++;
+		frames += 10;
 	}
 
 	return (0);

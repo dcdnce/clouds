@@ -14,6 +14,7 @@ uniform mat4 uViewSun;
 out vec3 fragColor;
 out vec3 fragPosition;
 out vec4 fragPositionLightSpace;
+out vec3 fragNormal;
 
 void main()
 {
@@ -21,4 +22,5 @@ void main()
 	fragColor = vertexColor;
 	fragPosition = (uModel * vec4(vertexPosition, 1.0)).rgb;
 	fragPositionLightSpace = uProjSun * uViewSun * vec4(fragPosition, 1.0);
+	fragNormal = vertexNormal;
 }

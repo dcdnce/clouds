@@ -8,10 +8,10 @@ void Plane::Debug()
 {
 	_vertices = std::vector<Vertex>(4);
 
-	_vertices[0].position = pfm::vec3(0.f, 6020.f, 10.f);
-	_vertices[1].position = pfm::vec3(10.f, 6020.f, 10.f);
-	_vertices[2].position = pfm::vec3(0.f, 6010.f, 10.f);
-	_vertices[3].position = pfm::vec3(10.f, 6010.f, 10.f);
+	_vertices[0].position = pfm::vec3(0.f, 6050.f, 10.f);
+	_vertices[1].position = pfm::vec3(10.f, 6050.f, 10.f);
+	_vertices[2].position = pfm::vec3(0.f, 6040.f, 10.f);
+	_vertices[3].position = pfm::vec3(10.f, 6040.f, 10.f);
 	_vertices[0].tex_coords = pfm::vec2(0.f, 1.f);
 	_vertices[1].tex_coords = pfm::vec2(1.f, 1.f);
 	_vertices[2].tex_coords = pfm::vec2(0.f, 0.f);

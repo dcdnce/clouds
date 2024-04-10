@@ -11,6 +11,7 @@ uniform float uOpticalLengthHaze;
 in vec3 fragPosition;
 in vec3 fragColor;
 in vec4 fragPositionLightSpace;
+in vec3 fragNormal;
 
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
@@ -28,6 +29,20 @@ float CloudsShadowScalar()
 	float currentDepth = projCoords.z;
 
 	float shadow = currentDepth < textureDepth ? 1.0 : textureDepth;
+	return (shadow);
+}
+
+float TerrainShadow()
+{
+	// perform perspective divide
+	vec3 projCoords = fragPositionLightSpace.xyz / fragPositionLightSpace.w; //[-1;1]
+	projCoords = projCoords * 0.5 + 0.5; //[0;1]
+	// texture saved depth
+	float textureDepth = texture(texture_depth, projCoords.xy).r;
+	// current fragment depth
+	float currentDepth = projCoords.z;
+
+	float shadow = currentDepth - 0.005 < textureDepth ? 1.0 : 0.0;
 	return (shadow);
 }
 
@@ -57,11 +72,12 @@ void main()
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 	// Diffuse
-	vec3 normal = vec3(0.0, 1.0, 0.0);
 	vec3 ambient = 0.2 * (E_sun/255.0);
-	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(normal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
-	float shadow = CloudsShadowScalar();
+	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(fragNormal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
+	diffuse = max(vec3(0.0), diffuse.rgb);
+	float shadow = TerrainShadow();
 	color *= ambient + shadow * diffuse;    
+	// color *= ambient + diffuse;    
 
 	// AERIAL PERSPECTIVE
 	float sA = view_dist * uOpticalLengthAir / 40000.f; // fucking constant
