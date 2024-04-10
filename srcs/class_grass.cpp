@@ -1,12 +1,16 @@
 #include "class_grass.h"
 
-Grass::Grass()
+
+Grass::Grass(FastNoiseLite const & noise, pfm::vec3 const & cam)
 {
-	pfm::vec3 p = pfm::vec3(-100.f, 5999.f, -100.f);
-	for (; p.x < 100.f; p.x += 1.f) {
-		for (p.z = -100.f ; p.z < 100.f; p.z += 1.f) {
+	for (float i = -10; i < 10; i += 0.1) {
+		for (float j = -10; j < 10; j += 0.1) {
+			float noise_value = (noise.GetNoise(i + cam.x, j + cam.z) + 1.0f) * 0.5f;
+			noise_value *= 50.f;
+			std::max(noise_value, 10.f);
+
 			Vertex curr;
-			curr.position = p;
+			curr.position = pfm::vec3(i + cam.x, 6000.f + noise_value, j + cam.z);
 			_vertices.push_back(curr);
 		}
 	}

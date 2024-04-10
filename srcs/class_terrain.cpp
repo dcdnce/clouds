@@ -2,17 +2,17 @@
 
 Terrain::Terrain(size_t const size)
 {
-	_noise_size = size;
+	noise_size = size;
 	_vertices = std::vector<Vertex>(size*size);
 
-	_noise.SetSeed(1337);
-	_noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-	_noise.SetFrequency(0.019);
-	_noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-	_noise.SetFractalOctaves(5);
-	_noise.SetFractalLacunarity(2);
-	_noise.SetFractalGain(0.5f);
-	_noise.SetFractalWeightedStrength(0.1f);
+	noise.SetSeed(1337);
+	noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+	noise.SetFrequency(0.019);
+	noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+	noise.SetFractalOctaves(5);
+	noise.SetFractalLacunarity(2);
+	noise.SetFractalGain(0.5f);
+	noise.SetFractalWeightedStrength(0.1f);
 
 	glGenBuffers(1, &_VBO);
 	glGenBuffers(1, &_EBO);
@@ -21,12 +21,12 @@ Terrain::Terrain(size_t const size)
 
 void Terrain::SetupBuffers()
 {
-	float const sizebytwo = _noise_size / 2;
+	float const sizebytwo = noise_size / 2;
 
 	size_t index = 0;
 	for (float i = -sizebytwo ; i < sizebytwo ; i++) {
 		for (float j = -sizebytwo ; j < sizebytwo ; j++) {
-			float noise_value = (_noise.GetNoise(i, j) + 1.0f) * 0.5f;
+			float noise_value = (noise.GetNoise(i, j) + 1.0f) * 0.5f;
 			noise_value *= 50.f;
 			std::max(noise_value, 10.f);
 			_vertices[index].position = pfm::vec3(i, 6000.f + noise_value, j);
@@ -35,23 +35,23 @@ void Terrain::SetupBuffers()
 	}
 
 	// Normal et indices
-	for (size_t i = 0; i < _noise_size - 1; ++i) {
-		for (size_t j = 0; j < _noise_size - 1; ++j) {
-			size_t index = i * _noise_size + j;
-			pfm::vec3 normal = pfm::normalize(pfm::cross(_vertices[index+1].position - _vertices[index].position, _vertices[index+_noise_size].position - _vertices[index].position));
+	for (size_t i = 0; i < noise_size - 1; ++i) {
+		for (size_t j = 0; j < noise_size - 1; ++j) {
+			size_t index = i * noise_size + j;
+			pfm::vec3 normal = pfm::normalize(pfm::cross(_vertices[index+1].position - _vertices[index].position, _vertices[index+noise_size].position - _vertices[index].position));
 			_indices.push_back(index);
-			_indices.push_back(index+_noise_size);
+			_indices.push_back(index+noise_size);
 			_indices.push_back(index+1);
 			_vertices[index].normal = normal;
 			_vertices[index+1].normal = normal;
-			_vertices[index+_noise_size].normal = normal;
-			normal = pfm::normalize(pfm::cross(_vertices[index+_noise_size].position - _vertices[index+1].position, _vertices[index+_noise_size+1].position - _vertices[index+1].position));
+			_vertices[index+noise_size].normal = normal;
+			normal = pfm::normalize(pfm::cross(_vertices[index+noise_size].position - _vertices[index+1].position, _vertices[index+noise_size+1].position - _vertices[index+1].position));
 			_indices.push_back(index+1);
-			_indices.push_back(index+_noise_size+1);
-			_indices.push_back(index+_noise_size);
+			_indices.push_back(index+noise_size+1);
+			_indices.push_back(index+noise_size);
 			_vertices[index+1].normal = normal;
-			_vertices[index+_noise_size].normal = normal;
-			_vertices[index+_noise_size+1].normal = normal;
+			_vertices[index+noise_size].normal = normal;
+			_vertices[index+noise_size+1].normal = normal;
 		}
 	}
 

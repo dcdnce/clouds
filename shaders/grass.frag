@@ -34,8 +34,10 @@ void main()
 	vec4 color = texture(texture_grass, vec2(geomTexCoord.x, 1.0 - geomTexCoord.y));
 	color.a = min(1.0, color.a * 1.25);
 	if (color.a < 0.25)
+		// color.a = 0.0;
 		discard ;
 
+	color.rgb *= vec3(86.0, 125.0, 70.0) / 255.0;
 	// Light and clouds shadow
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 normal = vec3(0.0, 1.0, 0.0);

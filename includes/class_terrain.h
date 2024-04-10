@@ -11,8 +11,6 @@ class Terrain {
 		GLuint _VAO, _VBO, _EBO;
 		std::vector<Vertex> _vertices;
 		std::vector<GLuint> _indices;
-		FastNoiseLite _noise;
-		size_t _noise_size;
 
 	public:
 		Terrain(size_t const size);
@@ -21,6 +19,9 @@ class Terrain {
 		Shader depth_map_shader;
 		GLuint depth_map_FBO;
 		GLuint depth_map_texture;
+		FastNoiseLite noise;
+		size_t noise_size;
+
 		void SetupBuffers();
 		void InitDepthMap();
 		void DrawDepthMap(int frames, Engine & e);

@@ -28,7 +28,7 @@ int	main(void)
  
 	// Initialization
 	clouds.Init();
-	clouds.camera.position = pfm::vec3(5.f, 6030.f, 20.f);
+	clouds.camera.position = pfm::vec3(9.f, 6032.f, 10.f);
 	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
 	skydome.ComputePositions(6381.f, 60, 60);
 	skydome.ComputeTexCoords();
@@ -52,7 +52,7 @@ int	main(void)
 	terrain.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(90.f), 1024.f/1024.f, 0.1f, 100000.f));
 
 	// Grass
-	Grass grass;
+	Grass grass(terrain.noise, clouds.camera.position);
 	grass.shader.LoadShaders("./shaders/grass.vert", "./shaders/grass.geom", "./shaders/grass.frag");
 	grass.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
 	load_texture_png(&grass.grass_texture, "./grass.png", GL_TEXTURE0);
@@ -85,14 +85,6 @@ int	main(void)
 
 		// Draw
 		skydome.Draw(frames, clouds);
-		// glUseProgram(grass.shader.program);
-		// glActiveTexture(GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, grass.grass_texture);
-		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_grass"), 0);
-		// glActiveTexture(GL_TEXTURE1);
-		// glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
-		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
-		// grass.Draw(frames, clouds);
 		glUseProgram(terrain.shader.program);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
@@ -110,6 +102,14 @@ int	main(void)
 			glUseProgram(0);
 			debug_plane.Draw(frames, clouds);
 
+		glUseProgram(grass.shader.program);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, grass.grass_texture);
+		glUniform1i(glGetUniformLocation(grass.shader.program, "texture_grass"), 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
+		glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
+		grass.Draw(frames, clouds);
 
 		ImGui::Render();// save DrawData
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata

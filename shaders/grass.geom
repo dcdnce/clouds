@@ -50,12 +50,12 @@ void main()
 	base_dirs[0] = vec3(1.0, 0.0, 0.0);
 	base_dirs[1] = vec3(float(cos(45.0*piover180)), 0.0f, float(sin(45.0*piover180)));
 	base_dirs[2] = vec3(float(cos(-45.0*piover180)), 0.0f, float(sin(-45.0*piover180)));
-	float grass_patch_size = 5.0;
+	float grass_patch_size = 0.5;
 
 	int grass_patch = RandomInt(0, 3, gl_in[0].gl_Position.xz);
 	for (int i = 0 ; i < 3 ; i++) {
-		vec3 base_dir_rotated = (RotationMatrix(vec3(0, 1, 0), sin(uFrames*0.01f)*0.1f)*vec4(base_dirs[i], 1.0)).xyz;
-		float grass_patch_height = 3.5+random(gl_in[0].gl_Position.xz)*2.0;
+		vec3 base_dir_rotated = (RotationMatrix(vec3(0, 1, 0), sin(uFrames*0.01f))*vec4(base_dirs[i], 1.0)).xyz;
+		float grass_patch_height = 0.1+random(gl_in[0].gl_Position.xz);
 		// Texture Coords
 		grass_patch = (grass_patch + 1) % 4;
 		float texcoord_start_x = float(grass_patch)*0.25f;

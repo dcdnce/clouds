@@ -4,6 +4,7 @@
 #include "class_vertex.h"
 #include "class_shader.h"
 #include "class_engine.h"
+#include "FastNoiseLite.h"
 
 class Grass {
 	private:
@@ -11,10 +12,11 @@ class Grass {
 		std::vector<Vertex> _vertices;
 		void _SetupBuffers();
 	public:
+		Grass(FastNoiseLite const & noise, pfm::vec3 const & cam);
+		~Grass();
 	 	Shader shader;
 		GLuint grass_texture;
-		Grass();
-		~Grass();
+
 		inline void Draw(int const frames, Engine & e)
 		{
 			glUseProgram(shader.program);
