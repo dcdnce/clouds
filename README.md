@@ -8,6 +8,6 @@ Version alternative sur Shadertoy : [naive clouds and scattering](https://www.sh
 
 ## Screenshots
 ![Screenshot 1](https://i.ibb.co/8MjhtxY/Screenshot-from-2024-02-02-01-26-48.png)
+![Screenshot 3](https://i.ibb.co/ws6Twq3/Screenshot-2024-05-20-10-48-27.png)
 ![Screenshot 2](https://i.ibb.co/vQp39SP/Screenshot-from-2024-02-02-14-46-52.png)
-
 
