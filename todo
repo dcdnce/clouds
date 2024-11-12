@@ -2,6 +2,7 @@
 	- Regrouper uniforms/data
 
 - Finalize
+	- E to W and W to E
 	- Infinite terrain
 	- Skydome - centrer sur camera position
 	- Culling (everything)

@@ -28,6 +28,7 @@ float CloudsShadowScalar()
 	// current fragment depth
 	float currentDepth = projCoords.z;
 
+	//if currentDepth is less than textureDepth, the fragment is lit
 	float shadow = currentDepth < textureDepth ? 1.0 : textureDepth;
 	return (shadow);
 }
@@ -42,6 +43,7 @@ float TerrainShadow()
 	// current fragment depth
 	float currentDepth = projCoords.z;
 
+	//if currentDepth is less than textureDepth, the fragment is lit
 	float shadow = currentDepth - 0.005 < textureDepth ? 1.0 : 0.0;
 	return (shadow);
 }
@@ -60,7 +62,6 @@ void main()
 {
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 color = vec3(86.0, 125.0, 70.0) / 255.0;
-	// vec3 color = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
@@ -74,8 +75,7 @@ void main()
 	// Diffuse
 	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(fragNormal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
 	diffuse = max(vec3(0.0), diffuse.rgb);
-	// diffuse = vec3(1.0);
-	float shadow = TerrainShadow();
+	float shadow = CloudsShadowScalar();
 	color *= shadow * diffuse;    
 	// color *= ambient + diffuse;    
 
