@@ -19,10 +19,12 @@ uniform int uAverageDensity;
 uniform float uAverageDensityStepSize;
 uniform float uNoiseScale;
 
-vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
-vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
+vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1); // Beta Rayleigh - out-scattering already computed coefficients
+vec3 beta_M = vec3(2e-4, 2e-4, 2e-4); // Beta Mie - out-scattering already computed coefficients
+
 const float g = 0.95;
 vec3 E_sun = vec3(250.0, 235.0, 200.0);
+const float pi = 3.14159265;
 
 const float noise_res = 256.f;
 float offsets[8];
@@ -69,14 +71,12 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 
 	for (int i = 0 ; i < (bool(uAverageDensity) ? 3 : 1) ; i++) {
 		sum[i] = 0;
-		sum_weights = 0;
 		if (i != 0)
 			v += dir * uAverageDensityStepSize;
 		// k = 0 is too much granularity at high scale
 		for (int k = 3  ; k < 8 ; k++) { // octaves
 			float weight = float(1 << k);
 			sum[i] += noise(weight, vec2(v.x + offsets[k], v.y)) * weight;
-			sum_weights += weight;
 		}
     	sum[i] += 128.f;
     	sum[i] /= 256.f;
@@ -103,9 +103,9 @@ void main()
 	float view_dist = length(fragPosition - uCameraPosition);
 	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
 	float theta = acos(cos_theta);
-	const float pi = 3.14159265;
 	float theta_degree = theta * 180.f / pi;
-	// phases functions
+
+	// phases functions - in-scattering probability
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
@@ -147,7 +147,7 @@ void main()
 	}
 	vec3 cumulus_rgb = vec3(cumulus.x);
 
-	// AERIAL PERSPECTIVE on clouds - I doubt it's useful
+	// AERIAL PERSPECTIVE on clouds - looks better
 	sA = view_dist / 40000.0; // shitty constant
 	F_ex = exp(-(beta_R*sA));
 	L_in = (beta_R * Phi_R) / (beta_R);

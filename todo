@@ -1,5 +1,11 @@
-- Gui - Regrouper uniforms/data
-- Skydome - Centrer sur camera pos
+- Gui
+	- Regrouper uniforms/data
+
+- Finalize
+	- Infinite terrain
+	- Skydome - centrer sur camera position
+	- Culling (everything)
+	- Walk
 
 - Grass
 	- Grass color fix
@@ -16,6 +22,7 @@
 	- Sun pos no matching
 	- only one rotated_sun_mat
 	- Grass + Plane same shader
+	- Webassembly
 
 Guidelines
 - F.5 If a function is very small and time-critical, declare it inline

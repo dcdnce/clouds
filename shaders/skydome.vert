@@ -15,7 +15,7 @@ out vec2 fragTexCoord;
 
 void main() {
 	gl_Position = uProj * uView * uModel * vec4(vertexPosition, 1.0);
-	fragPosition = (uModel * vec4(vertexPosition, 1.0)).rgb;
+	fragPosition = (uModel * vec4(vertexPosition, 1.0)).xyz;
 	fragColor = vertexColor;
     fragTexCoord = vertexTexCoord;
 }

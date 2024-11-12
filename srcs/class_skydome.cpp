@@ -20,64 +20,42 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 
 	float heading_increment = 360.f / static_cast<float>(num_cols);
 	float pitch_increment = 90.f / static_cast<float>(num_rows);
-	float u_increment = heading_increment / 360.f;
-	float v_increment = pitch_increment / 180.f;
 
 	size_t i = 0;
 	
-	// Top strips
-	for (float heading = 0.f, u = 0.f ; heading < 360.f ; heading += heading_increment, u += u_increment) {
-		pfm::vec3 v0(0.f, radius, 0.f); 
-		pfm::vec2 v0_tex_coords(u - (u/2.f), 1.f);
-		pfm::vec3 v1(0.f, radius, 0.f); 
-		pfm::vec2 v1_tex_coords(u, 1.f);
+	// Top strip
+	for (float heading = 0.f; heading < 360.f ; heading += heading_increment) {
+		pfm::vec3 v0(0.f, radius, 0.f);  // Pole so same vertices
+		pfm::vec3 v1(0.f, radius, 0.f); // Pole so same vertices
 
 		pfm::vec3 v2 = pfm::sphericalToCartesian(radius, -pitch_increment, heading);
-		pfm::vec2 v2_tex_coords(u, 1.f - v_increment);
 		pfm::vec3 v3 = pfm::sphericalToCartesian(radius, -pitch_increment, heading+heading_increment);
-		pfm::vec2 v3_tex_coords(u + u_increment, 1.f - v_increment);
 
-		_vertices[i].tex_coords = v0_tex_coords;
 		_vertices[i++].position = v0;
-		_vertices[i].tex_coords = v1_tex_coords;
 		_vertices[i++].position = v1;
-		_vertices[i].tex_coords = v2_tex_coords;
 		_vertices[i++].position = v2;
 
-		_vertices[i].tex_coords = v1_tex_coords;
 		_vertices[i++].position = v1;
-		_vertices[i].tex_coords = v3_tex_coords;
 		_vertices[i++].position = v3;
-		_vertices[i].tex_coords = v2_tex_coords;
 		_vertices[i++].position = v2;
 	}
 
  	// Regular strips
-	for (float pitch = -90.f, v = 0.f; pitch < -pitch_increment ; pitch += pitch_increment, v += v_increment) {
-		for (float heading = 0.f, u = 0.f ; heading < 360.f ; heading += heading_increment, u += u_increment) {
+	for (float pitch = -90.f; pitch < -pitch_increment ; pitch += pitch_increment) {
+		for (float heading = 0.f; heading < 360.f ; heading += heading_increment) {
 			pfm::vec3 v0 = pfm::sphericalToCartesian(radius, pitch, heading);
-			pfm::vec2 v0_tex_coords(u, v);
 			pfm::vec3 v1 = pfm::sphericalToCartesian(radius, pitch, heading+heading_increment);
-			pfm::vec2 v1_tex_coords(u + u_increment, v);
 			pfm::vec3 v2 = pfm::sphericalToCartesian(radius, pitch+pitch_increment, heading);
-			pfm::vec2 v2_tex_coords(u, v + v_increment);
 			pfm::vec3 v3 = pfm::sphericalToCartesian(radius, pitch+pitch_increment, heading+heading_increment);
-			pfm::vec2 v3_tex_coords(u + u_increment, v + v_increment);
 
 			assert(i + 6 <= _num_vertices);
 
-			_vertices[i].tex_coords = v0_tex_coords;
 			_vertices[i++].position = v0;
-			_vertices[i].tex_coords = v1_tex_coords;
 			_vertices[i++].position = v1;
-			_vertices[i].tex_coords = v2_tex_coords;
 			_vertices[i++].position = v2;
 
-			_vertices[i].tex_coords = v1_tex_coords;
 			_vertices[i++].position = v1;
-			_vertices[i].tex_coords = v3_tex_coords;
 			_vertices[i++].position = v3;
-			_vertices[i].tex_coords = v2_tex_coords;
 			_vertices[i++].position = v2;
 		}
 	}
@@ -91,6 +69,7 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 	}
 }
 
+// This is apparently sterographic projection [?]
 void Skydome::ComputeTexCoords()
 {
 	float max_u = 0.f;

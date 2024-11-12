@@ -81,7 +81,8 @@ void main()
 
 	// AERIAL PERSPECTIVE
 	float sA = view_dist * uOpticalLengthAir / 5000.f; // fucking constant
-	vec3 F_ex = exp(-(beta_R*sA));
+	float sH = view_dist * uOpticalLengthHaze / 5000.f; // fucking constant
+	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = (beta_R * Phi_R + beta_M * Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
