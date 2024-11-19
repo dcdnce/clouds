@@ -65,27 +65,27 @@ void main()
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
-	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
+	float cos_theta = dot(light_dir, view_dir);
 	const float pi = 3.14159265;
-	float theta_degree = acos(cos_theta) * 180.f / pi;
-	// phases functions
+
+	// Diffuse
+	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(fragNormal, light_dir);
+	diffuse = max(vec3(0.0), diffuse.rgb);
+	float shadow = CloudsShadowScalar();
+	color *= shadow * diffuse;
+
+	// phases functions - in-scattering probability
 	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
 	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-	// Diffuse
-	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(fragNormal, normalize(sun_position - vec3(0.0, 6000.0, 0.0)));
-	diffuse = max(vec3(0.0), diffuse.rgb);
-	float shadow = CloudsShadowScalar();
-	color *= shadow * diffuse;    
-	// color *= ambient + diffuse;    
-
 	// AERIAL PERSPECTIVE
-	float sA = view_dist * uOpticalLengthAir / 5000.f; // fucking constant
-	float sH = view_dist * uOpticalLengthHaze / 5000.f; // fucking constant
+	float sA = view_dist * uOpticalLengthAir / 40000.f; // fucking constant
+	float sH = view_dist * uOpticalLengthHaze / 40000.f; // fucking constant
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = (beta_R * Phi_R + beta_M * Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
+	L_in *= (1.0 / (beta_R+beta_M));
 	color *= F_ex;
 	color += L_in;
 	color = ACESFilm(color);
