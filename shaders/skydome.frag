@@ -140,28 +140,33 @@ void main()
 	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
-	if (bool(uAverageDensity)) {
-		float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
-		average_density = mix(1.0, 0.0, average_density);
-		cumulus.x = smoothstep(-0.8, 0.3, average_density);
-	}
 	vec3 cumulus_rgb = vec3(cumulus.x);
 
 	// AERIAL PERSPECTIVE on clouds - looks better
-	sA = view_dist / 40000.0; // shitty constant
-	F_ex = exp(-(beta_R*sA));
-	L_in = (beta_R * Phi_R) / (beta_R);
+	sA = view_dist * uOpticalLengthAir / uZenith; // need to compute zenith
+	sH = view_dist * uOpticalLengthHaze / uZenith;
+	F_ex = exp(-(beta_R*sA+beta_M*sH));
+	L_in = (beta_R * Phi_R + beta_M * Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
-	cumulus_rgb *= (F_ex);
-	L_in = ACESFilm(L_in);
-	cumulus_rgb += (L_in);
+	L_in *= (1.0 / (beta_R+beta_M));
+	cumulus_rgb *= F_ex;
+	cumulus_rgb += L_in;
+	cumulus_rgb = ACESFilm(cumulus_rgb);
+	cumulus_rgb = pow(cumulus_rgb, vec3(2.2));
+
+	// Average density
+	if (bool(uAverageDensity)) {
+		float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
+		average_density = mix(1.0, 0.0, average_density);
+		vec3 smoothed_density = smoothstep(-0.8, 0.2, vec3(average_density));
+    	cumulus_rgb *= smoothed_density;
+	}
 
 	// Final Color
 	vec4 tot_rgb;
 	if (bool(uCloudsRender)) {
 		tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
-		// tot_rgb = mix(tot_rgb, vec4(cirrus_rgb, 1.0), cirrus_alpha);
 	}
 	else {
 		tot_rgb = vec4(sky_rgb, 1.);
