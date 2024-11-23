@@ -16,7 +16,7 @@ in vec3 fragNormal;
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
 vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
 const float g = 0.95;
-vec3 E_sun = vec3(250.0, 235.0, 200.0);
+vec3 E_sun = vec3(255.0, 255.0, 255.0);
 
 float CloudsShadowScalar()
 {
@@ -68,21 +68,20 @@ void main()
 	float cos_theta = dot(light_dir, view_dir);
 	const float pi = 3.14159265;
 
+	// phases functions - in-scattering probability
+	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
+	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+
 	// Diffuse
-	vec3 diffuse = ((E_sun/255.0) * 2.0) * dot(fragNormal, light_dir);
-	diffuse = max(vec3(0.0), diffuse.rgb);
+	float diffuse = max(0.0, dot(fragNormal, light_dir));
 	float shadow = CloudsShadowScalar();
 	color *= shadow * diffuse;
 
-	// phases functions - in-scattering probability
-	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
-	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
-
 	// AERIAL PERSPECTIVE
-	float sA = view_dist * uOpticalLengthAir / 40000.f; // fucking constant
-	float sH = view_dist * uOpticalLengthHaze / 40000.f; // fucking constant
+	float sA = view_dist * uOpticalLengthAir / 3000.f; // fucking constant
+	float sH = view_dist * uOpticalLengthHaze / 3000.f; // fucking constant
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 L_in = (beta_R * Phi_R + beta_M * Phi_M) / (beta_R + beta_M);
+	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	color *= F_ex;
