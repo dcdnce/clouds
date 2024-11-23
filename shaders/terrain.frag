@@ -85,7 +85,6 @@ void main()
 	vec3 L_in = (beta_R * Phi_R + beta_M * Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
-	L_in *= (1.0 / (beta_R+beta_M));
 	color *= F_ex;
 	color += L_in;
 	color = ACESFilm(color);
