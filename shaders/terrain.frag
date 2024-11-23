@@ -78,8 +78,8 @@ void main()
 	color *= shadow * diffuse;
 
 	// AERIAL PERSPECTIVE
-	float sA = view_dist * uOpticalLengthAir / 3000.f; // fucking constant
-	float sH = view_dist * uOpticalLengthHaze / 3000.f; // fucking constant
+	float sA = view_dist * uOpticalLengthAir / 10000.f; // fucking constant
+	float sH = view_dist * uOpticalLengthHaze / 10000.f; // fucking constant
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);

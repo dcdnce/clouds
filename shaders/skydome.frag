@@ -106,29 +106,29 @@ void main()
 	float theta_degree = theta * 180.f / pi;
 
 	// phases functions - in-scattering probability
-	float Phi_R = 3.0 / (16.0 * pi) * (1.0 + cos_theta * cos_theta);
-	float Phi_M = 1.0 / (4.0 * pi) * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
+	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-	// SUNLIGHT 
+
+	// SUN and SKY
 	float sA = uOpticalLengthAir / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
 	float sH = uOpticalLengthHaze / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
+	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	sky_rgb += L_in;
 
-	// SKY COLOR - edge gradient
-	sA = view_dist * uOpticalLengthAir / uZenith; // need to compute zenith
-	sH = view_dist * uOpticalLengthHaze / uZenith;
+	// AERIAL PERSPECTIVE
+	sA = view_dist * (uOpticalLengthAir / 40000.f); // fucking constant
+	sH = view_dist * (uOpticalLengthHaze / 40000.f); // fucking constant
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	L_in = ((beta_R * Phi_R + beta_M * Phi_M)/(beta_R + beta_M));
-	L_in *= 1.f - exp(-(beta_R+beta_M)*sH);
-	L_in *= (beta_R * Phi_R) / beta_R;
-	L_in *= 1.f - exp(-(beta_R*(sA - sH)));
-	L_in *= exp(-(beta_R+beta_M)*sH);
+	L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
+	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
+	sky_rgb *= F_ex;
 	sky_rgb += L_in;
+
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
@@ -143,10 +143,11 @@ void main()
 	vec3 cumulus_rgb = vec3(cumulus.x);
 
 	// AERIAL PERSPECTIVE on clouds - looks better
-	sA = view_dist * uOpticalLengthAir / uZenith; // need to compute zenith
-	sH = view_dist * uOpticalLengthHaze / uZenith;
+	E_sun *= E_sun;
+	sA = view_dist * (uOpticalLengthAir / 40000.f); // fucking constant
+	sH = view_dist * (uOpticalLengthHaze / 40000.f); // fucking constant
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	L_in = (beta_R * Phi_R + beta_M * Phi_M) / (beta_R + beta_M);
+	L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	cumulus_rgb *= F_ex;
