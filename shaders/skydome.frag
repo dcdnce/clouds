@@ -99,9 +99,10 @@ void main()
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
+	float sun_dist = length(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
-	float cos_theta = (dot(view_dir, light_dir) + 1.) / 2.; // full length
+	float cos_theta = (dot(view_dir, light_dir) + 1.f) * 0.5f;
 	float theta = acos(cos_theta);
 	float theta_degree = theta * 180.f / pi;
 
@@ -109,26 +110,25 @@ void main()
 	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
 	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-
 	// SUN and SKY
-	float sA = uOpticalLengthAir / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	float sH = uOpticalLengthHaze / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	float air_mass = 1.0 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
+	float sA = (uOpticalLengthAir) * air_mass;
+	float sH = (uOpticalLengthHaze)  * air_mass;
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
-	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
+	L_in *= (1.0 - F_ex);
 	sky_rgb += L_in;
 
 	// AERIAL PERSPECTIVE
-	sA = view_dist * (uOpticalLengthAir / 40000.f); // fucking constant
-	sH = view_dist * (uOpticalLengthHaze / 40000.f); // fucking constant
+	sA = (view_dist / 40000.f) * uOpticalLengthAir; // fucking constant
+	sH = (view_dist / 10000.f) * uOpticalLengthHaze; // doesnt change depending on sun angle
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
 	L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
-	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
+	L_in *= (1.0 - F_ex);
 	sky_rgb *= F_ex;
 	sky_rgb += L_in;
-
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
