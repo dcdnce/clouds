@@ -93,7 +93,7 @@ int	main(void)
 		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
 		glUniform1i(glGetUniformLocation(skydome.shader.program, "texture_depth"), 0);
 		glUseProgram(0);
-		terrain.Draw(frames, clouds, skydome.depth_map_shader.GetProjMat(), skydome.depth_map_shader.GetViewMat());
+		terrain.Draw(frames, clouds, skydome.depth_map_shader.GetProjMat(), skydome.depth_map_shader.GetViewMat(), skydome.radius);
 
 			//Debug plane
 			debug_plane.shader.SetModelMat(pfm::mat4(1.f));
@@ -119,7 +119,7 @@ int	main(void)
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
 		// frames++;
-		frames += 10;
+		frames += 50;
 	}
 
 	return (0);

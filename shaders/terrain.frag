@@ -4,6 +4,7 @@ uniform sampler2D texture_depth;
 uniform vec3 uSunPosition;
 uniform mat4 uRotatedSun;
 uniform int uFrames;
+uniform float uZenith;
 uniform vec3 uCameraPosition;
 uniform float uOpticalLengthAir;
 uniform float uOpticalLengthHaze;
@@ -78,8 +79,8 @@ void main()
 	color *= shadow * diffuse;
 
 	// AERIAL PERSPECTIVE
-	float sA = view_dist * uOpticalLengthAir / 10000.f; // fucking constant
-	float sH = view_dist * uOpticalLengthHaze / 10000.f; // fucking constant
+	float sA = view_dist * uOpticalLengthAir / uZenith; // fucking constant
+	float sH = view_dist * uOpticalLengthHaze / uZenith; // fucking constant
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
@@ -89,8 +90,7 @@ void main()
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));
 
-	if (light_dir.y < 0.0) // earth shadow
-		color *= mix(1., 0., light_dir.y * -1);
+	color *= mix(1., 0., light_dir.y * -1);
 
 	gl_FragColor = vec4(color, 1.0);
 }

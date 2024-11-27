@@ -10,7 +10,7 @@ Skydome::~Skydome()
 
 void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size_t const& num_cols)
 {
-	_radius = radius;
+	this->radius = radius;
 	int top_strip_num_vertices = 6 * num_cols;
 	int regular_strip_num_vertices = 6 * num_cols;
 	//minus 1 because of top strip
@@ -79,7 +79,7 @@ void Skydome::ComputeTexCoords()
 
 	for (size_t i = 0 ; i < _num_vertices ; i++) {
 		pfm::vec3 v = _vertices[i].position;
-		float kR = _radius;
+		float kR = radius;
 
 		_vertices[i].tex_coords.u = kR * tan(v.x / kR);
 		_vertices[i].tex_coords.v = kR * tan(v.z / kR);

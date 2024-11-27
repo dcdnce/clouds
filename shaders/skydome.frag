@@ -23,7 +23,7 @@ vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1); // Beta Rayleigh - out-scattering
 vec3 beta_M = vec3(2e-4, 2e-4, 2e-4); // Beta Mie - out-scattering already computed coefficients
 
 const float g = 0.95;
-vec3 E_sun = vec3(250.0, 235.0, 200.0);
+vec3 E_sun = vec3(255.0, 255.0, 255.0);
 const float pi = 3.14159265;
 
 const float noise_res = 256.f;
@@ -102,15 +102,19 @@ void main()
 	float sun_dist = length(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
-	float cos_theta = (dot(view_dir, light_dir) + 1.f) * 0.5f;
-	float theta = acos(cos_theta);
-	float theta_degree = theta * 180.f / pi;
+
 
 	// phases functions - in-scattering probability
+	float cos_theta = dot(view_dir, light_dir);
 	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
 	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-	// SUN and SKY
+
+	// SUN
+	// clamped to [0;1]: because normally [-1;1] for opposed, orthogonal, colinear 
+	cos_theta = clamp(dot(view_dir, light_dir), 0.0, 1.0); 
+	float theta = acos(cos_theta);
+	float theta_degree = theta * 180.f / pi;
 	float air_mass = 1.0 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
 	float sA = (uOpticalLengthAir) * air_mass;
 	float sH = (uOpticalLengthHaze)  * air_mass;
@@ -121,14 +125,24 @@ void main()
 	sky_rgb += L_in;
 
 	// AERIAL PERSPECTIVE
-	sA = (view_dist / 40000.f) * uOpticalLengthAir; // fucking constant
-	sH = (view_dist / 10000.f) * uOpticalLengthHaze; // doesnt change depending on sun angle
+	sA = view_dist * uOpticalLengthAir / uZenith;
+	sH = view_dist * uOpticalLengthHaze / uZenith; // doesnt change depending on sun angle
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
 	L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= E_sun;
 	L_in *= (1.0 - F_ex);
 	sky_rgb *= F_ex;
 	sky_rgb += L_in;
+
+	// // extinction test -> normalized angle
+	// cos_theta = (dot(view_dir, light_dir) + 1.f) * 0.5f; // normalized
+	// theta = acos(cos_theta);
+	// theta_degree = theta * 180.f / pi;
+	// air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
+	// sA = (uOpticalLengthAir) * air_mass;
+	// sH = (uOpticalLengthHaze)  * air_mass;
+	// F_ex = exp(-(beta_R*sA+beta_M*sH));
+	// vec3 full_F_ex = F_ex;
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
@@ -144,14 +158,15 @@ void main()
 
 	// AERIAL PERSPECTIVE on clouds - looks better
 	E_sun *= E_sun;
-	sA = view_dist * (uOpticalLengthAir / 40000.f); // fucking constant
-	sH = view_dist * (uOpticalLengthHaze / 40000.f); // fucking constant
+	sA = view_dist * uOpticalLengthAir / uZenith; // fucking constant
+	sH = view_dist * uOpticalLengthHaze / uZenith; // fucking constant
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
 	L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	cumulus_rgb *= F_ex;
 	cumulus_rgb += L_in;
+	// cumulus_rgb *= full_F_ex;
 	cumulus_rgb = ACESFilm(cumulus_rgb);
 	cumulus_rgb = pow(cumulus_rgb, vec3(2.2));
 
