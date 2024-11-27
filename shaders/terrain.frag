@@ -87,10 +87,12 @@ void main()
 	L_in *= E_sun;
 	color *= F_ex;
 	color += L_in;
+
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));
 
-	color *= mix(1., 0., light_dir.y * -1);
+	if (light_dir.y < 0.0) // earth shadow
+		color *= exp(-10.0 * -light_dir.y);
 
 	gl_FragColor = vec4(color, 1.0);
 }

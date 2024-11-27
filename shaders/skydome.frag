@@ -103,21 +103,19 @@ void main()
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
 
-
 	// phases functions - in-scattering probability
 	float cos_theta = dot(view_dir, light_dir);
 	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
 	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
-
 	// SUN
 	// clamped to [0;1]: because normally [-1;1] for opposed, orthogonal, colinear 
-	cos_theta = clamp(dot(view_dir, light_dir), 0.0, 1.0); 
+	cos_theta = (dot(view_dir, light_dir) + 1.f) * 0.5f;
 	float theta = acos(cos_theta);
 	float theta_degree = theta * 180.f / pi;
 	float air_mass = 1.0 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	float sA = (uOpticalLengthAir) * air_mass;
-	float sH = (uOpticalLengthHaze)  * air_mass;
+	float sA = 2.f * air_mass; // otherwise sun is too small
+	float sH = uOpticalLengthHaze  * air_mass;
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= E_sun;
@@ -134,16 +132,6 @@ void main()
 	sky_rgb *= F_ex;
 	sky_rgb += L_in;
 
-	// // extinction test -> normalized angle
-	// cos_theta = (dot(view_dir, light_dir) + 1.f) * 0.5f; // normalized
-	// theta = acos(cos_theta);
-	// theta_degree = theta * 180.f / pi;
-	// air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
-	// sA = (uOpticalLengthAir) * air_mass;
-	// sH = (uOpticalLengthHaze)  * air_mass;
-	// F_ex = exp(-(beta_R*sA+beta_M*sH));
-	// vec3 full_F_ex = F_ex;
-
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
 	sky_rgb = pow(sky_rgb, vec3(2.2));
@@ -157,18 +145,9 @@ void main()
 	vec3 cumulus_rgb = vec3(cumulus.x);
 
 	// AERIAL PERSPECTIVE on clouds - looks better
-	E_sun *= E_sun;
-	sA = view_dist * uOpticalLengthAir / uZenith; // fucking constant
-	sH = view_dist * uOpticalLengthHaze / uZenith; // fucking constant
-	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
-	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
 	cumulus_rgb *= F_ex;
 	cumulus_rgb += L_in;
-	// cumulus_rgb *= full_F_ex;
 	cumulus_rgb = ACESFilm(cumulus_rgb);
-	cumulus_rgb = pow(cumulus_rgb, vec3(2.2));
 
 	// Average density
 	if (bool(uAverageDensity)) {
@@ -179,15 +158,14 @@ void main()
 	}
 
 	// Final Color
-	vec4 tot_rgb;
+	vec4 tot_rgb = vec4(sky_rgb, 1.);
+
 	if (bool(uCloudsRender)) {
 		tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
 	}
-	else {
-		tot_rgb = vec4(sky_rgb, 1.);
-	}
+
 	if (light_dir.y < 0.0) // earth shadow
-		tot_rgb *= mix(1., 0., light_dir.y * -1);
+		tot_rgb *= exp(-10.0 * -light_dir.y);
 	if (view_dir.y < 0.0) // under earth
 		tot_rgb *= mix(1., 0., (view_dir.y * -1) * 5.f);
 	gl_FragColor = tot_rgb;
