@@ -108,21 +108,29 @@ void main()
 	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
 	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
+	// SUNLIGHT
+ 	float sA = view_dist * 8.4 / uZenith;
+	float sH = view_dist * uOpticalLengthHaze / uZenith; // change on view dist
+	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
+	vec3 kept_F_ex = F_ex;
+	E_sun *= F_ex;
+
 	// SUN
 	// clamped to [0;1]: because normally [-1;1] for opposed, orthogonal, colinear 
 	cos_theta = (dot(view_dir, light_dir) + 1.f) * 0.5f;
 	float theta = acos(cos_theta);
 	float theta_degree = theta * 180.f / pi;
 	float air_mass = 1.0 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	float sA = 2.f * air_mass; // otherwise sun is too small
-	float sH = uOpticalLengthHaze  * air_mass;
-	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
+	sA = 8.4 * air_mass;
+	sH = uOpticalLengthHaze  * air_mass;
+	F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
 	L_in *= E_sun;
 	L_in *= (1.0 - F_ex);
 	sky_rgb += L_in;
 
 	// AERIAL PERSPECTIVE
+	E_sun = vec3(255.f, 255.f, 255.f);
 	sA = view_dist * uOpticalLengthAir / uZenith;
 	sH = view_dist * uOpticalLengthHaze / uZenith; // doesnt change depending on sun angle
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
@@ -143,17 +151,19 @@ void main()
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
 	vec3 cumulus_rgb = vec3(cumulus.x);
+	// Average density
+	float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
+	average_density = mix(1.0, 0.0, average_density);
+	vec3 smoothed_density = smoothstep(-0.8, 0.2, vec3(average_density));
+
 
 	// AERIAL PERSPECTIVE on clouds - looks better
 	cumulus_rgb *= F_ex;
 	cumulus_rgb += L_in;
 	cumulus_rgb = ACESFilm(cumulus_rgb);
 
-	// Average density
+	// Average density bool
 	if (bool(uAverageDensity)) {
-		float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
-		average_density = mix(1.0, 0.0, average_density);
-		vec3 smoothed_density = smoothstep(-0.8, 0.2, vec3(average_density));
     	cumulus_rgb *= smoothed_density;
 	}
 
@@ -165,7 +175,7 @@ void main()
 	}
 
 	if (light_dir.y < 0.0) // earth shadow
-		tot_rgb *= exp(-10.0 * -light_dir.y);
+		tot_rgb *= exp(-1.0 * -light_dir.y);
 	if (view_dir.y < 0.0) // under earth
 		tot_rgb *= mix(1., 0., (view_dir.y * -1) * 5.f);
 	gl_FragColor = tot_rgb;

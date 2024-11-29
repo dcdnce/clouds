@@ -92,7 +92,7 @@ void main()
 	color = pow(color, vec3(2.2));
 
 	if (light_dir.y < 0.0) // earth shadow
-		color *= exp(-10.0 * -light_dir.y);
+		color *= exp(-1.0 * -light_dir.y);
 
 	gl_FragColor = vec4(color, 1.0);
 }
