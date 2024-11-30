@@ -111,8 +111,8 @@ void main()
 	float air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
 	float sAir = uZenithalOpticalLengthAir * air_mass;
 	float sHaze = uZenithalOpticalLengthHaze * air_mass;
-	vec3 F_ex = exp(-(beta_R*sAir+beta_M*sHaze));
-	E_sun *= F_ex;
+	vec3 F_ex = exp(-(beta_R+beta_M) * (sAir+sHaze));
+	// E_sun *= F_ex;
 
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
 	cos_theta = clamp(dot(view_dir, light_dir), 0.f, 1.f);
@@ -120,15 +120,14 @@ void main()
 	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
 	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - g, 2.f) / (pow(1.f + g*g - 2.f * g * cos_theta, 1.5))));
 
-	sAir = view_dist / uZenith;
-	sHaze = view_dist / uZenith;
+	sAir = view_dist / uZenith * uZenithalOpticalLengthAir;
+	sHaze = view_dist / uZenith * uZenithalOpticalLengthHaze;
 
-	F_ex = exp(-((beta_R + beta_M)*sAir));
+	F_ex = exp(-(beta_R + beta_M) * (sAir + sHaze));
 	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
 	L_in *= E_sun;
 	L_in *= 1.f - F_ex;
 	sky_rgb += L_in;
-
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
