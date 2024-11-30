@@ -26,8 +26,8 @@ class Plane {
 			glUniform3f(glGetUniformLocation(shader.program, "uSunPosition"), e.sun_position.x, e.sun_position.y, e.sun_position.z);
 			glUniform1i(glGetUniformLocation(shader.program, "uFrames"), frames);
 			glUniform3f(glGetUniformLocation(shader.program, "uCameraPosition"), e.camera.position.x, e.camera.position.y, e.camera.position.z);
-			glUniform1f(glGetUniformLocation(shader.program, "uOpticalLengthAir"), e.optical_length_air);
-			glUniform1f(glGetUniformLocation(shader.program, "uOpticalLengthHaze"), e.optical_length_haze);
+			glUniform1f(glGetUniformLocation(shader.program, "uZenithalOpticalLengthAir"), e.optical_length_air);
+			glUniform1f(glGetUniformLocation(shader.program, "uZenithalOpticalLengthHaze"), e.optical_length_haze);
 
 			glBindVertexArray(_VAO);
 			glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);

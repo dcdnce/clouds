@@ -12,18 +12,19 @@ uniform mat4 uRotatedSun;
 uniform float uCloudsSmoothstepEdgeMin;
 uniform float uCloudsSmoothstepEdgeMax;
 uniform float uZenith;
-uniform float uOpticalLengthAir;
-uniform float uOpticalLengthHaze;
+uniform float uZenithalOpticalLengthAir;
+uniform float uZenithalOpticalLengthHaze;
 uniform int uCloudsRender;
 uniform int uAverageDensity;
 uniform float uAverageDensityStepSize;
 uniform float uNoiseScale;
 
-vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1); // Beta Rayleigh - out-scattering already computed coefficients
+vec3 beta_R = vec3(6.95e-6, 1.18e-5, 2.44e-5); // Beta Rayleigh - out-scattering already computed coefficients
 vec3 beta_M = vec3(2e-5, 3e-5, 4e-5); // Beta Mie - out-scattering already computed coefficients
 
-const float g = -3;
+const float g = -1;
 vec3 E_sun = vec3(255.0, 255.0, 255.0);
+// vec3 E_sun = vec3(1.f, 1.f, 1.f);
 const float pi = 3.14159265;
 
 const float noise_res = 256.f;
@@ -99,46 +100,35 @@ void main()
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir = normalize(sun_position - uCameraPosition);
+	vec3 zenith_dir = normalize(vec3(0.f, uZenith, 0.f) - uCameraPosition);
 	float sun_dist = length(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(fragPosition - uCameraPosition);
 	float view_dist = length(fragPosition - uCameraPosition);
 
-	// phases functions - in-scattering probability
-	float cos_theta = dot(view_dir, light_dir);
-	vec3 B_scAir = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
-	vec3 B_scHaze = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
-
 	// SUNLIGHT
- 	float sA = view_dist * 8.4 / uZenith;
-	float sH = view_dist * 1.25 / uZenith; // change on view dist
-	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 kept_F_ex = F_ex;
+	float cos_theta = clamp(dot(view_dir, zenith_dir), 0.f, 1.f);
+	float theta_degree = acos(cos_theta) * 180.f / pi;
+	float air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
+	float sAir = uZenithalOpticalLengthAir * air_mass;
+	float sHaze = uZenithalOpticalLengthHaze * air_mass;
+	vec3 F_ex = exp(-(beta_R*sAir+beta_M*sHaze));
 	E_sun *= F_ex;
 
-	// SUN
-	// clamped to [0;1]: because normally [-1;1] for opposed, orthogonal, colinear 
-	cos_theta = (dot(view_dir, light_dir) + 1.f) * 0.5f;
-	float theta = acos(cos_theta);
-	float theta_degree = theta * 180.f / pi;
-	float air_mass = 1.0 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
-	sA = 8.4 * air_mass;
-	sH = 1.25  * air_mass;
-	F_ex = exp(-(beta_R*sA+beta_M*sH));
+	// GENERAL EQUATION - AERIAL PERSPECTIVE
+	cos_theta = clamp(dot(view_dir, light_dir), 0.f, 1.f);
+	// Scattering coefficients (quantity) multiplied by their phase function (angular direction)
+	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
+	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - g, 2.f) / (pow(1.f + g*g - 2.f * g * cos_theta, 1.5))));
+
+	sAir = view_dist / uZenith;
+	sHaze = view_dist / uZenith;
+
+	F_ex = exp(-((beta_R + beta_M)*sAir));
 	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
 	L_in *= E_sun;
-	L_in *= (1.0 - F_ex);
+	L_in *= 1.f - F_ex;
 	sky_rgb += L_in;
 
-	// AERIAL PERSPECTIVE
-	E_sun = vec3(255.f, 255.f, 255.f);
-	sA = view_dist * 8.4 / (sun_dist * 20.f);
-	sH = view_dist * 1.25 / (sun_dist * 20.f); // change depending on sun dist
-	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
-	L_in *= E_sun;
-	L_in *= (1.0 - F_ex);
-	sky_rgb *= F_ex;
-	sky_rgb += L_in;
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
@@ -156,11 +146,7 @@ void main()
 	average_density = mix(1.0, 0.0, average_density);
 	vec3 smoothed_density = smoothstep(-0.8, 0.2, vec3(average_density));
 
-
-	// AERIAL PERSPECTIVE on clouds - looks better
-	cumulus_rgb *= F_ex;
-	cumulus_rgb += L_in;
-	cumulus_rgb = ACESFilm(cumulus_rgb);
+	// cumulus_rgb = ACESFilm(cumulus_rgb);
 
 	// Average density bool
 	if (bool(uAverageDensity)) {

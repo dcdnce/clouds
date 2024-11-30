@@ -47,7 +47,7 @@ class Skydome {
 			glUniform1i(glGetUniformLocation(shader.program, "uAverageDensity"), e.average_density);
 			glUniform1f(glGetUniformLocation(shader.program, "uAverageDensityStepSize"), e.average_density_step_size);
 			glUniform1f(glGetUniformLocation(shader.program, "uNoiseScale"), e.noise_scale);
-			glUniform1f(glGetUniformLocation(shader.program, "uOpticalLengthAir"), e.optical_length_air);
+			glUniform1f(glGetUniformLocation(shader.program, "uZenithalOpticalLengthAir"), e.optical_length_air);
 			glUniform1f(glGetUniformLocation(shader.program, "uOpticalLengthHazat"), e.optical_length_haze);
 
 			glBindVertexArray(_VAO);
@@ -73,8 +73,8 @@ class Skydome {
 			glUniform1i(glGetUniformLocation(shadow_map_shader.program, "uAverageDensity"), e.average_density);
 			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uAverageDensityStepSize"), e.average_density_step_size);
 			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uNoiseScale"), e.noise_scale);
-			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uOpticalLengthAir"), e.optical_length_air);
-			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uOpticalLengthHaze"), e.optical_length_haze);
+			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uZenithalOpticalLengthAir"), e.optical_length_air);
+			glUniform1f(glGetUniformLocation(shadow_map_shader.program, "uZenithalOpticalLengthHaze"), e.optical_length_haze);
 
 			glBindVertexArray(_VAO);
 			glDrawArrays(GL_TRIANGLES, 0, _vertices.size());

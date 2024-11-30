@@ -6,17 +6,17 @@ uniform mat4 uRotatedSun;
 uniform int uFrames;
 uniform float uZenith;
 uniform vec3 uCameraPosition;
-uniform float uOpticalLengthAir;
-uniform float uOpticalLengthHaze;
+uniform float uZenithalOpticalLengthAir;
+uniform float uZenithalOpticalLengthHaze;
 
 in vec3 fragPosition;
 in vec3 fragColor;
 in vec4 fragPositionLightSpace;
 in vec3 fragNormal;
 
-vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1);
-vec3 beta_M = vec3(2e-4, 2e-4, 2e-4);
-const float g = 0.95;
+vec3 beta_R = vec3(6.95e-6, 1.18e-5, 2.44e-5);
+vec3 beta_M = vec3(2e-5, 3e-5, 4-5);
+const float g = -1;
 vec3 E_sun = vec3(255.0, 255.0, 255.0);
 
 float CloudsShadowScalar()
@@ -69,24 +69,14 @@ void main()
 	float cos_theta = dot(light_dir, view_dir);
 	const float pi = 3.14159265;
 
-	// phases functions - in-scattering probability
-	vec3 B_scAir = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
-	vec3 B_scHaze = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	// Scattering coefficients (quantity) multiplied by their phase function (angular direction)
+	vec3 B_scAir = beta_R * (3.f / (16.f * pi) * (1.f + cos_theta * cos_theta));
+	vec3 B_scHaze = beta_M * (pow(1.0 - g, 2.f) / ((4.f * pi) * pow(1.f + g*g - 2.f * g * cos_theta, 1.5)));
 
 	// Diffuse
 	float diffuse = max(0.0, dot(fragNormal, light_dir));
 	float shadow = CloudsShadowScalar();
 	color *= shadow * diffuse;
-
-	// AERIAL PERSPECTIVE
-	float sA = view_dist * uOpticalLengthAir / uZenith; // fucking constant
-	float sH = view_dist * uOpticalLengthHaze / uZenith; // fucking constant
-	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
-	L_in *= (1.0 - F_ex);
-	L_in *= E_sun;
-	color *= F_ex;
-	color += L_in;
 
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));

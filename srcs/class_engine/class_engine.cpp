@@ -13,8 +13,8 @@ Engine::Engine(void) : framebuffer_width(0), framebuffer_height(0), window(NULL)
 	clouds_type = TYPE_CUMULUS;
 	average_density = true;
 	average_density_step_size = 10.f;
-	optical_length_air = 0.150f;
-	optical_length_haze = 0.5f;
+	optical_length_air = 8.4f;
+	optical_length_haze = 1.25f;
 	clouds_render = true;
 	CloudsTypeCallback();
 }
