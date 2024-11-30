@@ -20,9 +20,9 @@ uniform float uAverageDensityStepSize;
 uniform float uNoiseScale;
 
 vec3 beta_R = vec3(6.95e-2, 1.18e-1, 2.44e-1); // Beta Rayleigh - out-scattering already computed coefficients
-vec3 beta_M = vec3(2e-4, 2e-4, 2e-4); // Beta Mie - out-scattering already computed coefficients
+vec3 beta_M = vec3(2e-5, 3e-5, 4e-5); // Beta Mie - out-scattering already computed coefficients
 
-const float g = 0.95;
+const float g = -3;
 vec3 E_sun = vec3(255.0, 255.0, 255.0);
 const float pi = 3.14159265;
 
@@ -105,12 +105,12 @@ void main()
 
 	// phases functions - in-scattering probability
 	float cos_theta = dot(view_dir, light_dir);
-	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
-	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	vec3 B_scAir = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
+	vec3 B_scHaze = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 	// SUNLIGHT
  	float sA = view_dist * 8.4 / uZenith;
-	float sH = view_dist * uOpticalLengthHaze / uZenith; // change on view dist
+	float sH = view_dist * 1.25 / uZenith; // change on view dist
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
 	vec3 kept_F_ex = F_ex;
 	E_sun *= F_ex;
@@ -122,19 +122,19 @@ void main()
 	float theta_degree = theta * 180.f / pi;
 	float air_mass = 1.0 / (theta_degree + 0.15 * pow(93.885 - theta_degree, -1.253));
 	sA = 8.4 * air_mass;
-	sH = uOpticalLengthHaze  * air_mass;
+	sH = 1.25  * air_mass;
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
+	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
 	L_in *= E_sun;
 	L_in *= (1.0 - F_ex);
 	sky_rgb += L_in;
 
 	// AERIAL PERSPECTIVE
 	E_sun = vec3(255.f, 255.f, 255.f);
-	sA = view_dist * uOpticalLengthAir / uZenith;
-	sH = view_dist * uOpticalLengthHaze / uZenith; // doesnt change depending on sun angle
+	sA = view_dist * 8.4 / (sun_dist * 20.f);
+	sH = view_dist * 1.25 / (sun_dist * 20.f); // change depending on sun dist
 	F_ex = exp(-(beta_R*sA+beta_M*sH));
-	L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
+	L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
 	L_in *= E_sun;
 	L_in *= (1.0 - F_ex);
 	sky_rgb *= F_ex;

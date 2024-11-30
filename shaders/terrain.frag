@@ -70,8 +70,8 @@ void main()
 	const float pi = 3.14159265;
 
 	// phases functions - in-scattering probability
-	vec3 Phi_R = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
-	vec3 Phi_M = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
+	vec3 B_scAir = 3.0 / (16.0 * pi) * beta_R * (1.0 + cos_theta * cos_theta);
+	vec3 B_scHaze = 1.0 / (4.0 * pi) * beta_M * pow(1.0 - g, 2.0) / pow(1.0 + g * g - 2.0 * g * cos_theta, 1.5);
 
 	// Diffuse
 	float diffuse = max(0.0, dot(fragNormal, light_dir));
@@ -82,7 +82,7 @@ void main()
 	float sA = view_dist * uOpticalLengthAir / uZenith; // fucking constant
 	float sH = view_dist * uOpticalLengthHaze / uZenith; // fucking constant
 	vec3 F_ex = exp(-(beta_R*sA+beta_M*sH));
-	vec3 L_in = (Phi_R + Phi_M) / (beta_R + beta_M);
+	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
 	L_in *= (1.0 - F_ex);
 	L_in *= E_sun;
 	color *= F_ex;
