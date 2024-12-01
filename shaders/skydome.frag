@@ -20,8 +20,8 @@ uniform float uAverageDensityStepSize;
 uniform float uNoiseScale;
 uniform float uG;
 
-vec3 beta_R = vec3(6.95e-6, 1.18e-5, 2.44e-5); // Beta Rayleigh - out-scattering already computed coefficients
-vec3 beta_M = vec3(2e-5, 3e-5, 4e-5); // Beta Mie - out-scattering already computed coefficients
+vec3 beta_R = vec3(6.95e-6, 1.18e-5, 2.44e-5); // Beta Rayleigh - scattering already computed coefficients
+vec3 beta_M = vec3(2e-5, 3e-5, 4e-5); // Beta Mie - scattering already computed coefficients
 
 vec3 E_sun = vec3(255.0, 255.0, 255.0);
 const float pi = 3.14159265;
@@ -99,17 +99,15 @@ void main()
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
 	vec3 light_dir = normalize(fragPosition - sun_position);
-	vec3 zenith_dir = normalize(vec3(0.f, uZenith, 0.f) - uCameraPosition);
 	float sun_dist = length(sun_position - uCameraPosition);
 	vec3 view_dir = normalize(uCameraPosition - fragPosition);
 	float view_dist = length(uCameraPosition - fragPosition);
 
 	// SUNLIGHT
-	float cos_theta = clamp(dot(view_dir, zenith_dir), 0.0, 1.0);
-	// if (cos_theta < -0.2f)
-	// 	discard;
+	float cos_theta = clamp(dot(normalize(sun_position - uCameraPosition), vec3(0.f, 1.f, 0.f)), 0.f, 1.f);
 	float theta_degree = acos(cos_theta) * 180.f / pi;
 	float air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
+	air_mass *= exp(6.5f * (1.0 - cos_theta)); // heuristic exponential - BAD
 	float sAir = uZenithalOpticalLengthAir * air_mass;
 	float sHaze = uZenithalOpticalLengthHaze * air_mass;
 	vec3 F_ex = exp(-(beta_R*sAir+beta_M*sHaze));
