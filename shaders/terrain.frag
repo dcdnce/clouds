@@ -64,7 +64,6 @@ void main()
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 color = vec3(86.0, 125.0, 70.0) / 255.0;
 	vec3 light_dir = normalize(fragPosition - sun_position);
-	vec3 zenith_dir = normalize(vec3(0.f, uZenith, 0.f) - uCameraPosition);
 	vec3 view_dir = normalize(uCameraPosition - fragPosition);
 	float view_dist = length(uCameraPosition - fragPosition);
 	const float pi = 3.14159265;
@@ -75,22 +74,21 @@ void main()
 	color *= shadow * diffuse;
 
 	// SUNLIGHT
-	float cos_theta = clamp(dot(view_dir, zenith_dir), 0.f, 1.f);
+	float cos_theta = clamp(dot(normalize(sun_position - uCameraPosition), vec3(0.f, 1.f, 0.f)), 0.f, 1.f);
 	float theta_degree = acos(cos_theta) * 180.f / pi;
 	float air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
+	air_mass *= exp(6.5f * (1.0 - cos_theta)); // heuristic exponential - BAD
 	float sAir = uZenithalOpticalLengthAir * air_mass;
 	float sHaze = uZenithalOpticalLengthHaze * air_mass;
-	vec3 F_ex = exp(-(beta_R+beta_M) * (sAir+sHaze));
-	// E_sun *= F_ex;
+	vec3 F_ex = exp(-(beta_R*sAir));
+	E_sun *= F_ex;
 
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
 	cos_theta = dot(view_dir, light_dir);
 	// Scattering coefficients (quantity) multiplied by their phase function (angular direction)
 	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
 	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - uG, 2.f) / (pow(1.f + uG*uG - 2.f * uG * cos_theta, 1.5))));
-
-	float s = view_dist * 10.f;
-
+	float s = view_dist * 30.f;
 	F_ex = exp(-(beta_R)*s); 
 	vec3 L_in = (B_scAir) / (beta_R);
 	L_in *= E_sun;
@@ -100,9 +98,6 @@ void main()
 
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));
-
-	// if (light_dir.y < 0.0) // earth shadow
-	// 	color *= exp(-1.0 * -light_dir.y);
 
 	gl_FragColor = vec4(color, 1.0);
 }

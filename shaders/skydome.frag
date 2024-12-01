@@ -111,6 +111,7 @@ void main()
 	float sAir = uZenithalOpticalLengthAir * air_mass;
 	float sHaze = uZenithalOpticalLengthHaze * air_mass;
 	vec3 F_ex = exp(-(beta_R*sAir+beta_M*sHaze));
+	vec3 kept_F_ex = F_ex;
 	E_sun *= F_ex;
 
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
@@ -127,15 +128,19 @@ void main()
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
-	sky_rgb = pow(sky_rgb, vec3(2.2));
+	// sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
 	// Cumulus
 	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
-	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
+	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 1.f);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !
-	vec3 cumulus_rgb = vec3(cumulus.x);
+
+	// AP with sun angle extinction
+	vec3 cumulus_rgb = cumulus.x * kept_F_ex;
+	cumulus_rgb += L_in;
+
 	// Average density
 	float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 
 	average_density = mix(1.0, 0.0, average_density);
@@ -149,15 +154,9 @@ void main()
 	}
 
 	// Final Color
-	vec4 tot_rgb = vec4(sky_rgb, 1.);
+	gl_FragColor = vec4(sky_rgb, 1.);
 
 	if (bool(uCloudsRender)) {
-		tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
+		gl_FragColor = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
 	}
-
-	// if (light_dir.y < 0.0) // earth shadow
-	// 	tot_rgb *= exp(-1.0 * -light_dir.y);
-	// if (view_dir.y < 0.0) // under earth
-	// 	tot_rgb *= mix(1., 0., (view_dir.y * -1) * 5.f);
-	gl_FragColor = tot_rgb;
 }
