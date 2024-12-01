@@ -70,7 +70,7 @@ void main()
 	const float pi = 3.14159265;
 
 	// Diffuse
-	float diffuse = max(0.0, dot(fragNormal, normalize(sun_position - fragPosition)));
+	float diffuse = clamp(dot(fragNormal, normalize(sun_position - fragPosition)), 0.f, 1.f);
 	float shadow = CloudsShadowScalar();
 	color *= shadow * diffuse;
 
@@ -89,14 +89,14 @@ void main()
 	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
 	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - uG, 2.f) / (pow(1.f + uG*uG - 2.f * uG * cos_theta, 1.5))));
 
-	float s = view_dist;
+	float s = view_dist * 10.f;
 
 	F_ex = exp(-(beta_R)*s); 
 	vec3 L_in = (B_scAir) / (beta_R);
 	L_in *= E_sun;
 	L_in *= (1.f - F_ex);
-	// color = F_ex;
-	color = L_in;	
+	color *= F_ex;
+	color += L_in;	
 
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));

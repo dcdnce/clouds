@@ -119,7 +119,7 @@ int	main(void)
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
 		// frames++;
-		frames += 10;
+		frames += 50;
 	}
 
 	return (0);

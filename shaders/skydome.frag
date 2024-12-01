@@ -105,14 +105,14 @@ void main()
 	float view_dist = length(uCameraPosition - fragPosition);
 
 	// SUNLIGHT
-	float cos_theta = dot(view_dir, zenith_dir);
-	if (cos_theta < -0.2f)
-		discard;
+	float cos_theta = clamp(dot(view_dir, zenith_dir), 0.0, 1.0);
+	// if (cos_theta < -0.2f)
+	// 	discard;
 	float theta_degree = acos(cos_theta) * 180.f / pi;
 	float air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
 	float sAir = uZenithalOpticalLengthAir * air_mass;
 	float sHaze = uZenithalOpticalLengthHaze * air_mass;
-	vec3 F_ex = exp(-(beta_R+beta_M) * (sAir+sHaze));
+	vec3 F_ex = exp(-(beta_R*sAir+beta_M*sHaze));
 	E_sun *= F_ex;
 
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
@@ -120,7 +120,7 @@ void main()
 	// Scattering coefficients (quantity) multiplied by their phase function (angular direction)
 	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
 	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - uG, 2.f) / (pow(1.f + uG*uG - 2.f * uG * cos_theta, 1.5))));
-	float s = view_dist;
+	float s = view_dist * 3.f;
 	F_ex = exp(-(beta_R + beta_M)*s);
 	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
 	L_in *= E_sun;
@@ -129,7 +129,7 @@ void main()
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
-	// sky_rgb = pow(sky_rgb, vec3(2.2));
+	sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
 	// Cumulus
@@ -143,7 +143,7 @@ void main()
 	average_density = mix(1.0, 0.0, average_density);
 	vec3 smoothed_density = smoothstep(-0.8, 0.2, vec3(average_density));
 
-	// cumulus_rgb = ACESFilm(cumulus_rgb);
+	cumulus_rgb = ACESFilm(cumulus_rgb);
 
 	// Average density bool
 	if (bool(uAverageDensity)) {

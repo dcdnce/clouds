@@ -27,8 +27,8 @@ void Terrain::SetupBuffers()
 	for (float i = -sizebytwo ; i < sizebytwo ; i++) {
 		for (float j = -sizebytwo ; j < sizebytwo ; j++) {
 			float noise_value = (noise.GetNoise(i, j) + 1.0f) * 0.5f;
+			noise_value = std::max(noise_value, 0.5f);
 			noise_value *= 50.f;
-			std::max(noise_value, 20.f);
 			_vertices[index].position = pfm::vec3(i, 6000.f + noise_value, j);
 			index++;
 		}
