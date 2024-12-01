@@ -62,10 +62,11 @@ vec3 ACESFilm( vec3 x )
 void main()
 {
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
-	vec3 color = vec3(86.0, 125.0, 70.0) / 255.0;
+	vec3 color = fragColor / 255.f;
 	vec3 light_dir = normalize(fragPosition - sun_position);
 	vec3 view_dir = normalize(uCameraPosition - fragPosition);
 	float view_dist = length(uCameraPosition - fragPosition);
+	vec3 up_dir = vec3(0.0, 1.0, 0.0);
 	const float pi = 3.14159265;
 
 	// SUNLIGHT
@@ -81,7 +82,7 @@ void main()
 	// Diffuse
 	float diffuse = clamp(dot(fragNormal, normalize(sun_position - fragPosition)), 0.f, 1.f);
 	float shadow = CloudsShadowScalar();
-	color *= shadow * diffuse * cos_theta;
+	color *= shadow * (diffuse * diffuse);
 
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
 	cos_theta = dot(view_dir, light_dir);
@@ -99,7 +100,7 @@ void main()
 	color = pow(color, vec3(2.2));
 
 	// Earth shadow
-	cos_theta = dot(normalize(sun_position - uCameraPosition), vec3(0.f, 1.f, 0.f));
+	cos_theta = dot(normalize(sun_position - uCameraPosition), up_dir);
 	if (cos_theta <= 0.f)
 		color *= exp(-abs(cos_theta) * 5.f);
 

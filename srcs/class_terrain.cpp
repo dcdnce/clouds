@@ -1,4 +1,12 @@
 #include "class_terrain.h"
+#define	OCEAN	(pfm::vec3){2, 75, 134}
+#define	WATER	(pfm::vec3){94, 207, 250}
+#define	BEACH	(pfm::vec3){255, 235, 205}
+#define	LAND	(pfm::vec3){169, 218, 63}
+#define DESERT	(pfm::vec3){237, 201, 175}
+#define FOREST	(pfm::vec3){86, 106, 61}
+#define	ROCK	(pfm::vec3){185,156,150}
+#define	CLASSIC (pfm::vec3){239,240,241}
 
 Terrain::Terrain(size_t const size)
 {
@@ -7,9 +15,9 @@ Terrain::Terrain(size_t const size)
 
 	noise.SetSeed(1337);
 	noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-	noise.SetFrequency(0.019);
+	noise.SetFrequency(0.009);
 	noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-	noise.SetFractalOctaves(5);
+	noise.SetFractalOctaves(10);
 	noise.SetFractalLacunarity(2);
 	noise.SetFractalGain(0.5f);
 	noise.SetFractalWeightedStrength(0.1f);
@@ -19,6 +27,28 @@ Terrain::Terrain(size_t const size)
 	glGenVertexArrays(1, &_VAO);
 }
 
+pfm::vec3 Terrain::WhichBiome(float const e)
+{
+	// if (e <= 0.3f)
+	// 	return (OCEAN);
+	// if (e < 0.33f){
+	// 	return (BEACH);
+	// }
+	// if (e < 0.3f) {
+	// 	// if (m < 0.4f) return (BEACH);
+	// 	return (LAND);
+	// }
+	if (e <= 0.3f){
+		// if (m < 0.4f) return (LAND);
+		return (FOREST);
+	}
+	if (e < 0.5f) {
+		return (ROCK);
+	}
+	return (CLASSIC);
+}
+
+
 void Terrain::SetupBuffers()
 {
 	float const sizebytwo = noise_size / 2;
@@ -27,7 +57,9 @@ void Terrain::SetupBuffers()
 	for (float i = -sizebytwo ; i < sizebytwo ; i++) {
 		for (float j = -sizebytwo ; j < sizebytwo ; j++) {
 			float noise_value = (noise.GetNoise(i, j) + 1.0f) * 0.5f;
-			noise_value = std::max(noise_value, 0.5f);
+			noise_value = pow(noise_value * 1.2f, 1.5f);
+			noise_value = std::max(noise_value, 0.3f);
+			_vertices[index].color = WhichBiome(noise_value);
 			noise_value *= 50.f;
 			_vertices[index].position = pfm::vec3(i, 6000.f + noise_value, j);
 			index++;

@@ -33,7 +33,7 @@ float offsets[8];
 float random(vec2 v)
 {
     return fract(sin(dot(v.xy,
-                         vec2(14.9898,78.233)))
+                         vec2(14.9798,78.233)))
                  * 403758.5453123);
 }
 

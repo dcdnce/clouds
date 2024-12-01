@@ -23,6 +23,7 @@ class Terrain {
 		size_t noise_size;
 
 		void SetupBuffers();
+		pfm::vec3 WhichBiome(float const e);
 		void InitDepthMap();
 		void DrawDepthMap(int frames, Engine & e);
 
