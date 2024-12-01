@@ -68,11 +68,6 @@ void main()
 	float view_dist = length(uCameraPosition - fragPosition);
 	const float pi = 3.14159265;
 
-	// Diffuse
-	float diffuse = clamp(dot(fragNormal, normalize(sun_position - fragPosition)), 0.f, 1.f);
-	float shadow = CloudsShadowScalar();
-	color *= shadow * diffuse;
-
 	// SUNLIGHT
 	float cos_theta = clamp(dot(normalize(sun_position - uCameraPosition), vec3(0.f, 1.f, 0.f)), 0.f, 1.f);
 	float theta_degree = acos(cos_theta) * 180.f / pi;
@@ -83,9 +78,13 @@ void main()
 	vec3 F_ex = exp(-(beta_R*sAir));
 	E_sun *= F_ex;
 
+	// Diffuse
+	float diffuse = clamp(dot(fragNormal, normalize(sun_position - fragPosition)), 0.f, 1.f);
+	float shadow = CloudsShadowScalar();
+	color *= shadow * diffuse * cos_theta;
+
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
 	cos_theta = dot(view_dir, light_dir);
-	// Scattering coefficients (quantity) multiplied by their phase function (angular direction)
 	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
 	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - uG, 2.f) / (pow(1.f + uG*uG - 2.f * uG * cos_theta, 1.5))));
 	float s = view_dist * 30.f;
@@ -98,6 +97,11 @@ void main()
 
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));
+
+	// Earth shadow
+	cos_theta = dot(normalize(sun_position - uCameraPosition), vec3(0.f, 1.f, 0.f));
+	if (cos_theta <= 0.f)
+		color *= exp(-abs(cos_theta) * 5.f);
 
 	gl_FragColor = vec4(color, 1.0);
 }

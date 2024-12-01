@@ -128,7 +128,6 @@ void main()
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
-	// sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
 	// Cumulus
@@ -159,4 +158,9 @@ void main()
 	if (bool(uCloudsRender)) {
 		gl_FragColor = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
 	}
+
+	// Earth shadow
+	cos_theta = dot(normalize(sun_position - uCameraPosition), vec3(0.f, 1.f, 0.f));
+	if (cos_theta <= 0.f)
+		gl_FragColor *= exp(-abs(cos_theta) * 5.f);
 }

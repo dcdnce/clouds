@@ -64,6 +64,7 @@ int	main(void)
 	while (!glfwWindowShouldClose(clouds.window)) {
 		clouds.ComputeDeltaTime();
 		static int frames = 25000;
+		// static int frames = 0;
 		ImGui_ImplGlfw_NewFrame();
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
