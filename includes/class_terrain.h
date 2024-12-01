@@ -40,6 +40,8 @@ class Terrain {
 			glUniform1f(glGetUniformLocation(shader.program, "uZenithalOpticalLengthAir"), e.optical_length_air);
 			glUniform1f(glGetUniformLocation(shader.program, "uZenithalOpticalLengthHaze"), e.optical_length_haze);
 			glUniform1f(glGetUniformLocation(shader.program, "uZenith"), zenith);
+			glUniform1f(glGetUniformLocation(shader.program, "uG"), e.mie_phase_eccentricity);
+			
 
 			glBindVertexArray(_VAO);
 			glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);

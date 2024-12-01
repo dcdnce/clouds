@@ -18,13 +18,12 @@ uniform int uCloudsRender;
 uniform int uAverageDensity;
 uniform float uAverageDensityStepSize;
 uniform float uNoiseScale;
+uniform float uG;
 
 vec3 beta_R = vec3(6.95e-6, 1.18e-5, 2.44e-5); // Beta Rayleigh - out-scattering already computed coefficients
 vec3 beta_M = vec3(2e-5, 3e-5, 4e-5); // Beta Mie - out-scattering already computed coefficients
 
-const float g = -1;
 vec3 E_sun = vec3(255.0, 255.0, 255.0);
-// vec3 E_sun = vec3(1.f, 1.f, 1.f);
 const float pi = 3.14159265;
 
 const float noise_res = 256.f;
@@ -99,39 +98,38 @@ void main()
 {
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
-	vec3 light_dir = normalize(sun_position - uCameraPosition);
+	vec3 light_dir = normalize(fragPosition - sun_position);
 	vec3 zenith_dir = normalize(vec3(0.f, uZenith, 0.f) - uCameraPosition);
 	float sun_dist = length(sun_position - uCameraPosition);
-	vec3 view_dir = normalize(fragPosition - uCameraPosition);
-	float view_dist = length(fragPosition - uCameraPosition);
+	vec3 view_dir = normalize(uCameraPosition - fragPosition);
+	float view_dist = length(uCameraPosition - fragPosition);
 
 	// SUNLIGHT
-	float cos_theta = clamp(dot(view_dir, zenith_dir), 0.f, 1.f);
+	float cos_theta = dot(view_dir, zenith_dir);
+	if (cos_theta < -0.2f)
+		discard;
 	float theta_degree = acos(cos_theta) * 180.f / pi;
 	float air_mass = 1.0 / (cos_theta + 0.15 * pow(93.885 - theta_degree, -1.253));
 	float sAir = uZenithalOpticalLengthAir * air_mass;
 	float sHaze = uZenithalOpticalLengthHaze * air_mass;
 	vec3 F_ex = exp(-(beta_R+beta_M) * (sAir+sHaze));
-	// E_sun *= F_ex;
+	E_sun *= F_ex;
 
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
-	cos_theta = clamp(dot(view_dir, light_dir), 0.f, 1.f);
+	cos_theta = dot(view_dir, light_dir);
 	// Scattering coefficients (quantity) multiplied by their phase function (angular direction)
 	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
-	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - g, 2.f) / (pow(1.f + g*g - 2.f * g * cos_theta, 1.5))));
-
-	sAir = view_dist / uZenith * uZenithalOpticalLengthAir;
-	sHaze = view_dist / uZenith * uZenithalOpticalLengthHaze;
-
-	F_ex = exp(-(beta_R + beta_M) * (sAir + sHaze));
+	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - uG, 2.f) / (pow(1.f + uG*uG - 2.f * uG * cos_theta, 1.5))));
+	float s = view_dist;
+	F_ex = exp(-(beta_R + beta_M)*s);
 	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
 	L_in *= E_sun;
-	L_in *= 1.f - F_ex;
+	L_in *= (1.f - F_ex);
 	sky_rgb += L_in;
 
 	// aesthetic
 	sky_rgb = ACESFilm(sky_rgb);
-	sky_rgb = pow(sky_rgb, vec3(2.2));
+	// sky_rgb = pow(sky_rgb, vec3(2.2));
 
 	/* CLOUDS */
 	// Cumulus
@@ -159,9 +157,9 @@ void main()
 		tot_rgb = vec4(mix(sky_rgb, cumulus_rgb, cumulus_alpha), 1.);
 	}
 
-	if (light_dir.y < 0.0) // earth shadow
-		tot_rgb *= exp(-1.0 * -light_dir.y);
-	if (view_dir.y < 0.0) // under earth
-		tot_rgb *= mix(1., 0., (view_dir.y * -1) * 5.f);
+	// if (light_dir.y < 0.0) // earth shadow
+	// 	tot_rgb *= exp(-1.0 * -light_dir.y);
+	// if (view_dir.y < 0.0) // under earth
+	// 	tot_rgb *= mix(1., 0., (view_dir.y * -1) * 5.f);
 	gl_FragColor = tot_rgb;
 }

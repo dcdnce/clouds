@@ -42,6 +42,7 @@ class Engine {
 		float average_density_step_size;
 		float optical_length_air;
 		float optical_length_haze;
+		float mie_phase_eccentricity;
 		float delta_time;
 		float last_frame;
 		int			framebuffer_width;

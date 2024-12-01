@@ -50,6 +50,9 @@ void Engine::Gui()
 		ImGui::DragFloat("Air Optical Length", &optical_length_air, 0.1f, 0.f, 100.f);
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::DragFloat("Haze Optical Length", &optical_length_haze, 0.1f, 0.f, 17.f);
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::DragFloat("Mie phase eccentricity", &mie_phase_eccentricity, 0.01f, -9.f, 9.f);
+
 	}
 
 	ImGui::End();

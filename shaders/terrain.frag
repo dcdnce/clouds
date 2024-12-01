@@ -8,6 +8,7 @@ uniform float uZenith;
 uniform vec3 uCameraPosition;
 uniform float uZenithalOpticalLengthAir;
 uniform float uZenithalOpticalLengthHaze;
+uniform float uG;
 
 in vec3 fragPosition;
 in vec3 fragColor;
@@ -16,7 +17,6 @@ in vec3 fragNormal;
 
 vec3 beta_R = vec3(6.95e-6, 1.18e-5, 2.44e-5);
 vec3 beta_M = vec3(2e-5, 3e-5, 4-5);
-const float g = -1;
 vec3 E_sun = vec3(255.0, 255.0, 255.0);
 
 float CloudsShadowScalar()
@@ -63,14 +63,14 @@ void main()
 {
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 color = vec3(86.0, 125.0, 70.0) / 255.0;
-	vec3 light_dir = normalize(sun_position - uCameraPosition);
+	vec3 light_dir = normalize(fragPosition - sun_position);
 	vec3 zenith_dir = normalize(vec3(0.f, uZenith, 0.f) - uCameraPosition);
-	vec3 view_dir = normalize(fragPosition - uCameraPosition);
-	float view_dist = length(fragPosition - uCameraPosition);
+	vec3 view_dir = normalize(uCameraPosition - fragPosition);
+	float view_dist = length(uCameraPosition - fragPosition);
 	const float pi = 3.14159265;
 
 	// Diffuse
-	float diffuse = max(0.0, dot(fragNormal, light_dir));
+	float diffuse = max(0.0, dot(fragNormal, normalize(sun_position - fragPosition)));
 	float shadow = CloudsShadowScalar();
 	color *= shadow * diffuse;
 
@@ -81,27 +81,28 @@ void main()
 	float sAir = uZenithalOpticalLengthAir * air_mass;
 	float sHaze = uZenithalOpticalLengthHaze * air_mass;
 	vec3 F_ex = exp(-(beta_R+beta_M) * (sAir+sHaze));
-	E_sun *= F_ex;
+	// E_sun *= F_ex;
 
 	// GENERAL EQUATION - AERIAL PERSPECTIVE
-	cos_theta = clamp(dot(light_dir, view_dir), 0.f, 1.f);
+	cos_theta = dot(view_dir, light_dir);
 	// Scattering coefficients (quantity) multiplied by their phase function (angular direction)
 	vec3 B_scAir =  (3.f / (16.f * pi) * beta_R * (1.f + cos_theta * cos_theta));
-	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - g, 2.f) / (pow(1.f + g*g - 2.f * g * cos_theta, 1.5))));
-	sAir = view_dist * uZenithalOpticalLengthAir / uZenith;
-	sHaze = view_dist * uZenithalOpticalLengthHaze / uZenith;
-	F_ex = exp(-(beta_R + beta_M)*(sAir+sHaze)); 
-	vec3 L_in = (B_scAir + B_scHaze) / (beta_R + beta_M);
+	vec3 B_scHaze = (4.f * pi) * beta_M * ((pow(1.0 - uG, 2.f) / (pow(1.f + uG*uG - 2.f * uG * cos_theta, 1.5))));
+
+	float s = view_dist;
+
+	F_ex = exp(-(beta_R)*s); 
+	vec3 L_in = (B_scAir) / (beta_R);
 	L_in *= E_sun;
-	L_in *= 1.f - F_ex;
-	color *= F_ex;
-	color += L_in;	
+	L_in *= (1.f - F_ex);
+	// color = F_ex;
+	color = L_in;	
 
 	color = ACESFilm(color);
 	color = pow(color, vec3(2.2));
 
-	if (light_dir.y < 0.0) // earth shadow
-		color *= exp(-1.0 * -light_dir.y);
+	// if (light_dir.y < 0.0) // earth shadow
+	// 	color *= exp(-1.0 * -light_dir.y);
 
 	gl_FragColor = vec4(color, 1.0);
 }

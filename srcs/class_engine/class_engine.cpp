@@ -15,6 +15,7 @@ Engine::Engine(void) : framebuffer_width(0), framebuffer_height(0), window(NULL)
 	average_density_step_size = 10.f;
 	optical_length_air = 8.4f;
 	optical_length_haze = 1.25f;
+	mie_phase_eccentricity = 0.99;
 	clouds_render = true;
 	CloudsTypeCallback();
 }
