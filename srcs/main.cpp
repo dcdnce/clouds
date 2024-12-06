@@ -10,7 +10,6 @@
 #include "class_skydome.h"
 #include "class_debug_plane.h"
 #include "class_terrain.h"
-#include "class_grass.h"
 #include "class_camera.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -54,17 +53,11 @@ int	main(void)
 	// terrain.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(30.f), 1024.f/1024.f, 0.1f, 100000.f));
 	terrain.depth_map_shader.SetProjMat(pfm::orthographic(-1000.f, 1000.f, -1000.f, 1000.f, 0.1f, 10000.f));
 
-	// Grass
-	Grass grass(terrain.noise, clouds.camera.position);
-	grass.shader.LoadShaders("./shaders/grass.vert", "./shaders/grass.geom", "./shaders/grass.frag");
-	grass.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
-	load_texture_png(&grass.grass_texture, "./grass.png", GL_TEXTURE0);
- 
 	// Main loop
 	while (!glfwWindowShouldClose(clouds.window)) {
 		clouds.ComputeDeltaTime();
-		// static int frames = 0;
-		static int frames = 25000;
+		static int frames = 0;
+		// static int frames = 25000;
 		// static int frames = -25000;
 		ImGui_ImplGlfw_NewFrame();
 		ImGui_ImplOpenGL3_NewFrame();
@@ -85,8 +78,6 @@ int	main(void)
 		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
 		terrain.shader.SetModelMat(pfm::mat4(1.f));
 		terrain.shader.SetViewMat(clouds.camera.GetViewMatrix());
-		grass.shader.SetModelMat(pfm::mat4(1.f));
-		grass.shader.SetViewMat(clouds.camera.GetViewMatrix());
 
 		// Draw
 		skydome.Draw(frames, clouds);
@@ -107,21 +98,12 @@ int	main(void)
 			glUseProgram(0);
 			debug_plane.Draw(frames, clouds);
 
-		// glUseProgram(grass.shader.program);
-		// glActiveTexture(GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, grass.grass_texture);
-		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_grass"), 0);
-		// glActiveTexture(GL_TEXTURE1);
-		// glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
-		// glUniform1i(glGetUniformLocation(grass.shader.program, "texture_depth"), 0);
-		// grass.Draw(frames, clouds);
-
 		ImGui::Render();// save DrawData
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata
 		glfwSwapBuffers(clouds.window);
 		glfwPollEvents();
 		frames++;
-		// frames += 50;
+		// frames += 10;
 	}
 
 	return (0);

@@ -1,8 +1,8 @@
 #version 330 core
 
-in vec3 fragPosition;
-in vec3 fragColor;
-in vec2 fragTexCoord;
+in vec3 vertexPosition;
+in vec3 vertexColor;
+in vec2 vertexTexCoord;
 
 uniform sampler2D texture1;
 uniform int uFrames;
@@ -98,10 +98,10 @@ void main()
 {
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	vec3 sky_rgb = vec3(0.0, 0.0, 0.0);
-	vec3 light_dir = normalize(fragPosition - sun_position);
+	vec3 light_dir = normalize(vertexPosition - sun_position);
 	float sun_dist = length(sun_position - uCameraPosition);
-	vec3 view_dir = normalize(uCameraPosition - fragPosition);
-	float view_dist = length(uCameraPosition - fragPosition);
+	vec3 view_dir = normalize(uCameraPosition - vertexPosition);
+	float view_dist = length(uCameraPosition - vertexPosition);
 
 	// SUNLIGHT
 	float cos_theta = clamp(dot(normalize(sun_position - uCameraPosition), vec3(0.f, 1.f, 0.f)), 0.f, 1.f);
@@ -131,7 +131,7 @@ void main()
 
 	/* CLOUDS */
 	// Cumulus
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
+	vec2 pos = vec2(vertexTexCoord.x * noise_res, vertexTexCoord.y * noise_res) * uNoiseScale;
 	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 1.f);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	float cumulus_alpha = cumulus.x; // keep alpha value before applying average density !

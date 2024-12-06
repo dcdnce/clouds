@@ -8,12 +8,6 @@
 	- Culling (everything)
 	- Walk
 
-- Grass
-	- Grass color fix
-	- Grass clouds shadow
-	- Grass wind
-	- Grass around camera
-
 - Terrain
 	- Ambient light
 	- Terrain shadow
@@ -23,7 +17,6 @@
 	- cloud shadow don't line up
 	- sm.frag opti
 	- only one rotated_sun_mat
-	- Grass + Plane same shader
 	- Webassembly
 
 Guidelines

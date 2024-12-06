@@ -1,8 +1,8 @@
 #version 330 core
 
-in vec3 fragPosition;
-in vec3 fragColor;
-in vec2 fragTexCoord;
+in vec3 vertexPosition;
+in vec3 vertexColor;
+in vec2 vertexTexCoord;
 
 uniform sampler2D texture1;
 uniform int uFrames;
@@ -82,12 +82,12 @@ vec4 fbm(vec2 v, vec2 s, const float speed)
 void main()
 {
 	// gl_FragDepth = 1.0;
-	if (fragPosition.y < 6000.0)
+	if (vertexPosition.y < 6000.0)
 		discard;
 
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	/* CLOUDS */
-	vec2 pos = vec2(fragTexCoord.x * noise_res, fragTexCoord.y * noise_res) * uNoiseScale;
+	vec2 pos = vec2(vertexTexCoord.x * noise_res, vertexTexCoord.y * noise_res) * uNoiseScale;
 	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	if (cumulus.x < 0.9) {

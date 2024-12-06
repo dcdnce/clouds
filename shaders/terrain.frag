@@ -10,8 +10,8 @@ uniform float uZenithalOpticalLengthAir;
 uniform float uZenithalOpticalLengthHaze;
 uniform float uG;
 
-in vec3 fragPosition;
-in vec3 fragColor;
+in vec3 vertexPosition;
+in vec3 vertexColor;
 in vec4 fragPositionLightSpace;
 in vec3 fragNormal;
 
@@ -62,10 +62,10 @@ vec3 ACESFilm( vec3 x )
 void main()
 {
 	vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
-	vec3 color = fragColor / 255.f;
-	vec3 light_dir = normalize(fragPosition - sun_position);
-	vec3 view_dir = normalize(uCameraPosition - fragPosition);
-	float view_dist = length(uCameraPosition - fragPosition);
+	vec3 color = vertexColor / 255.f;
+	vec3 light_dir = normalize(vertexPosition - sun_position);
+	vec3 view_dir = normalize(uCameraPosition - vertexPosition);
+	float view_dist = length(uCameraPosition - vertexPosition);
 	vec3 up_dir = vec3(0.0, 1.0, 0.0);
 	const float pi = 3.14159265;
 
@@ -80,7 +80,7 @@ void main()
 	E_sun *= F_ex;
 
 	// Diffuse
-	float diffuse = clamp(dot(fragNormal, normalize(sun_position - fragPosition)), 0.f, 1.f);
+	float diffuse = clamp(dot(fragNormal, normalize(sun_position - vertexPosition)), 0.f, 1.f);
 	float shadow = CloudsShadowScalar();
 	color *= shadow * (diffuse * diffuse);
 
