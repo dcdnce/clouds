@@ -66,7 +66,7 @@ int	main(void)
 
 		// Depth maps
 		skydome.DrawDepthMap(frames, clouds);
-		terrain.DrawDepthMap(frames, clouds);
+		// terrain.DrawDepthMap(frames, clouds);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, W_WIDTH, W_HEIGHT);

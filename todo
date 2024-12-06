@@ -5,7 +5,6 @@
 	- E to W and W to E
 	- Infinite terrain
 	- Skydome - centrer sur camera position
-	- Culling (everything)
 	- Walk
 
 - Terrain
@@ -13,7 +12,6 @@
 	- Terrain shadow
 
 - Autres
-	- Understand bais
 	- cloud shadow don't line up
 	- sm.frag opti
 	- only one rotated_sun_mat

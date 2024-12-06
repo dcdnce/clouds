@@ -139,6 +139,7 @@ void main()
 	// AP with sun angle extinction
 	vec3 cumulus_rgb = cumulus.x * kept_F_ex;
 	cumulus_rgb += L_in;
+	cumulus.rgb *= F_ex;
 
 	// Average density
 	float average_density = (cumulus.x + cumulus.y + cumulus.z) / 3.f; 

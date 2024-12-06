@@ -88,7 +88,7 @@ void main()
     vec3 sun_position = vec3(vec4(uRotatedSun * vec4(uSunPosition, 1.0)).rgb);
 	/* CLOUDS */
 	vec2 pos = vec2(vertexTexCoord.x * noise_res, vertexTexCoord.y * noise_res) * uNoiseScale;
-	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 0.3);
+	vec4 cumulus = fbm(pos, vec2(sun_position.x, sun_position.z), 1.f);
 	cumulus.x = smoothstep(uCloudsSmoothstepEdgeMin, uCloudsSmoothstepEdgeMax, cumulus.x); // cumulus like
 	if (cumulus.x < 0.9) {
 		gl_FragDepth = 1.0;
