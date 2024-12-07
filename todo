@@ -1,20 +1,19 @@
 - Gui
 	- Regrouper uniforms/data
 
-- Finalize
-	- E to W and W to E
-	- Infinite terrain
-	- Skydome - centrer sur camera position
-	- Walk
-
 - Terrain
-	- Ambient light
-	- Terrain shadow
+	- Infinite terrain [?]
+
+- Clouds
+	- cloud shadow don't line up
+	- good cloud color at sunset
 
 - Autres
-	- cloud shadow don't line up
-	- sm.frag opti
-	- only one rotated_sun_mat
+	- E to W and W to E
+	- Skydome - centrer sur camera position
+	- Walk
+	- Refactoriser / Optimiser
+	- Leaks
 	- Webassembly
 
 Guidelines

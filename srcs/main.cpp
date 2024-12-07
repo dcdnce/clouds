@@ -22,12 +22,12 @@ void	load_texture_png(GLuint *texture, const char* filename, GLenum activeTextur
 
 int	main(void)
 {
-	Engine 	clouds;
+	Engine 	engine;
 	Skydome skydome;
  
 	// Initialization
-	clouds.Init();
-	clouds.camera.position = pfm::vec3(9.f, 6032.f, 10.f);
+	engine.Init();
+	engine.camera.position = pfm::vec3(9.f, 6032.f, 10.f);
 	skydome.shader.LoadShaders("./shaders/skydome.vert", "./shaders/skydome.frag");
 	skydome.ComputePositions(6381.f, 60, 60);
 	skydome.ComputeTexCoords();
@@ -49,24 +49,21 @@ int	main(void)
 	terrain.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH/(float)W_HEIGHT, 0.1f, 10000.f));
 	// terrain.shader.SetProjMat(pfm::orthographic(-1000.f, 1000.f, -1000.f, 1000.f, 0.1f, 10000.f));
 	terrain.SetupBuffers();
-	terrain.InitDepthMap();
-	// terrain.depth_map_shader.SetProjMat(pfm::perspective(pfm::radians(30.f), 1024.f/1024.f, 0.1f, 100000.f));
-	terrain.depth_map_shader.SetProjMat(pfm::orthographic(-1000.f, 1000.f, -1000.f, 1000.f, 0.1f, 10000.f));
 
 	// Main loop
-	while (!glfwWindowShouldClose(clouds.window)) {
-		clouds.ComputeDeltaTime();
+	while (!glfwWindowShouldClose(engine.window)) {
+		engine.ComputeDeltaTime();
 		static int frames = 0;
 		// static int frames = 25000;
 		// static int frames = -25000;
 		ImGui_ImplGlfw_NewFrame();
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
-		clouds.Gui();
+		engine.Gui();
 
 		// Depth maps
-		skydome.DrawDepthMap(frames, clouds);
-		// terrain.DrawDepthMap(frames, clouds);
+		skydome.DrawDepthMap(frames, engine);
+		// terrain.DrawDepthMap(frames, engine);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, W_WIDTH, W_HEIGHT);
@@ -75,32 +72,36 @@ int	main(void)
 
 		// Matrices - model and view
 		skydome.shader.SetModelMat(pfm::mat4(1.f));
-		skydome.shader.SetViewMat(clouds.camera.GetViewMatrix());
+		skydome.shader.SetViewMat(engine.camera.GetViewMatrix());
 		terrain.shader.SetModelMat(pfm::mat4(1.f));
-		terrain.shader.SetViewMat(clouds.camera.GetViewMatrix());
+		terrain.shader.SetViewMat(engine.camera.GetViewMatrix());
+
+		// Other
+		pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f, 0.f, 1.f));
+		float zenith = static_cast<float>(pfm::magnitude(engine.camera.position - pfm::vec3(0.f, skydome.radius, 0.f)));
 
 		// Draw
-		skydome.Draw(frames, clouds);
+		skydome.Draw(frames, engine, rotated_sun_mat, zenith);
 		glUseProgram(terrain.shader.program); // bin depth map texture to terrain shader
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
 		glUniform1i(glGetUniformLocation(skydome.shader.program, "texture_depth"), 0);
 		glUseProgram(0);
-		terrain.Draw(frames, clouds, skydome.depth_map_shader.GetProjMat(), skydome.depth_map_shader.GetViewMat(), skydome.radius);
+		terrain.Draw(frames, engine, skydome.depth_map_shader.GetProjMat(), skydome.depth_map_shader.GetViewMat(), zenith, rotated_sun_mat);
 
 			//Debug plane
 			debug_plane.shader.SetModelMat(pfm::mat4(1.f));
-			debug_plane.shader.SetViewMat(clouds.camera.GetViewMatrix());
+			debug_plane.shader.SetViewMat(engine.camera.GetViewMatrix());
 			glUseProgram(debug_plane.shader.program);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, skydome.depth_map_texture);
 			glUniform1i(glGetUniformLocation(debug_plane.shader.program, "texture1"), 0);
 			glUseProgram(0);
-			debug_plane.Draw(frames, clouds);
+			debug_plane.Draw(frames, engine);
 
 		ImGui::Render();// save DrawData
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); //send drawdata
-		glfwSwapBuffers(clouds.window);
+		glfwSwapBuffers(engine.window);
 		glfwPollEvents();
 		frames++;
 		// frames += 10;

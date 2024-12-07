@@ -16,22 +16,15 @@ class Terrain {
 		Terrain(size_t const size);
 		~Terrain();
 	 	Shader shader;
-		Shader depth_map_shader;
-		GLuint depth_map_FBO;
-		GLuint depth_map_texture;
 		FastNoiseLite noise;
 		size_t noise_size;
 
 		void SetupBuffers();
 		pfm::vec3 WhichBiome(float const e);
-		void InitDepthMap();
-		void DrawDepthMap(int frames, Engine & e);
 
-		inline void Draw(int const frames, Engine & e, pfm::mat4 proj_sun = pfm::mat4(1.f), pfm::mat4 view_sun = pfm::mat4(1.f), float const skydome_radius = 300.f)
+		inline void Draw(int const frames, Engine & e, pfm::mat4 proj_sun = pfm::mat4(1.f), pfm::mat4 view_sun = pfm::mat4(1.f), float const zenith = 1.f, pfm::mat4 rotated_sun_mat = pfm::mat4(1.f)) 
 		{
 			glUseProgram(shader.program);
-			pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f, 0.f, 1.f));
-			float zenith = static_cast<float>(pfm::magnitude(e.camera.position - pfm::vec3(0.f, skydome_radius, 0.f)));
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uRotatedSun"), 1, GL_FALSE, &rotated_sun_mat);
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uProjSun"), 1, GL_FALSE, &proj_sun);
 			glUniformMatrix4fv(glGetUniformLocation(shader.program, "uViewSun"), 1, GL_FALSE, &view_sun);
