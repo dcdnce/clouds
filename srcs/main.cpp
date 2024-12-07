@@ -54,7 +54,7 @@ int	main(void)
 	while (!glfwWindowShouldClose(engine.window)) {
 		engine.ComputeDeltaTime();
 		static int frames = 35000;
-		// static int frames = -25000;
+		// static int frames = 0;
 		ImGui_ImplGlfw_NewFrame();
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
@@ -106,7 +106,7 @@ int	main(void)
 		glfwPollEvents();
 		frames++;
 		// frames += 10;
-		// frames += 50;
+		frames += 50;
 	}
 
 	return (0);

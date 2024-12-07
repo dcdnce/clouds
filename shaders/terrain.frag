@@ -34,21 +34,6 @@ float CloudsShadowScalar()
 	return (shadow);
 }
 
-float TerrainShadow()
-{
-	// perform perspective divide
-	vec3 projCoords = fragPositionLightSpace.xyz / fragPositionLightSpace.w; //[-1;1]
-	projCoords = projCoords * 0.5 + 0.5; //[0;1]
-	// texture saved depth
-	float textureDepth = texture(texture_depth, projCoords.xy).r;
-	// current fragment depth
-	float currentDepth = projCoords.z;
-
-	//if currentDepth is less than textureDepth, the fragment is lit
-	float shadow = currentDepth - 0.005 < textureDepth ? 1.0 : 0.0;
-	return (shadow);
-}
-
 vec3 ACESFilm( vec3 x )
 {
     float tA = 2.51;
@@ -81,6 +66,7 @@ void main()
 
 	// Diffuse
 	float diffuse = clamp(dot(fragNormal, normalize(sun_position - vertexPosition)), 0.f, 1.f);
+	diffuse = pow(diffuse, 0.2f); //fake ambient light, diffuse not strong a high sun angle
 	float shadow = CloudsShadowScalar();
 	color *= shadow * (diffuse * diffuse);
 

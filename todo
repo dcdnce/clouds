@@ -1,6 +1,5 @@
 - Terrain
 	- Infinite terrain [?]
-	- Ambient light
 
 - Clouds
 	- cloud shadow don't line up
@@ -9,6 +8,7 @@
 - Autres
 	- Skydome - centrer sur camera position
 	- Walk
+	- Measure performance [?]
 	- Refactoriser / Optimiser
 	- Leaks
 	- Webassembly
