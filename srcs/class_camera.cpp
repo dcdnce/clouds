@@ -38,14 +38,18 @@ void Camera::_UpdateCameraVectors() noexcept
 void Camera::ProcessKeyboard(Camera_Movement direction, float delta_time) noexcept
 {
 	float velocity = movement_speed * delta_time;
-	if (direction == FORWARD)
+	if (direction == FORWARD) {
 		position += front * velocity;
-	if (direction == BACKWARD)
+	}
+	if (direction == BACKWARD) {
 		position -= front * velocity;
-	if (direction == LEFT)
+	}
+	if (direction == LEFT) {
 		position += right * velocity;
-	if (direction == RIGHT)
+	}
+	if (direction == RIGHT) {
 		position -= right * velocity;
+	}
 }
 
 // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -58,10 +62,12 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset) noexcept
 	pitch += yoffset;
 
 	//  when pitch  out of bounds, screen doesn't get flipped
-	if (pitch > 89.0f)
+	if (pitch > 89.0f) {
 		pitch = 89.0f;
-	if (pitch < -89.0f)
+	}
+	if (pitch < -89.0f) {
 		pitch = -89.0f;
+	}
 
 	_UpdateCameraVectors();
 }

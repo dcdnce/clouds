@@ -22,12 +22,13 @@ Engine::Engine(void) : framebuffer_width(0), framebuffer_height(0), window(NULL)
 
 Engine::~Engine(void)
 {
-	if (window)
+	if (window) {
 		glfwDestroyWindow(this->window);
+	}
 	glfwTerminate();
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 }
 
@@ -35,23 +36,29 @@ void	Engine::KeyCallback(GLFWwindow* w, int key, int scancode, int action, int m
 {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(w));
 
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(w, true);
-	if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS))
+	}
+	if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
 		engine->camera.ProcessKeyboard(FORWARD, engine->delta_time);
-	if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
+	}
+	if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
 		engine->camera.ProcessKeyboard(BACKWARD, engine->delta_time);
-	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
+	}
+	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
 		engine->camera.ProcessKeyboard(LEFT, engine->delta_time);
-	if (key == GLFW_KEY_D && (action == GLFW_REPEAT || action == GLFW_PRESS))
+	}
+	if (key == GLFW_KEY_D && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
 		engine->camera.ProcessKeyboard(RIGHT, engine->delta_time);
+	}
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-          isImGuiMouseCaptured = !isImGuiMouseCaptured;
+		isImGuiMouseCaptured = !isImGuiMouseCaptured;
 		if (isImGuiMouseCaptured) {
-            glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        } else {
-            glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        }
+			glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+		else {
+			glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
 	}
 
 	ImGui_ImplGlfw_MouseButtonCallback(w, key, action, mods);
@@ -62,7 +69,7 @@ void Engine::MouseCallback(GLFWwindow* w, double current_mouse_x, double current
 {
 	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(w));
 	if (!isImGuiMouseCaptured && !ImGui::GetIO().WantCaptureMouse) {
-	// if (!isImGuiMouseCaptured) {
+		// if (!isImGuiMouseCaptured) {
 		static bool first_mouse = true;
 		static float last_mouse_x;
 		static float last_mouse_y;

@@ -6,7 +6,7 @@
 Terrain::Terrain(size_t const size)
 {
 	noise_size = size;
-	_vertices = std::vector<Vertex>(size*size);
+	_vertices = std::vector<Vertex>(size * size);
 
 	noise.SetSeed(1337);
 	noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
@@ -24,7 +24,7 @@ Terrain::Terrain(size_t const size)
 
 pfm::vec3 Terrain::WhichBiome(float const e)
 {
-	if (e <= 0.3f){
+	if (e <= 0.3f) {
 		return (FOREST);
 	}
 	if (e < 0.5f) {
@@ -55,20 +55,22 @@ void Terrain::SetupBuffers()
 	for (size_t i = 0; i < noise_size - 1; ++i) {
 		for (size_t j = 0; j < noise_size - 1; ++j) {
 			size_t index = i * noise_size + j;
-			pfm::vec3 normal = pfm::normalize(pfm::cross(_vertices[index+1].position - _vertices[index].position, _vertices[index+noise_size].position - _vertices[index].position));
+			pfm::vec3 normal = pfm::normalize(pfm::cross(_vertices[index + 1].position - _vertices[index].position,
+			                                  _vertices[index + noise_size].position - _vertices[index].position));
 			_indices.push_back(index);
-			_indices.push_back(index+noise_size);
-			_indices.push_back(index+1);
+			_indices.push_back(index + noise_size);
+			_indices.push_back(index + 1);
 			_vertices[index].normal = normal;
-			_vertices[index+1].normal = normal;
-			_vertices[index+noise_size].normal = normal;
-			normal = pfm::normalize(pfm::cross(_vertices[index+noise_size].position - _vertices[index+1].position, _vertices[index+noise_size+1].position - _vertices[index+1].position));
-			_indices.push_back(index+1);
-			_indices.push_back(index+noise_size+1);
-			_indices.push_back(index+noise_size);
-			_vertices[index+1].normal = normal;
-			_vertices[index+noise_size].normal = normal;
-			_vertices[index+noise_size+1].normal = normal;
+			_vertices[index + 1].normal = normal;
+			_vertices[index + noise_size].normal = normal;
+			normal = pfm::normalize(pfm::cross(_vertices[index + noise_size].position - _vertices[index + 1].position,
+			                                   _vertices[index + noise_size + 1].position - _vertices[index + 1].position));
+			_indices.push_back(index + 1);
+			_indices.push_back(index + noise_size + 1);
+			_indices.push_back(index + noise_size);
+			_vertices[index + 1].normal = normal;
+			_vertices[index + noise_size].normal = normal;
+			_vertices[index + noise_size + 1].normal = normal;
 		}
 	}
 
@@ -79,9 +81,9 @@ void Terrain::SetupBuffers()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(GLuint), _indices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, normal)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, normal)));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, tex_coords)));
 	glEnableVertexAttribArray(3);

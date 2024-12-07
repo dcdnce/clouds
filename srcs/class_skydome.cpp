@@ -22,14 +22,14 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 	float pitch_increment = 90.f / static_cast<float>(num_rows);
 
 	size_t i = 0;
-	
+
 	// Top strip
 	for (float heading = 0.f; heading < 360.f ; heading += heading_increment) {
 		pfm::vec3 v0(0.f, radius, 0.f);  // Pole so same vertices
 		pfm::vec3 v1(0.f, radius, 0.f); // Pole so same vertices
 
 		pfm::vec3 v2 = pfm::sphericalToCartesian(radius, -pitch_increment, heading);
-		pfm::vec3 v3 = pfm::sphericalToCartesian(radius, -pitch_increment, heading+heading_increment);
+		pfm::vec3 v3 = pfm::sphericalToCartesian(radius, -pitch_increment, heading + heading_increment);
 
 		_vertices[i++].position = v0;
 		_vertices[i++].position = v1;
@@ -40,13 +40,13 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 		_vertices[i++].position = v2;
 	}
 
- 	// Regular strips
+	// Regular strips
 	for (float pitch = -90.f; pitch < -pitch_increment ; pitch += pitch_increment) {
 		for (float heading = 0.f; heading < 360.f ; heading += heading_increment) {
 			pfm::vec3 v0 = pfm::sphericalToCartesian(radius, pitch, heading);
-			pfm::vec3 v1 = pfm::sphericalToCartesian(radius, pitch, heading+heading_increment);
-			pfm::vec3 v2 = pfm::sphericalToCartesian(radius, pitch+pitch_increment, heading);
-			pfm::vec3 v3 = pfm::sphericalToCartesian(radius, pitch+pitch_increment, heading+heading_increment);
+			pfm::vec3 v1 = pfm::sphericalToCartesian(radius, pitch, heading + heading_increment);
+			pfm::vec3 v2 = pfm::sphericalToCartesian(radius, pitch + pitch_increment, heading);
+			pfm::vec3 v3 = pfm::sphericalToCartesian(radius, pitch + pitch_increment, heading + heading_increment);
 
 			assert(i + 6 <= _num_vertices);
 
@@ -62,9 +62,9 @@ void Skydome::ComputePositions(float const& radius, size_t const& num_rows, size
 
 	for (size_t i = 0 ; i < _vertices.size() ; i++) {
 		_vertices[i].color = {
-			static_cast<float>(rand()%255) / 255.f,
-			static_cast<float>(rand()%255) / 255.f,
-			static_cast<float>(rand()%255) / 255.f
+			static_cast<float>(rand() % 255) / 255.f,
+			static_cast<float>(rand() % 255) / 255.f,
+			static_cast<float>(rand() % 255) / 255.f
 		};
 	}
 }
@@ -139,8 +139,8 @@ void Skydome::InitDepthMap()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
@@ -156,7 +156,7 @@ void Skydome::InitDepthMap()
 	depth_map_shader.LoadShaders("./shaders/depth_map.vert", "./shaders/depth_map.frag");
 }
 
-void Skydome::DrawDepthMap(int frames, Engine & e)
+void Skydome::DrawDepthMap(int frames, Engine& e)
 {
 	glViewport(0, 0, 1024, 1024);
 	glBindFramebuffer(GL_FRAMEBUFFER, depth_map_FBO);
@@ -165,7 +165,8 @@ void Skydome::DrawDepthMap(int frames, Engine & e)
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_DEPTH_TEST);
-	pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f, 0.f, 1.f));
+	pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f,
+	                                        0.f, 1.f));
 	pfm::vec4 sp = rotated_sun_mat * pfm::vec4(e.sun_position.x, e.sun_position.y, e.sun_position.z, 1.f);
 	depth_map_shader.SetViewMat(pfm::lookAt(pfm::vec3(sp.x, sp.y, sp.z), e.camera.position, pfm::vec3(1.f, 0.f, 0.f)));
 	depth_map_shader.SetModelMat(pfm::mat4(1.f));

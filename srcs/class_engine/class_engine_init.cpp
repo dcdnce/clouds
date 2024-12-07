@@ -25,15 +25,16 @@ void	Engine::_InitWindow()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	#ifdef __APPLE__
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	#endif
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
-    // const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    // window = glfwCreateWindow(mode->width, mode->height, "clouds", glfwGetPrimaryMonitor(), NULL);
+	// const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	// window = glfwCreateWindow(mode->width, mode->height, "clouds", glfwGetPrimaryMonitor(), NULL);
 	window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "clouds", NULL, NULL);
-	if (window == NULL)
+	if (window == NULL) {
 		throw std::runtime_error("Failed to create glfw window");
+	}
 
 	glfwMakeContextCurrent(window);
 
@@ -42,13 +43,13 @@ void	Engine::_InitWindow()
 
 void Engine::_InitImGui()
 {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
 	ImGuiIO& imgui_io = ImGui::GetIO();
 	imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 void	Engine::_InitEvents()
@@ -57,8 +58,9 @@ void	Engine::_InitEvents()
 
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, Engine::MouseCallback);
-	if (glfwRawMouseMotionSupported())
+	if (glfwRawMouseMotionSupported()) {
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	}
 
 	glfwSetKeyCallback(window, Engine::KeyCallback);
 }
@@ -74,6 +76,7 @@ void	Engine::_InitGl()
 
 void	Engine::_InitGlad()
 {
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw std::runtime_error("Failed to initialize glad");
+	}
 }

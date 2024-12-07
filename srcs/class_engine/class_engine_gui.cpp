@@ -2,19 +2,19 @@
 
 void Engine::Gui()
 {
-    ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 
 	const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 650, main_viewport->WorkPos.y + 20), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(550, 680), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 650, main_viewport->WorkPos.y + 20), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(550, 680), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Clouds", nullptr, 0)) {
 		ImGui::End();
 		return ;
 	}
 
 	// Framerate
-    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::Text("TAB to change focus");
+	ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+	ImGui::Text("TAB to change focus");
 
 	// Infos header
 	if (ImGui::CollapsingHeader("Infos")) {
@@ -29,12 +29,15 @@ void Engine::Gui()
 		ImGui::Checkbox("Render", &clouds_render);
 		ImGui::SetNextItemWidth(100.f);
 		int old_clouds_type = clouds_type;
-		ImGui::RadioButton("Cumulus", &clouds_type, TYPE_CUMULUS); ImGui::SameLine();
+		ImGui::RadioButton("Cumulus", &clouds_type, TYPE_CUMULUS);
+		ImGui::SameLine();
 		ImGui::RadioButton("Cirrus", &clouds_type, TYPE_CIRRUS);
-		if (clouds_type != old_clouds_type) CloudsTypeCallback();
+		if (clouds_type != old_clouds_type) {
+			CloudsTypeCallback();
+		}
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::DragFloat("Smoothstep Edge Min", &clouds_smoothstep_edge_min, 0.05f, -4.f, 4.f);
-        ImGui::SetItemTooltip("Smoothstep redistributes noise value. The less the difference between the two values, the denser the clouds will appear.");
+		ImGui::SetItemTooltip("Smoothstep redistributes noise value. The less the difference between the two values, the denser the clouds will appear.");
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::DragFloat("Smoothstep Edge Max", &clouds_smoothstep_edge_max, 0.05f, -4.f, 4.f);
 		ImGui::SetNextItemWidth(100.f);

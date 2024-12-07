@@ -22,10 +22,12 @@ int	Shader::LoadShaders(char* const vertex_shader_path, char* const fragment_sha
 	GLuint		vertex_shader_ref;
 	GLuint		fragment_shader_ref;
 
-	if (!CreateShader(&vertex_shader_ref, GL_VERTEX_SHADER, vertex_shader_path))
+	if (!CreateShader(&vertex_shader_ref, GL_VERTEX_SHADER, vertex_shader_path)) {
 		return (0);
-	if (!CreateShader(&fragment_shader_ref, GL_FRAGMENT_SHADER, fragment_shader_path))
+	}
+	if (!CreateShader(&fragment_shader_ref, GL_FRAGMENT_SHADER, fragment_shader_path)) {
 		return (0);
+	}
 	program = glCreateProgram();
 	glAttachShader(program, vertex_shader_ref);
 	glAttachShader(program, fragment_shader_ref);
@@ -42,7 +44,8 @@ int	Shader::LoadShaders(char* const vertex_shader_path, char* const fragment_sha
 	return (ret_value);
 }
 
-int	Shader::LoadShaders(char* const vertex_shader_path, char* const geometry_shader_path, char* const fragment_shader_path)
+int	Shader::LoadShaders(char* const vertex_shader_path, char* const geometry_shader_path,
+                        char* const fragment_shader_path)
 {
 	int			ret_value = 1;
 	char		infoLog[512];
@@ -51,12 +54,15 @@ int	Shader::LoadShaders(char* const vertex_shader_path, char* const geometry_sha
 	GLuint		geometry_shader_ref;
 	GLuint		fragment_shader_ref;
 
-	if (!CreateShader(&vertex_shader_ref, GL_VERTEX_SHADER, vertex_shader_path))
+	if (!CreateShader(&vertex_shader_ref, GL_VERTEX_SHADER, vertex_shader_path)) {
 		return (0);
-	if (!CreateShader(&geometry_shader_ref, GL_GEOMETRY_SHADER, geometry_shader_path))
+	}
+	if (!CreateShader(&geometry_shader_ref, GL_GEOMETRY_SHADER, geometry_shader_path)) {
 		return (0);
-	if (!CreateShader(&fragment_shader_ref, GL_FRAGMENT_SHADER, fragment_shader_path))
+	}
+	if (!CreateShader(&fragment_shader_ref, GL_FRAGMENT_SHADER, fragment_shader_path)) {
 		return (0);
+	}
 	program = glCreateProgram();
 	glAttachShader(program, vertex_shader_ref);
 	glAttachShader(program, geometry_shader_ref);
@@ -86,8 +92,9 @@ static int	CreateShader(GLuint* shader_ref, GLenum type, const char* path)
 	// Vertex Shader
 	file.open(path);
 	if (file.is_open())
-		while (std::getline(file, tmp))
+		while (std::getline(file, tmp)) {
 			src += tmp + "\n";
+		}
 	else {
 		Logger::error(true) << "Shader class can't open shader file" << std::endl;
 		return (0);
