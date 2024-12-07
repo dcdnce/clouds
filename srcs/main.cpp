@@ -46,24 +46,28 @@ int	main(void)
 	// Terrain
 	Terrain terrain(1000);
 	terrain.shader.LoadShaders("./shaders/terrain.vert", "./shaders/terrain.frag");
+	terrain.SetupBuffers();
 	terrain.shader.SetProjMat(pfm::perspective(pfm::radians(90.f), (float)W_WIDTH / (float)W_HEIGHT, 0.1f, 10000.f));
 	// terrain.shader.SetProjMat(pfm::orthographic(-1000.f, 1000.f, -1000.f, 1000.f, 0.1f, 10000.f));
-	terrain.SetupBuffers();
 
 	// Main loop
 	while (!glfwWindowShouldClose(engine.window)) {
 		engine.ComputeDeltaTime();
-		static int frames = 0;
-		// static int frames = 25000;
+		static int frames = 35000;
 		// static int frames = -25000;
 		ImGui_ImplGlfw_NewFrame();
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui::NewFrame();
 		engine.Gui();
 
+		// Various data
+		int sun_frames = 35000 - (frames % 70000); // E to W loop
+		pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(sun_frames) * pfm::radians(0.001), pfm::vec3(0.f,
+		                                        0.f, 1.f));
+		float zenith = static_cast<float>(pfm::magnitude(engine.camera.position - pfm::vec3(0.f, skydome.radius, 0.f)));
+
 		// Depth maps
-		skydome.DrawDepthMap(frames, engine);
-		// terrain.DrawDepthMap(frames, engine);
+		skydome.DrawDepthMap(sun_frames, engine);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, W_WIDTH, W_HEIGHT);
@@ -75,11 +79,6 @@ int	main(void)
 		skydome.shader.SetViewMat(engine.camera.GetViewMatrix());
 		terrain.shader.SetModelMat(pfm::mat4(1.f));
 		terrain.shader.SetViewMat(engine.camera.GetViewMatrix());
-
-		// Other
-		pfm::mat4 rotated_sun_mat = pfm::rotate(pfm::mat4(1.f), static_cast<float>(frames) * pfm::radians(0.001), pfm::vec3(0.f,
-		                                        0.f, 1.f));
-		float zenith = static_cast<float>(pfm::magnitude(engine.camera.position - pfm::vec3(0.f, skydome.radius, 0.f)));
 
 		// Draw
 		skydome.Draw(frames, engine, rotated_sun_mat, zenith);
@@ -107,6 +106,7 @@ int	main(void)
 		glfwPollEvents();
 		frames++;
 		// frames += 10;
+		// frames += 50;
 	}
 
 	return (0);

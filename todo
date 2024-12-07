@@ -1,15 +1,12 @@
-- Gui
-	- Regrouper uniforms/data
-
 - Terrain
 	- Infinite terrain [?]
+	- Ambient light
 
 - Clouds
 	- cloud shadow don't line up
 	- good cloud color at sunset
 
 - Autres
-	- E to W and W to E
 	- Skydome - centrer sur camera position
 	- Walk
 	- Refactoriser / Optimiser
